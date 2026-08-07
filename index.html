@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu — Emma's Place | Coffee &amp; More | Plateau, Praia</title>
+<meta name="description" content="Menu completo do Emma's Place — cafés, matcha, coco, sumos naturais, tostas, wraps, poke bowls e combos. Plateau, Av. Amílcar Cabral (frente BAI/IMPAR), Praia. Encomendas: 989 53 24.">
+<meta property="og:title" content="Menu — Emma's Place | Coffee &amp; More">
+<meta property="og:description" content="Cafés, matcha, coco, sumos naturais, tostas, wraps e poke bowls. Plateau, Praia. Entregas grátis acima de 750$.">
+<meta property="og:image" content="assets/matcha1.jpg">
+<meta property="og:type" content="restaurant.menu">
+<link rel="icon" href="assets/logo.jpg">
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"CafeOrCoffeeShop",
+  "name":"Emma's Place | Coffee & More",
+  "image":"assets/logo.jpg",
+  "telephone":"+2389895324",
+  "servesCuisine":["Café","Pequeno-almoço","Almoço"],
+  "priceRange":"85–700 ECV",
+  "address":{"@type":"PostalAddress","streetAddress":"Av. Amílcar Cabral, Plateau (frente BAI/IMPAR)","addressLocality":"Praia","addressCountry":"CV"},
+  "openingHoursSpecification":[
+    {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"08:00","closes":"17:00"},
+    {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:00","closes":"15:00"}
+  ],
+  "hasMenu":{"@type":"Menu","url":"menu-emmas-place.pdf"}
+}
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Jost:wght@300;400;500;600&family=Caveat:wght@600&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --cream:#F3ECDD; --card:#FBF7EE; --line:#E5D9C2; --dot:#CBB693;
+  --ink:#3B2314; --ink2:#7A5A3C; --gold:#C89B6D; --dark:#2E2018; --green:#22301B;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--cream);color:var(--ink);font-family:'Jost',system-ui,sans-serif;
+  -webkit-text-size-adjust:100%;padding-bottom:86px;}
+.wrap{max-width:1080px;margin:0 auto;padding:26px 16px 20px;}
+
+/* HEADER */
+header{text-align:center;padding-top:8px;}
+header img.logo{width:104px;height:104px;border-radius:50%;border:3px solid var(--gold);
+  object-fit:cover;background:#fff;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(30px,8vw,50px);
+  letter-spacing:3px;margin-top:12px;line-height:1.05;}
+header .tag{font-family:'Caveat',cursive;font-size:clamp(20px,5vw,30px);color:#8B5E3C;margin-top:2px;}
+header .rule{width:160px;height:3px;background:var(--gold);margin:12px auto 8px;border-radius:2px;}
+header .mt{font-size:clamp(15px,4vw,22px);letter-spacing:9px;font-weight:600;}
+header .loc{font-size:14.5px;color:#6E4B2F;margin-top:8px;line-height:1.6;}
+header .loc a{color:#6E4B2F;}
+
+/* ACÇÕES */
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 4px;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:40px;
+  font-size:15.5px;font-weight:600;text-decoration:none;border:2px solid var(--dark);}
+.btn-p{background:var(--dark);color:#F7F1E4;}
+.btn-s{background:transparent;color:var(--dark);}
+.btn:active{transform:translateY(1px);}
+
+/* HERO */
+.hero{background:var(--green);border-radius:20px;padding:22px 16px 18px;margin:22px 0;}
+.hero h2{font-family:'Caveat',cursive;font-size:clamp(34px,9vw,52px);color:#F7F1E4;
+  text-align:center;line-height:1;}
+.hero .sub{text-align:center;font-size:12.5px;letter-spacing:3px;color:#B9CE8F;
+  font-weight:600;margin-top:4px;}
+.hgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
+.hcell{background:#2E4023;border-radius:14px;overflow:hidden;}
+.hcell img{width:100%;height:170px;object-fit:cover;display:block;}
+.hcell .in{padding:10px 10px 12px;text-align:center;color:#F7F1E4;}
+.hcell .n{font-size:14.5px;font-weight:600;line-height:1.3;min-height:38px;}
+.hcell .p{font-family:'Playfair Display',serif;font-size:19px;font-weight:800;color:#D7B77E;margin-top:4px;}
+.hcell .mg{font-size:11.5px;color:#B9CE8F;letter-spacing:1px;}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:1fr;gap:18px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+.card img.banner{width:100%;height:150px;object-fit:cover;display:block;}
+.card .in{padding:16px 18px 18px;}
+.ribbon{display:inline-block;background:var(--dark);color:#F7F1E4;font-weight:600;
+  font-size:16px;letter-spacing:2px;padding:7px 18px;border-radius:6px 16px 6px 16px;margin-bottom:8px;}
+.sizes{display:flex;justify-content:flex-end;font-size:12px;letter-spacing:2px;
+  color:#8B5E3C;font-weight:600;}
+.sizes span{width:46px;text-align:right;}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  padding:7px 0;font-size:16.5px;border-bottom:1px dotted var(--dot);}
+.row:last-of-type{border-bottom:none;}
+.row .d{font-size:13.5px;color:var(--ink2);font-weight:300;display:block;}
+.price{font-weight:600;white-space:nowrap;}
+.price em{font-style:normal;color:#8B5E3C;}
+.note{font-size:13.5px;color:var(--ink2);font-weight:300;margin-top:9px;
+  border-top:1px solid var(--line);padding-top:8px;}
+
+/* COMBOS */
+.combos{background:var(--dark);border-radius:18px;padding:20px 16px 8px;margin:18px 0;}
+.combos .ribbon{background:var(--gold);color:var(--dark);}
+.cgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px;}
+.combo{background:#3B2A1E;border-radius:12px;padding:12px 13px;color:#F7F1E4;}
+.combo .cn{font-size:14px;font-weight:600;letter-spacing:.5px;}
+.combo .ci{font-size:12.5px;color:#D9C7A8;font-weight:300;margin-top:2px;}
+.combo .cp{font-family:'Playfair Display',serif;font-size:21px;font-weight:800;color:var(--gold);margin-top:5px;}
+.combo.full{grid-column:1/-1;text-align:center;}
+
+/* MILK */
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.mitem{background:var(--cream);border:1px solid var(--line);border-radius:10px;
+  padding:9px 4px;text-align:center;}
+.mitem b{display:block;font-size:14px;}
+.mitem span{font-size:12.5px;color:var(--ink2);}
+
+/* INFO */
+.info{background:var(--dark);color:#F7F1E4;border-radius:18px;padding:22px 20px;text-align:center;}
+.info .big{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--gold);}
+.info .sm{font-size:14.5px;color:#D9C7A8;margin-top:4px;font-weight:300;line-height:1.7;}
+.info a{color:var(--gold);}
+footer{text-align:center;font-size:12.5px;color:var(--ink2);padding:20px 0 8px;font-weight:300;}
+
+/* BARRA FIXA */
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(46,32,24,.97);
+  padding:11px 14px;display:flex;gap:9px;justify-content:center;
+  box-shadow:0 -3px 16px rgba(0,0,0,.22);z-index:50;}
+.bar a{flex:1;max-width:260px;text-align:center;padding:13px 8px;border-radius:40px;
+  font-size:15px;font-weight:600;text-decoration:none;}
+.bar .wa{background:#25D366;color:#08320F;}
+.bar .cl{background:var(--gold);color:var(--dark);}
+
+@media(min-width:720px){
+  .cards{grid-template-columns:1fr 1fr;}
+  .hgrid{grid-template-columns:repeat(4,1fr);}
+  .cgrid{grid-template-columns:repeat(3,1fr);}
+  .mgrid{grid-template-columns:repeat(6,1fr);}
+  .card img.banner{height:170px;}
+  .hcell img{height:200px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <img class="logo" src="assets/logo.jpg" alt="Emma's Place — Coffee &amp; More">
+  <h1>EMMA'S PLACE</h1>
+  <div class="tag">Coffee &amp; More — sabores que acolhem, momentos que ficam.</div>
+  <div class="rule"></div>
+  <div class="mt">MENU</div>
+  <div class="loc">
+    Plateau — Av. Amílcar Cabral (frente BAI/IMPAR), Praia<br>
+    Seg–Sex 08h–17h · Sáb 09h–15h
+  </div>
+  <div class="actions">
+    <a class="btn btn-p" href="https://wa.me/2389895324?text=Ol%C3%A1%20Emma's%20Place!%20Queria%20fazer%20uma%20encomenda%3A%20" target="_blank" rel="noopener">Encomendar no WhatsApp</a>
+    <a class="btn btn-s" href="menu-emmas-place.pdf" download>Descarregar menu (PDF)</a>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>Novidade!</h2>
+  <div class="sub">MATCHA &amp; COCO · PROVA. SENTE. REPETE.</div>
+  <div class="hgrid">
+    <div class="hcell"><img src="assets/matcha1.jpg" alt="Iced Matcha Latte" loading="lazy">
+      <div class="in"><div class="n">Iced Matcha Latte</div><div class="p">400 · 450</div><div class="mg">M · G</div></div></div>
+    <div class="hcell"><img src="assets/matcha2.jpg" alt="Matcha Crème Frappuccino" loading="lazy">
+      <div class="in"><div class="n">Matcha Crème Frappuccino</div><div class="p">450 · 500</div><div class="mg">M · G</div></div></div>
+    <div class="hcell"><img src="assets/coco1.jpg" alt="Raw Coconut Latte" loading="lazy">
+      <div class="in"><div class="n">Raw Coconut Latte</div><div class="p">450 · 500</div><div class="mg">M · G</div></div></div>
+    <div class="hcell"><img src="assets/coco2.jpg" alt="Iced Caramel Macchiato com leite de coco" loading="lazy">
+      <div class="in"><div class="n">Iced Caramel Macchiato c/ coco</div><div class="p">450 · 500</div><div class="mg">M · G</div></div></div>
+  </div>
+</section>
+
+<div class="cards">
+
+  <div class="card">
+    <div class="in">
+      <div class="ribbon">BEBIDAS DE CAFÉS</div>
+      <div class="sizes"><span>M</span><span>G</span></div>
+      <div class="row"><span>Espresso</span><span class="price">85</span></div>
+      <div class="row"><span>Espresso Duplo</span><span class="price">150</span></div>
+      <div class="row"><span>Americano</span><span class="price">120 <em>· 150</em></span></div>
+      <div class="row"><span>Cappuccino</span><span class="price">140 <em>· 180</em></span></div>
+      <div class="row"><span>Latte Clássico <span class="d">meia de leite</span></span><span class="price">130 <em>· 170</em></span></div>
+      <div class="row"><span>Mocha Chocolate</span><span class="price">170 <em>· 190</em></span></div>
+      <div class="row"><span>Caramelo Latte</span><span class="price">180 <em>· 200</em></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <img class="banner" src="assets/frape.jpg" alt="Frape" loading="lazy">
+    <div class="in">
+      <div class="ribbon">BEBIDAS FRIAS</div>
+      <div class="sizes"><span>M</span><span>G</span></div>
+      <div class="row"><span>Iced Latte</span><span class="price">175 <em>· 200</em></span></div>
+      <div class="row"><span>Iced Caramelo Latte</span><span class="price">275 <em>· 300</em></span></div>
+      <div class="row"><span>Café Instantâneo Gelado</span><span class="price">225 <em>· 250</em></span></div>
+      <div class="row"><span>Frape Chocolate</span><span class="price">275 <em>· 300</em></span></div>
+      <div class="row"><span>Frape Caramelo</span><span class="price">300 <em>· 325</em></span></div>
+      <div class="row"><span>Frape Clássico</span><span class="price">225 <em>· 250</em></span></div>
+      <div class="row"><span>Iced Mocha</span><span class="price">275 <em>· 300</em></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <img class="banner" src="assets/sumo.jpg" alt="Sumos naturais" loading="lazy">
+    <div class="in">
+      <div class="ribbon">SUMOS NATURAIS</div>
+      <div class="row"><span>Laranja</span><span class="price">350</span></div>
+      <div class="row"><span>Manga</span><span class="price">450</span></div>
+      <div class="row"><span>Papaia</span><span class="price">350</span></div>
+      <div class="row"><span>Ananás</span><span class="price">375</span></div>
+      <div class="row"><span>Maçã</span><span class="price">350</span></div>
+      <div class="note">Feitos na hora · Extras: gengibre ou hortelã <b>+50</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <img class="banner" src="assets/sweets.jpg" alt="Donuts e muffins" loading="lazy">
+    <div class="in">
+      <div class="ribbon">DONUTS &amp; MUFFINS</div>
+      <div class="row"><span>Donut Chocolate</span><span class="price">135</span></div>
+      <div class="row"><span>Donut Doce de Leite</span><span class="price">120</span></div>
+      <div class="row"><span>Muffin Chocolate</span><span class="price">100</span></div>
+      <div class="row"><span>Muffin Laranja</span><span class="price">95</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <img class="banner" src="assets/pao.jpg" alt="Pão recheado" loading="lazy">
+    <div class="in">
+      <div class="ribbon">MERENDA &amp; PÃO RECHEADO</div>
+      <div class="row"><span>Merenda Mista <span class="d">fiambre, queijo</span></span><span class="price">150</span></div>
+      <div class="row"><span>Merenda de Chouriço <span class="d">chouriço, queijo</span></span><span class="price">140</span></div>
+      <div class="row"><span>Pão Rech. Frango <span class="d">rúcula, queijo, tomate</span></span><span class="price">190</span></div>
+      <div class="row"><span>Pão Rech. Atum <span class="d">queijo, tomate</span></span><span class="price">190</span></div>
+      <div class="row"><span>Pão Rech. Caprese <span class="d">queijo, tomate, molho pesto</span></span><span class="price">180</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <img class="banner" src="assets/wrap.jpg" alt="Wraps e tostas" loading="lazy">
+    <div class="in">
+      <div class="ribbon">TOSTAS &amp; WRAPS</div>
+      <div class="row"><span>Tosta Mista</span><span class="price">180</span></div>
+      <div class="row"><span>Tosta Fiambre</span><span class="price">160</span></div>
+      <div class="row"><span>Tosta Queijo</span><span class="price">160</span></div>
+      <div class="row"><span>Tosta com Manteiga</span><span class="price">120</span></div>
+      <div class="row"><span>Wrap de Frango</span><span class="price">400</span></div>
+      <div class="row"><span>Wrap de Atum</span><span class="price">400</span></div>
+      <div class="note">Feitas na hora · Alergias ou intolerâncias? Informe-nos antes de pedir!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <img class="banner" src="assets/poke_frango.jpg" alt="Poke bowl" loading="lazy">
+    <div class="in">
+      <div class="ribbon">ALMOÇO</div>
+      <div class="row"><span>Salada Fria de Frango <span class="d">massa espiral, legumes, molho leve</span></span><span class="price">420</span></div>
+      <div class="row"><span>Salada Fria de Atum <span class="d">massa espiral, legumes, molho leve</span></span><span class="price">420</span></div>
+      <div class="row"><span>Sopa do Dia <span class="d">pergunte a opção!</span></span><span class="price">300</span></div>
+      <div class="row"><span>Poke Bowl Frango</span><span class="price">600</span></div>
+      <div class="row"><span>Poke Bowl Atum</span><span class="price">700</span></div>
+      <div class="row"><span>Poke Bowl Salmão</span><span class="price">700</span></div>
+      <div class="note">Poke bowls servidos com molho especial</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="in">
+      <div class="ribbon">PERSONALIZE O SEU LEITE</div>
+      <div class="mgrid">
+        <div class="mitem"><b>Normal</b><span>incluído</span></div>
+        <div class="mitem"><b>Aveia</b><span>+100</span></div>
+        <div class="mitem"><b>Coco</b><span>+100</span></div>
+        <div class="mitem"><b>Soja</b><span>+100</span></div>
+        <div class="mitem"><b>Amêndoa</b><span>+100</span></div>
+        <div class="mitem"><b>S/ Lactose</b><span>+100</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<section class="combos">
+  <div class="ribbon">COMBOS QUE COMBINAM COM VOCÊ ♡</div>
+  <div class="cgrid">
+    <div class="combo"><div class="cn">PEQUENO-ALMOÇO</div><div class="ci">café + muffin</div><div class="cp">180</div></div>
+    <div class="combo"><div class="cn">LANCHE</div><div class="ci">bebida fria + donut</div><div class="cp">370</div></div>
+    <div class="combo"><div class="cn">SOPA E PÃO</div><div class="ci">sopa + sandes</div><div class="cp">420</div></div>
+    <div class="combo"><div class="cn">ALMOÇO LEVE</div><div class="ci">sandes + sumo</div><div class="cp">480</div></div>
+    <div class="combo"><div class="cn">SALADA E PÃO</div><div class="ci">salada + sandes</div><div class="cp">500</div></div>
+    <div class="combo"><div class="cn">SALADA E SUMO</div><div class="ci">salada + sumo natural</div><div class="cp">570</div></div>
+    <div class="combo full"><div class="cn">SUPER COMBO</div><div class="ci">sopa + sandes + bebida</div><div class="cp">700</div></div>
+  </div>
+</section>
+
+<section class="info">
+  <div class="big">ENTREGAS GRÁTIS</div>
+  <div class="sm">
+    para pedidos acima de 750$<br>
+    Encomendas &amp; entregas: <a href="tel:+2389895324">989 53 24</a><br>
+    Plateau — frente BAI/IMPAR · <a href="https://instagram.com/emmasplace.cv" target="_blank" rel="noopener">@emmasplace.cv</a>
+  </div>
+</section>
+
+<footer>Preços em ECV · Imagens meramente ilustrativas</footer>
+</div>
+
+<nav class="bar">
+  <a class="wa" href="https://wa.me/2389895324?text=Ol%C3%A1%20Emma's%20Place!%20Queria%20fazer%20uma%20encomenda%3A%20" target="_blank" rel="noopener">Encomendar</a>
+  <a class="cl" href="tel:+2389895324">Ligar 989 53 24</a>
+</nav>
+</body>
+</html>

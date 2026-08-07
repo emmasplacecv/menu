@@ -1,0 +1,43 @@
+EMMA'S PLACE — SITE DO MENU
+============================
+
+CONTEUDO
+  index.html ............ a pagina do menu
+  assets/ ............... imagens
+  menu-emmas-place.pdf .. menu em PDF para download
+
+PUBLICAR NO GITHUB PAGES (gratis, permanente)
+---------------------------------------------
+1. Criar conta em github.com (se ainda nao tiver).
+   Sugestao de nome de utilizador: emmasplace
+
+2. Criar repositorio novo:
+   - Nome: menu
+   - Marcar "Public"
+   - Criar
+
+3. Carregar os ficheiros:
+   - "Add file" > "Upload files"
+   - Arrastar index.html, a pasta assets e o PDF
+   - "Commit changes"
+
+4. Activar o site:
+   - Separador "Settings" > menu lateral "Pages"
+   - Em "Branch" escolher "main" e pasta "/ (root)"
+   - "Save"
+
+5. Aguardar 1-2 minutos. O endereco fica:
+   https://SEU-UTILIZADOR.github.io/menu
+
+   Exemplo: https://emmasplace.github.io/menu
+
+ACTUALIZAR PRECOS NO FUTURO
+---------------------------
+Abrir o index.html no GitHub, clicar no lapis (editar),
+alterar o numero, "Commit changes". O site actualiza sozinho
+em cerca de 1 minuto. O ENDERECO NUNCA MUDA.
+
+DOMINIO PROPRIO (opcional, mais tarde)
+--------------------------------------
+Se comprar um dominio (ex: emmasplace.cv), pode liga-lo
+em Settings > Pages > Custom domain, sem perder nada.
