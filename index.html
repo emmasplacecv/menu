@@ -71,6 +71,14 @@ header .loc{font-size:14px;color:#6E4B2F;margin-top:8px;line-height:1.6;}
 .add:active{transform:scale(.92);}
 .qbadge{width:36px;height:36px;flex:none;border-radius:50%;background:var(--wa);color:#08320F;
  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;cursor:pointer;border:none;font-family:inherit;}
+.it.blk{opacity:.5;}
+.it .only{color:#A33;font-weight:400;}
+.noadd{width:36px;height:36px;flex:none;border-radius:50%;border:2px dashed var(--dot);
+ display:flex;align-items:center;justify-content:center;color:var(--dot);font-size:15px;}
+.modebox{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:14px;margin-top:16px;text-align:center;}
+.modebox .mlbl{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin-bottom:9px;}
+.modebox .chips{justify-content:center;}
+.modebox .mnote{font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.5;font-weight:300;}
 .note{font-size:13px;color:var(--ink2);font-weight:300;margin-top:9px;border-top:1px solid var(--line);padding-top:8px;}
 
 .combos{background:var(--dark);border-radius:18px;padding:18px 14px 8px;margin:18px 0;}
@@ -168,6 +176,14 @@ textarea.fld{min-height:74px;resize:vertical;}
     <a class="btn btn-s" href="menu-emmas-place.pdf" download>Descarregar menu (PDF)</a>
     <a class="btn btn-p" href="tel:+2389895324">Ligar 989 53 24</a>
   </div>
+  <div class="modebox">
+    <div class="mlbl">COMO QUER RECEBER?</div>
+    <div class="chips" id="topChips">
+      <button class="chip sel" onclick="setMode('recolha')">Recolher no local</button>
+      <button class="chip" onclick="setMode('entrega')">Entrega</button>
+    </div>
+    <div class="mnote" id="modeNote">Levanta na carrinha, no Plateau (frente BAI/IMPAR).</div>
+  </div>
   <div class="hint">Toque no <b>+</b> ao lado de cada produto para montar a sua encomenda. No fim, enviamos tudo pelo WhatsApp.</div>
 </header>
 
@@ -251,10 +267,13 @@ textarea.fld{min-height:74px;resize:vertical;}
 
   <div class="lbl">HORA</div>
   <div class="chips" id="timeChips">
-    <button class="chip sel" data-t="Assim que possível" onclick="setTime(this)">Assim que possível</button>
-    <button class="chip" data-t="Hora marcada" onclick="setTime(this)">Hora marcada</button>
+    <button class="chip sel" data-t="asap" onclick="setTime(this)">Assim que possível</button>
+    <button class="chip" data-t="marcada" onclick="setTime(this)">Hora marcada</button>
   </div>
-  <input class="fld" id="fTime" placeholder="Ex: às 12h30" style="display:none">
+  <div id="slotBox" style="display:none">
+    <select class="fld" id="fSlot" onchange="slotVal=this.value"></select>
+    <div id="slotMsg" style="font-size:13px;margin-top:7px;color:var(--ink2)"></div>
+  </div>
 
   <div class="lbl">NOTAS (opcional)</div>
   <textarea class="fld" id="fNotes" placeholder="Alergias, sem açúcar, ponto de referência…"></textarea>
@@ -274,7 +293,7 @@ textarea.fld{min-height:74px;resize:vertical;}
 const LEITES=[["Normal",0],["Aveia",100],["Coco",100],["Soja",100],["Amêndoa",100],["Sem lactose",100]];
 const MENU=[
  {cat:"BEBIDAS DE CAFÉS",milk:true,items:[
-  {n:"Espresso",p:85},{n:"Espresso Duplo",p:150},{n:"Americano",p:120,g:150},
+  {n:"Espresso",p:85,nm:1,nd:1},{n:"Espresso Duplo",p:150,nm:1},{n:"Americano",p:120,g:150,nm:1},
   {n:"Cappuccino",p:140,g:180},{n:"Latte Clássico",d:"meia de leite",p:130,g:170},
   {n:"Mocha Chocolate",p:170,g:190},{n:"Caramelo Latte",p:180,g:200}]},
 
@@ -319,7 +338,7 @@ const COMBOS=[
 const TEL="2389895324", FREE=750;
 
 /* ---------- ESTADO ---------- */
-let cart=[], mode="recolha", geo=null, timeMode="Assim que possível";
+let cart=[], mode="recolha", geo=null, timeMode="asap", slotVal="";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
@@ -330,11 +349,14 @@ function build(){
   return `<div class="card">${c.img?`<img class="banner" src="${c.img}" alt="${c.cat}" loading="lazy">`:""}
    <div class="in"><div class="ribbon">${c.cat}</div>
    ${hasG?'<div class="sizes"><span>M</span><span>G</span></div>':""}
-   ${c.items.map((i,ii)=>`<div class="it">
-     <div class="nm">${i.n}${i.d?`<small>${i.d}</small>`:""}</div>
+   ${c.items.map((i,ii)=>{
+     const blocked = (mode==="entrega" && i.nd);
+     return `<div class="it${blocked?" blk":""}">
+     <div class="nm">${i.n}${i.d?`<small>${i.d}</small>`:""}${blocked?`<small class="only">Apenas no local — não entregamos</small>`:""}</div>
      <div class="pr">${i.p}${i.g?` <em>· ${i.g}</em>`:""}</div>
-     <button class="add" onclick="pick(${ci},${ii})" aria-label="Adicionar ${i.n}">+</button>
-   </div>`).join("")}
+     ${blocked?`<span class="noadd" title="Não disponível para entrega">✕</span>`
+              :`<button class="add" onclick="pick(${ci},${ii})" aria-label="Adicionar ${i.n}">+</button>`}
+   </div>`}).join("")}
    ${c.note?`<div class="note">${c.note}</div>`:""}</div></div>`;
  }).join("");
 
@@ -355,7 +377,7 @@ function pick(ci,ii){
  if(i.g) h+=`<div class="lbl">TAMANHO</div><div class="chips" id="szC">
    <button class="chip sel" onclick="setSize('M',this)">Médio · ${i.p}</button>
    <button class="chip" onclick="setSize('G',this)">Grande · ${i.g}</button></div>`;
- if(c.milk) h+=`<div class="lbl">LEITE</div><div class="chips" id="mkC">`+
+ if(c.milk && !i.nm) h+=`<div class="lbl">LEITE</div><div class="chips" id="mkC">`+
    LEITES.map((m,k)=>`<button class="chip${k===0?" sel":""}" onclick="setMilk('${m[0]}',this)">${m[0]}${m[1]?` +${m[1]}`:""}</button>`).join("")+`</div>`;
  if(c.extras) h+=`<div class="lbl">EXTRAS</div><div class="chips">`+
    c.extras.map(e=>`<button class="chip" onclick="tglEx('${e[0]}',${e[1]},this)">${e[0]} +${e[1]}</button>`).join("")+`</div>`;
@@ -373,17 +395,17 @@ function confirmAdd(){
  const i=cur.item;
  let price=(cur.size==="G")?i.g:i.p, opts=[];
  if(cur.size) opts.push(cur.size==="G"?"Grande":"Médio");
- if(cur.cat.milk&&cur.milk!=="Normal"){const m=LEITES.find(l=>l[0]===cur.milk);price+=m[1];opts.push("leite "+cur.milk.toLowerCase());}
+ if(cur.cat.milk&&!cur.item.nm&&cur.milk!=="Normal"){const m=LEITES.find(l=>l[0]===cur.milk);price+=m[1];opts.push("leite "+cur.milk.toLowerCase());}
  cur.extras.forEach(e=>{price+=e[1];opts.push(e[0].toLowerCase());});
- addToCart(i.n,price,opts);
+ addToCart(i.n,price,opts,i.nd);
  closeAll(); openCart();
 }
 function addCombo(k){const c=COMBOS[k];addToCart("Combo "+c.n,c.p,[c.d]);openCart();}
 
-function addToCart(name,price,opts){
+function addToCart(name,price,opts,nd){
  const key=name+"|"+opts.join(",");
  const ex=cart.find(x=>x.key===key);
- if(ex) ex.q++; else cart.push({key,name,price,opts,q:1});
+ if(ex) ex.q++; else cart.push({key,name,price,opts,q:1,nd:nd||0});
  refresh();
 }
 function chg(k,d){
@@ -419,14 +441,61 @@ function totalsHTML(){
 
 /* ---------- CHECKOUT ---------- */
 function setMode(m){
+ // Espresso nao vai para entrega: avisar e retirar do carrinho
+ if(m==="entrega"){
+  const bloq=cart.filter(i=>i.nd);
+  if(bloq.length){
+   if(!confirm("O Espresso só está disponível para levantamento no local.\n\nAo escolher entrega, será retirado do seu pedido. Continuar?")) return;
+   cart=cart.filter(i=>!i.nd); refresh(); renderCart();
+  }
+ }
  mode=m;
+ document.querySelectorAll("#topChips .chip").forEach((c,k)=>c.classList.toggle("sel",(k===0)===(m==="recolha")));
  document.querySelectorAll("#modeChips .chip").forEach(c=>c.classList.toggle("sel",c.dataset.mode===m));
- $("deliveryBox").style.display=(m==="entrega")?"block":"none";
+ const dbox=$("deliveryBox"); if(dbox) dbox.style.display=(m==="entrega")?"block":"none";
+ $("modeNote").innerHTML=(m==="entrega")
+  ? "Entregamos em Praia. Entrega grátis acima de 750$. <b>O Espresso não está disponível para entrega.</b>"
+  : "Levanta na carrinha, no Plateau (frente BAI/IMPAR).";
+ build();               // menu adapta-se ao modo
+ fillSlots();
 }
 function setTime(el){
  timeMode=el.dataset.t;
  el.parentNode.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel"));el.classList.add("sel");
- $("fTime").style.display=(timeMode==="Hora marcada")?"block":"none";
+ $("slotBox").style.display=(timeMode==="marcada")?"block":"none";
+ if(timeMode==="marcada") fillSlots();
+}
+
+/* Horarios: recolha a partir de +10min, entrega a partir de +30min, de 5 em 5 */
+function fillSlots(){
+ const sel=$("fSlot"); if(!sel) return;
+ const ahead = (mode==="entrega")?30:10;
+ const now=new Date();
+ const d=new Date(now.getTime()+ahead*60000);
+ d.setSeconds(0,0);
+ d.setMinutes(d.getMinutes()+((5-d.getMinutes()%5)%5));   // arredondar ao proximo multiplo de 5
+ const day=now.getDay();                                   // 0=domingo, 6=sabado
+ const close=new Date(now);
+ close.setHours(day===6?15:17,0,0,0);
+ const out=[];
+ if(day!==0){
+  const t=new Date(d);
+  while(t<=close && out.length<200){
+   out.push(("0"+t.getHours()).slice(-2)+":"+("0"+t.getMinutes()).slice(-2));
+   t.setMinutes(t.getMinutes()+5);
+  }
+ }
+ if(!out.length){
+  sel.innerHTML='<option value="">Sem horas disponíveis hoje</option>';
+  slotVal="";
+  $("slotMsg").textContent="Não há mais horas disponíveis hoje. Envie o pedido e confirmamos a hora por WhatsApp.";
+ }else{
+  sel.innerHTML=out.map(o=>`<option value="${o}">${o}</option>`).join("");
+  slotVal=out[0];
+  $("slotMsg").textContent=(mode==="entrega")
+   ? "Entregas com hora marcada a partir de 30 minutos."
+   : "Levantamento com hora marcada a partir de 10 minutos.";
+ }
 }
 function getGeo(){
  if(!navigator.geolocation){$("geoMsg").textContent="O seu telemóvel não permite partilhar localização.";return;}
@@ -460,7 +529,7 @@ function sendWA(){
   if(addr) L.push("Morada: "+addr);
   if(geo) L.push("Localização: https://maps.google.com/?q="+geo);
  }
- L.push("Quando: "+(timeMode==="Hora marcada"&&$("fTime").value.trim()?$("fTime").value.trim():"assim que possível"));
+ L.push("Quando: "+((timeMode==="marcada"&&slotVal)?("hora marcada — "+slotVal):"assim que possível"));
  const nt=$("fNotes").value.trim();
  if(nt) L.push("Notas: "+nt);
  window.open("https://wa.me/"+TEL+"?text="+encodeURIComponent(L.join("\n")),"_blank");
@@ -471,7 +540,7 @@ function show(id){closeAll();$("ov").classList.add("on");$(id).classList.add("on
 function closeAll(){$("ov").classList.remove("on");
  ["optSheet","cartSheet","chkSheet"].forEach(i=>$(i).classList.remove("on"));document.body.style.overflow="";}
 function openCart(){renderCart();show("cartSheet");}
-function openCheckout(){if(!cart.length)return;$("chkTotals").innerHTML=totalsHTML();show("chkSheet");}
+function openCheckout(){if(!cart.length)return;$("chkTotals").innerHTML=totalsHTML();fillSlots();show("chkSheet");}
 
 build(); refresh();
 </script>
