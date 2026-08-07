@@ -75,6 +75,13 @@ header .loc{font-size:14px;color:#6E4B2F;margin-top:8px;line-height:1.6;}
 .it .only{color:#A33;font-weight:400;}
 .noadd{width:36px;height:36px;flex:none;border-radius:50%;border:2px dashed var(--dot);
  display:flex;align-items:center;justify-content:center;color:var(--dot);font-size:15px;}
+.again{background:var(--green);border-radius:16px;padding:13px 14px;margin-top:16px;color:#F7F1E4;text-align:left;}
+.again .agtop{display:flex;justify-content:space-between;align-items:center;}
+.again .aglbl{font-size:11.5px;letter-spacing:2px;font-weight:600;color:#B9CE8F;}
+.again .agx{background:transparent;border:none;color:#8FA37A;font-size:16px;cursor:pointer;padding:0 4px;font-family:inherit;}
+.again .agtxt{font-size:14.5px;font-weight:300;margin:7px 0 11px;line-height:1.45;}
+.again .agbtn{width:100%;padding:12px;border-radius:30px;background:var(--gold);color:var(--dark);
+ border:none;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;}
 .modebox{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:14px;margin-top:16px;text-align:center;}
 .modebox .mlbl{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin-bottom:9px;}
 .modebox .chips{justify-content:center;}
@@ -152,6 +159,17 @@ textarea.fld{min-height:74px;resize:vertical;}
 .warn{background:#FFF6E2;border:1px solid var(--gold);border-radius:12px;padding:10px 12px;
  font-size:13.5px;color:#6E4B2F;margin-top:12px;line-height:1.5;}
 .geo-ok{color:#2E6B32;font-weight:600;}
+.paynote{font-size:13.5px;color:var(--ink2);font-weight:300;margin-bottom:9px;line-height:1.5;}
+.bankcard{background:var(--dark);color:#F7F1E4;border-radius:14px;padding:14px 16px;margin-top:12px;}
+.bankcard .bk{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);font-weight:800;}
+.bankcard .ln{display:flex;justify-content:space-between;gap:10px;font-size:14.5px;padding:5px 0;border-bottom:1px dotted #5A4636;}
+.bankcard .ln:last-of-type{border-bottom:none;}
+.bankcard .ln span:first-child{color:#D9C7A8;font-weight:300;}
+.bankcard .ln b{font-family:monospace;font-size:15px;letter-spacing:.5px;text-align:right;word-break:break-all;}
+.bankcard .amt{font-family:'Playfair Display',serif;font-size:21px;font-weight:800;color:var(--gold);}
+.bankcard .ref{background:#F7F1E4;color:var(--dark);border-radius:10px;padding:8px 10px;margin-top:10px;
+ font-size:13.5px;text-align:center;line-height:1.5;}
+.bankcard .ref b{font-family:monospace;font-size:16px;letter-spacing:1px;}
 
 @media(min-width:720px){
  .cards{grid-template-columns:1fr 1fr;}
@@ -176,11 +194,12 @@ textarea.fld{min-height:74px;resize:vertical;}
     <a class="btn btn-s" href="menu-emmas-place.pdf" download>Descarregar menu (PDF)</a>
     <a class="btn btn-p" href="tel:+2389895324">Ligar 989 53 24</a>
   </div>
+  <div class="again" id="againBox" style="display:none"></div>
   <div class="modebox">
     <div class="mlbl">COMO QUER RECEBER?</div>
     <div class="chips" id="topChips">
-      <button class="chip sel" onclick="setMode('recolha')">Recolher no local</button>
-      <button class="chip" onclick="setMode('entrega')">Entrega</button>
+      <button class="chip sel" onclick="setMode('recolha',true)">Recolher no local</button>
+      <button class="chip" onclick="setMode('entrega',true)">Entrega</button>
     </div>
     <div class="mnote" id="modeNote">Levanta na carrinha, no Plateau (frente BAI/IMPAR).</div>
   </div>
@@ -254,8 +273,8 @@ textarea.fld{min-height:74px;resize:vertical;}
 
   <div class="lbl">COMO QUER RECEBER</div>
   <div class="chips" id="modeChips">
-    <button class="chip sel" data-mode="recolha" onclick="setMode('recolha')">Recolher no local</button>
-    <button class="chip" data-mode="entrega" onclick="setMode('entrega')">Entrega</button>
+    <button class="chip sel" data-mode="recolha" onclick="setMode('recolha',true)">Recolher no local</button>
+    <button class="chip" data-mode="entrega" onclick="setMode('entrega',true)">Entrega</button>
   </div>
 
   <div id="deliveryBox" style="display:none">
@@ -279,8 +298,18 @@ textarea.fld{min-height:74px;resize:vertical;}
   <textarea class="fld" id="fNotes" placeholder="Alergias, sem açúcar, ponto de referência…"></textarea>
 
   <div id="chkTotals"></div>
-  <div class="warn">O pagamento é feito no momento da entrega ou levantamento, conforme combinado no WhatsApp.</div>
 
+  <div id="payBox">
+    <div class="lbl">PAGAMENTO — TRANSFERÊNCIA</div>
+    <div class="paynote">O pedido só entra em preparação depois de recebermos o comprovativo. Escolha o seu banco:</div>
+    <div class="chips" id="bankChips"></div>
+    <div id="bankCard" class="bankcard" style="display:none"></div>
+  </div>
+  <div id="noPayBox" class="warn" style="display:none">
+    Espresso para levantar no local: <b>paga no balcão</b>, não precisa de transferir.
+  </div>
+
+  <div class="warn" id="finalWarn"></div>
   <button class="go" onclick="sendWA()">Enviar pedido no WhatsApp</button>
   <button class="gs" onclick="openCart()">Voltar ao pedido</button>
 </div>
@@ -335,10 +364,22 @@ const COMBOS=[
  {n:"SALADA E PÃO",d:"salada + sandes",p:500},{n:"SALADA E SUMO",d:"salada + sumo natural",p:570},
  {n:"SUPER COMBO",d:"sopa + sandes + bebida",p:700,full:true}
 ];
-const TEL="2389895324", FREE=750;
+const TEL="2389895324", FREE=750, TAXA=225, PRAZO=15;
+const BANCOS=[
+ {id:"bca",   b:"BCA",              t:"Na Via",       lbl:"Conta", c:"9261676510001"},
+ {id:"cec",   b:"Caixa Económica",  t:"João Leal",    lbl:"Conta", c:"4618765410001"},
+ {id:"bai",   b:"BAI",              t:"Emma's Place", lbl:"Conta", c:"100400076861001"},
+ {id:"outro", b:"Outro banco → BAI",t:"Emma's Place", lbl:"NIB",   c:"000810040007686100125"}
+];
 
 /* ---------- ESTADO ---------- */
-let cart=[], mode="recolha", geo=null, timeMode="asap", slotVal="";
+let cart=[], mode="recolha", modoEscolhido=false, geo=null, timeMode="asap", slotVal="", banco=null, codigo="";
+function novoCodigo(){
+ const d=new Date(), p=n=>("0"+n).slice(-2);
+ const r="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+ let s=""; for(let i=0;i<3;i++) s+=r[Math.floor(Math.random()*r.length)];
+ return "EP-"+p(d.getDate())+p(d.getMonth()+1)+"-"+s;
+}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
@@ -397,21 +438,22 @@ function confirmAdd(){
  if(cur.size) opts.push(cur.size==="G"?"Grande":"Médio");
  if(cur.cat.milk&&!cur.item.nm&&cur.milk!=="Normal"){const m=LEITES.find(l=>l[0]===cur.milk);price+=m[1];opts.push("leite "+cur.milk.toLowerCase());}
  cur.extras.forEach(e=>{price+=e[1];opts.push(e[0].toLowerCase());});
- addToCart(i.n,price,opts,i.nd);
+ addToCart(i.n,price,opts,i.nd,{size:cur.size,milk:(cur.cat.milk&&!i.nm)?cur.milk:null,extras:cur.extras.map(e=>e[0])});
  closeAll(); openCart();
 }
-function addCombo(k){const c=COMBOS[k];addToCart("Combo "+c.n,c.p,[c.d]);openCart();}
+function addCombo(k){const c=COMBOS[k];addToCart("Combo "+c.n,c.p,[c.d],0,{combo:c.n});openCart();}
 
-function addToCart(name,price,opts,nd){
+function addToCart(name,price,opts,nd,meta){
  const key=name+"|"+opts.join(",");
  const ex=cart.find(x=>x.key===key);
- if(ex) ex.q++; else cart.push({key,name,price,opts,q:1,nd:nd||0});
+ if(ex) ex.q++; else cart.push({key,name,price,opts,q:1,nd:nd||0,meta:meta||{}});
  refresh();
 }
 function chg(k,d){
  const it=cart.find(x=>x.key===k); if(!it)return;
  it.q+=d; if(it.q<=0) cart=cart.filter(x=>x.key!==k);
  refresh(); renderCart();
+ if($("chkSheet").classList.contains("on")) refreshChk();
 }
 function refresh(){
  const n=cart.reduce((s,i)=>s+i.q,0);
@@ -431,16 +473,30 @@ function renderCart(){
    <button onclick="chg('${i.key.replace(/'/g,"\\'")}',1)">+</button></div>
    <div class="cp2">${i.price*i.q}</div></div>`).join("")+totalsHTML();
 }
+function taxa(){ return (mode==="entrega" && sub()<FREE) ? TAXA : 0; }
+function total(){ return sub()+taxa(); }
 function totalsHTML(){
  const s=sub(), falta=FREE-s;
- return `<div class="tot"><span>Subtotal</span><b>${s} ECV</b></div>`+
-  (s>=FREE?`<div class="tot" style="color:#2E6B32"><span>Entrega</span><b>GRÁTIS</b></div>`
-          :`<div class="warn">Faltam <b>${falta} ECV</b> para ter entrega grátis. Abaixo de ${FREE}$ o custo de entrega é combinado no WhatsApp.</div>`)+
-  `<div class="tot grand"><span>Total</span><span>${s} ECV</span></div>`;
+ let h=`<div class="tot"><span>Subtotal</span><b>${s} ECV</b></div>`;
+ if(mode==="entrega"){
+  h+= (s>=FREE)
+   ? `<div class="tot" style="color:#2E6B32"><span>Entrega</span><b>GRÁTIS</b></div>`
+   : `<div class="tot"><span>Entrega</span><b>${TAXA} ECV</b></div>
+      <div class="warn">Faltam <b>${falta} ECV</b> em produtos para a entrega ficar grátis — e poupa os ${TAXA}$.</div>`;
+ }
+ h+=`<div class="tot grand"><span>Total a pagar</span><span>${total()} ECV</span></div>`;
+ return h;
+}
+/* Pagamento antecipado: dispensado se for só Espresso para levantar no local */
+function pagaAntes(){
+ if(!cart.length) return true;
+ if(mode==="recolha" && cart.every(i=>i.name==="Espresso")) return false;
+ return true;
 }
 
 /* ---------- CHECKOUT ---------- */
-function setMode(m){
+function setMode(m,doUtilizador){
+ if(doUtilizador!==false) modoEscolhido=true;
  // Espresso nao vai para entrega: avisar e retirar do carrinho
  if(m==="entrega"){
   const bloq=cart.filter(i=>i.nd);
@@ -458,6 +514,7 @@ function setMode(m){
   : "Levanta na carrinha, no Plateau (frente BAI/IMPAR).";
  build();               // menu adapta-se ao modo
  fillSlots();
+ if($("chkSheet").classList.contains("on")) refreshChk();
 }
 function setTime(el){
  timeMode=el.dataset.t;
@@ -512,17 +569,20 @@ function sendWA(){
  const nome=$("fName").value.trim();
  const addr=$("fAddr").value.trim();
  if(mode==="entrega"&&!addr&&!geo){alert("Indique a morada de entrega ou envie a sua localização.");return;}
- const s=sub();
+ const precisa=pagaAntes();
+ if(precisa&&!banco){alert("Escolha o banco onde vai fazer a transferência.");return;}
+ const s=sub(), t=taxa();
  let L=[];
  L.push("*NOVO PEDIDO — Emma's Place*");
+ L.push("Código: "+codigo);
  if(nome) L.push("Cliente: "+nome);
  L.push("");
  L.push("*Produtos:*");
  cart.forEach(i=>L.push(`• ${i.q}x ${i.name}${i.opts.length?" ("+i.opts.join(", ")+")":""} — ${i.price*i.q} ECV`));
  L.push("");
  L.push(`Subtotal: ${s} ECV`);
- L.push(s>=FREE?"Entrega: GRÁTIS (acima de 750$)":"Entrega: a combinar");
- L.push(`*TOTAL: ${s} ECV*`);
+ if(mode==="entrega") L.push(t?`Entrega: ${t} ECV`:"Entrega: GRÁTIS (acima de 750$)");
+ L.push(`*TOTAL A PAGAR: ${total()} ECV*`);
  L.push("");
  L.push(mode==="entrega"?"*ENTREGA*":"*RECOLHA NO LOCAL* (Plateau, frente BAI/IMPAR)");
  if(mode==="entrega"){
@@ -532,6 +592,21 @@ function sendWA(){
  L.push("Quando: "+((timeMode==="marcada"&&slotVal)?("hora marcada — "+slotVal):"assim que possível"));
  const nt=$("fNotes").value.trim();
  if(nt) L.push("Notas: "+nt);
+ L.push("");
+ if(precisa){
+  L.push("*PAGAMENTO — TRANSFERÊNCIA*");
+  L.push("Banco: "+banco.b);
+  L.push("Titular: "+banco.t);
+  L.push(banco.lbl+": "+banco.c);
+  L.push("Valor: "+total()+" ECV");
+  L.push("Descrição: "+codigo);
+  L.push("");
+  L.push("Vou transferir e enviar o comprovativo aqui.");
+ }else{
+  L.push("*PAGAMENTO:* no balcão, no levantamento.");
+ }
+
+ guardarUltimo();
  window.open("https://wa.me/"+TEL+"?text="+encodeURIComponent(L.join("\n")),"_blank");
 }
 
@@ -540,9 +615,115 @@ function show(id){closeAll();$("ov").classList.add("on");$(id).classList.add("on
 function closeAll(){$("ov").classList.remove("on");
  ["optSheet","cartSheet","chkSheet"].forEach(i=>$(i).classList.remove("on"));document.body.style.overflow="";}
 function openCart(){renderCart();show("cartSheet");}
-function openCheckout(){if(!cart.length)return;$("chkTotals").innerHTML=totalsHTML();fillSlots();show("chkSheet");}
+function openCheckout(){
+ if(!cart.length)return;
+ if(!codigo) codigo=novoCodigo();
+ refreshChk(); fillSlots(); show("chkSheet");
+}
+function refreshChk(){
+ $("chkTotals").innerHTML=totalsHTML();
+ const precisa=pagaAntes();
+ $("finalWarn").innerHTML = precisa
+  ? `Tem <b>${PRAZO} minutos</b> para transferir e enviar o comprovativo. Sem comprovativo, o pedido é cancelado.<br>A preparação começa após a nossa confirmação.`
+  : "Confirmamos o seu pedido por WhatsApp assim que o recebermos.";
+ $("payBox").style.display=precisa?"block":"none";
+ $("noPayBox").style.display=precisa?"none":"block";
+ if(precisa){
+  $("bankChips").innerHTML=BANCOS.map(b=>
+   `<button class="chip${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)">${b.b}</button>`).join("");
+  drawBank();
+ }
+}
+function setBanco(id,el){
+ banco=BANCOS.find(b=>b.id===id);
+ el.parentNode.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel"));
+ el.classList.add("sel");
+ drawBank();
+}
+function drawBank(){
+ const box=$("bankCard");
+ if(!banco){box.style.display="none";return;}
+ box.style.display="block";
+ box.innerHTML=`<div class="bk">${banco.b}</div>
+  <div class="ln"><span>Titular</span><b>${banco.t}</b></div>
+  <div class="ln"><span>${banco.lbl}</span><b>${banco.c}</b></div>
+  <div class="ln"><span>Valor exacto</span><span class="amt">${total()} ECV</span></div>
+  <div class="ref">Escreva na descrição da transferência:<br><b>${codigo}</b></div>`;
+}
 
-build(); refresh();
+/* ---------- REPETIR ÚLTIMO PEDIDO (guardado no telemóvel do cliente) ---------- */
+const LSK="ep_ultimo_pedido", VALIDADE=60*86400000; // 60 dias
+function guardarUltimo(){
+ try{
+  localStorage.setItem(LSK, JSON.stringify({
+   t:Date.now(), mode:mode,
+   nome:$("fName").value.trim(), addr:$("fAddr").value.trim(),
+   items:cart.map(i=>({n:i.name,m:i.meta,q:i.q}))
+  }));
+ }catch(e){}
+}
+function lerUltimo(){
+ try{
+  const r=localStorage.getItem(LSK); if(!r) return null;
+  const d=JSON.parse(r);
+  if(!d.items||!d.items.length) return null;
+  if(Date.now()-d.t>VALIDADE) return null;
+  return d;
+ }catch(e){ return null; }
+}
+function esquecerUltimo(){ try{localStorage.removeItem(LSK);}catch(e){} $("againBox").style.display="none"; }
+
+function acharItem(nome){
+ for(const c of MENU){ const i=c.items.find(x=>x.n===nome); if(i) return {cat:c,item:i}; }
+ return null;
+}
+function mostrarRepetir(){
+ const d=lerUltimo(); const box=$("againBox"); if(!box) return;
+ if(!d){ box.style.display="none"; return; }
+ const n=d.items.reduce((s,i)=>s+i.q,0);
+ const lista=d.items.map(i=>i.q+"x "+i.n).join(", ");
+ box.style.display="block";
+ box.innerHTML=`<div class="agtop"><span class="aglbl">O SEU ÚLTIMO PEDIDO</span>
+   <button class="agx" onclick="esquecerUltimo()" aria-label="Esquecer">✕</button></div>
+  <div class="agtxt">${lista}</div>
+  <button class="agbtn" onclick="repetirUltimo()">Repetir este pedido (${n} ${n===1?"item":"itens"})</button>`;
+}
+function repetirUltimo(){
+ const d=lerUltimo(); if(!d) return;
+ cart=[];
+ if(!modoEscolhido && d.mode && d.mode!==mode) setMode(d.mode,false);
+ const faltam=[];
+ d.items.forEach(s=>{
+  const m=s.m||{};
+  if(m.combo){
+   const cb=COMBOS.find(x=>x.n===m.combo);
+   if(!cb){faltam.push(s.n);return;}
+   for(let k=0;k<s.q;k++) addToCart("Combo "+cb.n, cb.p, [cb.d], 0, {combo:cb.n});
+   return;
+  }
+  const f=acharItem(s.n);
+  if(!f){faltam.push(s.n);return;}
+  if(mode==="entrega"&&f.item.nd){faltam.push(s.n+" (só no local)");return;}
+  // recalcular sempre com os preços actuais
+  let price=(m.size==="G"&&f.item.g)?f.item.g:f.item.p, opts=[];
+  if(f.item.g&&m.size) opts.push(m.size==="G"?"Grande":"Médio");
+  if(f.cat.milk&&!f.item.nm&&m.milk&&m.milk!=="Normal"){
+   const L=LEITES.find(l=>l[0]===m.milk);
+   if(L){ price+=L[1]; opts.push("leite "+m.milk.toLowerCase()); }
+  }
+  (m.extras||[]).forEach(en=>{
+   const e=(f.cat.extras||[]).find(x=>x[0]===en);
+   if(e){ price+=e[1]; opts.push(en.toLowerCase()); }
+  });
+  for(let k=0;k<s.q;k++) addToCart(f.item.n, price, opts, f.item.nd, m);
+ });
+ if(d.nome) $("fName").value=d.nome;
+ if(d.addr) $("fAddr").value=d.addr;
+ if(faltam.length) alert("Não foi possível repetir estes produtos:\n\n"+faltam.join("\n"));
+ openCart();
+}
+
+build(); refresh(); mostrarRepetir();
 </script>
 </body>
 </html>
