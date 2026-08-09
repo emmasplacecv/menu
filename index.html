@@ -394,7 +394,7 @@ const TEL="2389895324", FREE=750, TAXA=225, PRAZO=15;
    Substitua PROMO_API pelo URL do seu Worker depois de o publicar
    (ver ficheiro worker-promocodes.js).
    ============================================================ */
-const PROMO_API="https://COLOQUE-AQUI-O-SEU-URL.workers.dev";
+const PROMO_API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
 const BANCOS=[
  {id:"bca",   b:"BCA",              t:"Na Via",       lbl:"Conta", c:"9261676510001",
   nota:"Na Via é a empresa que trata da organização e entrega dos pedidos do Emma's Place."},
@@ -421,11 +421,14 @@ function build(){
    <div class="in"><div class="ribbon">${c.cat}</div>
    ${hasG?'<div class="sizes"><span>M</span><span>G</span></div>':""}
    ${c.items.map((i,ii)=>{
-     const blocked = (mode==="entrega" && i.nd);
+     const fim = esgotados.includes(i.n);
+     const blocked = fim || (mode==="entrega" && i.nd);
+     const nota = fim ? `<small class="only">Acabou por hoje</small>`
+                : (mode==="entrega" && i.nd) ? `<small class="only">Apenas no local — não entregamos</small>` : "";
      return `<div class="it${blocked?" blk":""}">
-     <div class="nm">${i.n}${i.d?`<small>${i.d}</small>`:""}${blocked?`<small class="only">Apenas no local — não entregamos</small>`:""}</div>
+     <div class="nm">${i.n}${i.d?`<small>${i.d}</small>`:""}${nota}</div>
      <div class="pr">${i.p}${i.g?` <em>· ${i.g}</em>`:""}</div>
-     ${blocked?`<span class="noadd" title="Não disponível para entrega">✕</span>`
+     ${blocked?`<span class="noadd" title="${fim?"Esgotado hoje":"Não disponível para entrega"}">✕</span>`
               :`<button class="add" onclick="pick(${ci},${ii})" aria-label="Adicionar ${i.n}">+</button>`}
    </div>`}).join("")}
    ${c.note?`<div class="note">${c.note}</div>`:""}</div></div>`;
@@ -891,6 +894,7 @@ function repetirUltimo(){
   }
   const f=acharItem(s.n);
   if(!f){faltam.push(s.n);return;}
+  if(esgotados.includes(s.n)){faltam.push(s.n+" (acabou hoje)");return;}
   if(mode==="entrega"&&f.item.nd){faltam.push(s.n+" (só no local)");return;}
   // recalcular sempre com os preços actuais
   let price=(m.size==="G"&&f.item.g)?f.item.g:f.item.p, opts=[];
@@ -911,7 +915,24 @@ function repetirUltimo(){
  openCart();
 }
 
-build(); refresh(); rotularChips(); mostrarRepetir();
+let esgotados=[];
+async function carregarEsgotados(){
+ try{
+  const r=await fetch(PROMO_API+"/soldout");
+  const d=await r.json();
+  esgotados = d.itens || [];
+ }catch(e){ esgotados=[]; }
+ build();
+ // tirar do carrinho o que entretanto esgotou
+ const fora=cart.filter(i=>esgotados.includes(i.name));
+ if(fora.length){
+  cart=cart.filter(i=>!esgotados.includes(i.name));
+  refresh(); renderCart();
+  alert("Estes produtos acabaram por hoje e foram retirados do seu pedido:\n\n"+fora.map(i=>i.name).join("\n"));
+ }
+}
+
+build(); refresh(); rotularChips(); mostrarRepetir(); carregarEsgotados();
 </script>
 </body>
 </html>
