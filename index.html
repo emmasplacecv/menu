@@ -175,6 +175,7 @@ textarea.fld{min-height:74px;resize:vertical;}
 .bankcard .ln:last-of-type{border-bottom:none;}
 .bankcard .ln span:first-child{color:#D9C7A8;font-weight:300;}
 .bankcard .ln b{font-family:monospace;font-size:15px;letter-spacing:.5px;text-align:right;word-break:break-all;}
+.bankcard .bnota{font-size:12.5px;color:#D9C7A8;font-weight:300;line-height:1.45;margin-top:8px;}
 .bankcard .amt{font-family:'Playfair Display',serif;font-size:21px;font-weight:800;color:var(--gold);}
 .bankcard .ref{background:#F7F1E4;color:var(--dark);border-radius:10px;padding:8px 10px;margin-top:10px;
  font-size:13.5px;text-align:center;line-height:1.5;}
@@ -376,10 +377,13 @@ const MENU=[
   {n:"Poke Bowl Frango",pt:3,p:600},{n:"Poke Bowl Atum",pt:3,p:700},{n:"Poke Bowl Salmão",pt:3,p:700}]}
 ];
 const COMBOS=[
- {n:"PEQUENO-ALMOÇO",d:"café + muffin",p:180},{n:"LANCHE",d:"bebida fria + donut",p:370},
- {n:"SOPA E PÃO",d:"sopa + sandes",p:420},{n:"ALMOÇO LEVE",d:"sandes + sumo",p:480},
- {n:"SALADA E PÃO",d:"salada + sandes",p:500},{n:"SALADA E SUMO",d:"salada + sumo natural",p:570},
- {n:"SUPER COMBO",d:"sopa + sandes + bebida",p:700,full:true}
+ {n:"PEQUENO-ALMOÇO",d:"espresso + muffin ou donut",p:180},
+ {n:"LANCHE",d:"bebida fria + donut",p:370},
+ {n:"SOPA E PÃO",d:"sopa + pão recheado",p:440},
+ {n:"ALMOÇO LEVE",d:"pão recheado + sumo",p:530},
+ {n:"SALADA E PÃO",d:"salada + pão recheado",p:550},
+ {n:"SALADA E SUMO",d:"salada + sumo natural",p:740},
+ {n:"SUPER COMBO",d:"sopa + pão recheado + bebida",p:605,full:true}
 ];
 const TEL="2389895324", FREE=750, TAXA=225, PRAZO=15;
 
@@ -392,8 +396,8 @@ const TEL="2389895324", FREE=750, TAXA=225, PRAZO=15;
    ============================================================ */
 const PROMO_API="https://COLOQUE-AQUI-O-SEU-URL.workers.dev";
 const BANCOS=[
- {id:"bca",   b:"BCA",              t:"Na Via",       lbl:"Conta", c:"9261676510001"},
- {id:"cec",   b:"Caixa Económica",  t:"João Leal",    lbl:"Conta", c:"4618765410001"},
+ {id:"bca",   b:"BCA",              t:"Na Via",       lbl:"Conta", c:"9261676510001",
+  nota:"Na Via é a empresa que trata da organização e entrega dos pedidos do Emma's Place."},
  {id:"bai",   b:"BAI",              t:"Emma's Place", lbl:"Conta", c:"100400076861001"},
  {id:"outro", b:"Outro banco → BAI",t:"Emma's Place", lbl:"NIB",   c:"000810040007686100125"}
 ];
@@ -830,6 +834,7 @@ function drawBank(){
  box.innerHTML=`<div class="bk">${banco.b}</div>
   <div class="ln"><span>Titular</span><b>${banco.t}</b></div>
   <div class="ln"><span>${banco.lbl}</span><b>${banco.c}</b></div>
+  ${banco.nota?`<div class="bnota">${banco.nota}</div>`:""}
   <div class="ln"><span>Valor exacto</span><span class="amt">${total()} ECV</span></div>
   <div class="ref">Escreva na descrição da transferência:<br><b>${codigo}</b></div>`;
 }
