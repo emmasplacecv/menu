@@ -403,7 +403,7 @@ const BANCOS=[
 ];
 
 /* ---------- ESTADO ---------- */
-let cart=[], promo=null, mode="recolha", modoEscolhido=false, geo=null, timeMode="asap", slotVal="", banco=null, codigo="";
+let cart=[], promo=null, slotQuando="", slotHoje=true, mode="recolha", modoEscolhido=false, geo=null, timeMode="asap", slotVal="", banco=null, codigo="";
 function novoCodigo(){
  const d=new Date(), p=n=>("0"+n).slice(-2);
  const r="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -610,6 +610,13 @@ function totalsHTML(){
  let h=`<div class="tot"><span>Subtotal</span><b>${s} ECV</b></div>`;
  if(d5) h+=`<div class="tot" style="color:#2E6B32"><span>Desconto encomenda online (−${DESC_ONLINE}%)</span><b>−${d5} ECV</b></div>`;
  if(dsc) h+=`<div class="tot" style="color:#2E6B32"><span>Desconto (${promo.c})</span><b>−${dsc} ECV</b></div>`;
+ if(!slotHoje && slotQuando)
+  h+=`<div class="warn" style="border-color:#8C2F2F;background:#F6E9E6;color:#8C2F2F;">
+   <b>Atenção:</b> este pedido será ${mode==="entrega"?"entregue":"preparado"} <b>${slotQuando}</b>, não hoje.
+   ${mode==="entrega"?"As entregas são de segunda a sábado, das 09h às 16h (sábados até às 14h)."
+                    :"Estamos fechados neste momento."}
+   <br><br>Só preparamos depois de <b>confirmarmos consigo na manhã do dia</b>. Se entretanto quiser cancelar,
+   avise-nos e devolvemos o valor.</div>`;
  const anul=anulado();
  if(anul) h+=`<div class="warn">Os descontos não acumulam. ${anul}</div>`;
  else if(!d5 && mode==="recolha" && !descPromoBruto())
@@ -690,14 +697,21 @@ async function fillSlots(){
   sel.innerHTML='<option value="">Horários indisponíveis</option>'; slotVal="";
   $("slotMsg").textContent="Não foi possível carregar os horários. Verifique a ligação e tente novamente.";
  }else if(!out.length){
-  sel.innerHTML='<option value="">Sem horas disponíveis hoje</option>'; slotVal="";
-  $("slotMsg").textContent="Não há mais horas disponíveis hoje. Envie o pedido e confirmamos a hora por WhatsApp.";
+  sel.innerHTML='<option value="">Sem horas disponíveis</option>'; slotVal=""; slotQuando=""; slotHoje=true;
+  $("slotMsg").textContent="Sem horas disponíveis de momento. Envie o pedido e combinamos a hora por WhatsApp.";
  }else{
-  sel.innerHTML=out.map(o=>`<option value="${o}">${o}</option>`).join("");
+  slotQuando=d.quando||""; slotHoje=(d.hoje!==false);
+  const pref = slotHoje ? "" : (slotQuando.charAt(0).toUpperCase()+slotQuando.slice(1)+" · ");
+  sel.innerHTML=out.map(o=>`<option value="${o}">${pref}${o}</option>`).join("");
   slotVal=out[0];
-  $("slotMsg").textContent=(mode==="entrega")
-   ? "Entregas com hora marcada a partir de 30 minutos."
-   : "Levantamento a partir de 15 minutos. A hora fica garantida após enviarmos a confirmação do comprovativo.";
+  if(!slotHoje){
+   $("slotMsg").innerHTML='<b>Já encerrámos '+(mode==="entrega"?"as entregas":"o atendimento")+
+    ' por hoje.</b> O seu pedido fica para <b>'+slotQuando+'</b> — escolha a hora abaixo.';
+  }else{
+   $("slotMsg").textContent=(mode==="entrega")
+    ? "Entregas de segunda a sábado, das 09h às 16h (sábados até às 14h)."
+    : "Levantamento a partir de 15 minutos. A hora fica garantida após enviarmos a confirmação do comprovativo.";
+  }
  }
  refreshChk();
 }
@@ -736,6 +750,7 @@ async function sendWA(){
     fillSlots(); return;
    }
    blocoPrep=d.slot||null;
+   if(d.quando){ slotQuando=d.quando; slotHoje=(d.hoje!==false); }
   }catch(e){
    enviando=false;
    alert("Não foi possível confirmar a hora agora. Tente enviar novamente.");
@@ -766,9 +781,10 @@ async function sendWA(){
   if(addr) L.push("Morada: "+addr);
   if(geo) L.push("Localização: https://maps.google.com/?q="+geo);
  }
+ const diaTxt = (!slotHoje && slotQuando) ? (" — "+slotQuando.toUpperCase()) : "";
  L.push("Quando: "+((timeMode==="marcada"&&slotVal)
-   ? ("hora marcada — "+slotVal)
-   : ("assim que possível"+(blocoPrep?(" (previsto ~"+blocoPrep+")"):""))));
+   ? ("hora marcada — "+slotVal+diaTxt)
+   : ("assim que possível"+(blocoPrep?(" (previsto ~"+blocoPrep+diaTxt+")"):""))));
  if(timeMode==="marcada"&&slotVal&&pagaAntes()) L.push("(hora garantida após confirmarmos o comprovativo)");
  const nt=$("fNotes").value.trim();
  if(nt) L.push("Notas: "+nt);
@@ -782,6 +798,7 @@ async function sendWA(){
   L.push("Descrição: "+codigo);
   L.push("");
   L.push("Vou transferir e enviar o comprovativo aqui.");
+  if(!slotHoje && slotQuando) L.push("(pedido para "+slotQuando+" — confirmar na manhã do dia antes de preparar)");
  }else{
   L.push("*PAGAMENTO:* no balcão, no levantamento.");
  }
@@ -813,9 +830,11 @@ function refreshChk(){
  $("chkTotals").innerHTML=totalsHTML();
  desenharPromo();
  const precisa=pagaAntes();
- $("finalWarn").innerHTML = precisa
-  ? `Tem <b>${PRAZO} minutos</b> para transferir e enviar o comprovativo. Sem comprovativo, o pedido é cancelado.<br>A preparação começa após a nossa confirmação.`
-  : "Confirmamos o seu pedido por WhatsApp assim que o recebermos.";
+ $("finalWarn").innerHTML = !precisa
+  ? "Confirmamos o seu pedido por WhatsApp assim que o recebermos."
+  : (!slotHoje && slotQuando)
+   ? `Reservamos o seu lugar <b>${slotQuando}</b> assim que recebermos o comprovativo.<br>Na manhã do dia confirmamos consigo antes de preparar.`
+   : `Tem <b>${PRAZO} minutos</b> para transferir e enviar o comprovativo. Sem comprovativo, o pedido é cancelado.<br>A preparação começa após a nossa confirmação.`;
  $("payBox").style.display=precisa?"block":"none";
  $("noPayBox").style.display=precisa?"none":"block";
  if(precisa){
