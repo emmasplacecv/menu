@@ -4,225 +4,152 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Gestão — Emma's Place</title>
+<title>Cozinha — Emma's Place</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Jost:wght@300;400;500;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{--cream:#F3ECDD;--card:#FBF7EE;--line:#E5D9C2;--ink:#3B2314;--ink2:#7A5A3C;
  --gold:#C89B6D;--dark:#2E2018;--vermelho:#8C2F2F;--verde:#2E6B32;}
 body{background:var(--cream);color:var(--ink);font-family:'Jost',system-ui,sans-serif;
- padding-bottom:90px;-webkit-text-size-adjust:100%;}
-.wrap{max-width:720px;margin:0 auto;padding:22px 15px;}
-h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
-.sub{font-size:14px;color:var(--ink2);font-weight:300;margin-top:4px;line-height:1.5;}
-.hoje{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-top:6px;}
+ padding-bottom:24px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:900px;margin:0 auto;padding:18px 14px;}
+h1{font-family:'Playfair Display',serif;font-size:24px;}
+.sub{font-size:13.5px;color:var(--ink2);font-weight:300;margin-top:3px;}
+.hoje{font-size:12.5px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-top:5px;}
 
-.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:18px;}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:16px;}
 .fld{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;
  font-family:inherit;font-size:16px;color:var(--ink);}
-.fld:focus{outline:none;border-color:var(--gold);}
 .btn{width:100%;padding:14px;border-radius:40px;background:var(--dark);color:#F7F1E4;
  border:none;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px;}
-.btn.sec{background:transparent;color:var(--dark);border:2px solid var(--dark);}
-
-.tabs{display:flex;gap:8px;margin-top:18px;}
-.tabb{flex:1;padding:12px;border-radius:30px;border:2px solid var(--line);background:var(--card);
- font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);}
-.tabb.sel{background:var(--dark);color:#F7F1E4;border-color:var(--dark);}
-.pill{background:var(--gold);color:var(--dark);border-radius:20px;padding:1px 8px;font-size:12.5px;}
-.tabb.sel .pill{background:#F7F1E4;}
-.ped{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;}
-.ped.aguarda{border-color:#D9B4AC;background:#F9EFEC;}
-.ped.pronto{border-color:#9CC29C;background:#EEF6EE;}
-.ped .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-.ped .hora{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;}
-.ped .tipo{font-size:12px;letter-spacing:1.5px;font-weight:600;padding:3px 9px;border-radius:20px;
- background:var(--dark);color:#F7F1E4;}
-.ped .tipo.ent{background:var(--gold);color:var(--dark);}
-.ped .cli{font-size:14.5px;margin-top:6px;}
-.ped .cod{font-family:monospace;font-size:12.5px;color:var(--ink2);}
-.ped ul{list-style:none;margin:8px 0 0;}
-.ped li{font-size:14.5px;padding:3px 0;border-bottom:1px dotted var(--line);}
-.ped li:last-child{border-bottom:none;}
-.ped .nt{font-size:13.5px;color:#8C2F2F;margin-top:7px;}
-.ped .tot{font-size:14.5px;font-weight:600;margin-top:7px;}
-.ped .acts{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px;}
-.ped .acts button{flex:1;min-width:96px;padding:11px 6px;border-radius:30px;border:none;
- font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
-.bok{background:var(--verde);color:#fff;}
-.bno{background:transparent;color:var(--vermelho);border:2px solid var(--vermelho)!important;}
-.bnx{background:var(--dark);color:#F7F1E4;}
-.est{font-size:12px;letter-spacing:1.5px;font-weight:600;color:var(--ink2);margin-top:9px;}
-.cat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:20px 0 6px;}
-.row{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--card);
- border:1px solid var(--line);border-radius:13px;margin-bottom:7px;}
-.row .n{flex:1;font-size:15.5px;line-height:1.3;}
-.row.off{background:#F6E9E6;border-color:#D9B4AC;}
-.row.off .n{color:var(--vermelho);text-decoration:line-through;}
-.sw{width:60px;height:32px;flex:none;border-radius:20px;border:none;cursor:pointer;
- font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.5px;}
-.sw.on{background:var(--verde);color:#fff;}
-.sw.no{background:var(--vermelho);color:#fff;}
-.aviso{background:#FFF6E2;border:1px solid var(--gold);border-radius:12px;padding:11px 13px;
- font-size:13.5px;color:#6E4B2F;line-height:1.5;margin-top:12px;}
 .msg{font-size:14px;margin-top:10px;min-height:18px;}
 .msg.bad{color:var(--vermelho);}
-.msg.good{color:var(--verde);font-weight:600;}
-.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(46,32,24,.98);padding:11px 13px;
- padding-bottom:calc(11px + env(safe-area-inset-bottom));display:flex;gap:9px;justify-content:center;z-index:50;}
-.bar button,.bar a{flex:1;max-width:280px;text-align:center;padding:13px;border-radius:40px;
- font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:inherit;text-decoration:none;}
-.bar .lim{background:var(--gold);color:var(--dark);}
-.bar .ver{background:#F7F1E4;color:var(--dark);}
+
+.filtros{display:flex;gap:7px;margin:16px 0 4px;}
+.fb{flex:1;padding:11px 6px;border-radius:30px;border:2px solid var(--line);background:var(--card);
+ font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);}
+.fb.sel{background:var(--dark);color:#F7F1E4;border-color:var(--dark);}
+
+.grid{display:grid;grid-template-columns:1fr;gap:11px;margin-top:12px;}
+@media(min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+.ped{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 15px;}
+.ped.preparar{border-color:var(--gold);background:#FFF9EF;}
+.ped.pronto{border-color:#9CC29C;background:#EEF6EE;}
+.ped .top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.ped .hora{font-family:'Playfair Display',serif;font-size:30px;font-weight:800;line-height:1;}
+.ped .tipo{font-size:11.5px;letter-spacing:1.5px;font-weight:600;padding:4px 10px;border-radius:20px;
+ background:var(--dark);color:#F7F1E4;white-space:nowrap;}
+.ped .tipo.ent{background:var(--gold);color:var(--dark);}
+.ped .cli{font-size:14px;color:var(--ink2);margin-top:5px;}
+.ped ul{list-style:none;margin:10px 0 0;}
+.ped li{font-size:17px;font-weight:500;padding:5px 0;border-bottom:1px dotted var(--line);line-height:1.35;}
+.ped li:last-child{border-bottom:none;}
+.ped .nt{font-size:14px;color:#8C2F2F;margin-top:8px;font-weight:500;}
+.ped .est{font-size:11.5px;letter-spacing:1.5px;font-weight:600;color:var(--ink2);margin-top:9px;}
+.ped .acts{display:flex;gap:7px;margin-top:11px;}
+.ped .acts button{flex:1;padding:13px 6px;border-radius:30px;border:none;
+ font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;}
+.bnx{background:var(--dark);color:#F7F1E4;}
+.bok{background:var(--verde);color:#fff;}
+.vazio{text-align:center;padding:30px 12px;color:var(--ink2);font-weight:300;}
+.atr{background:#F6E9E6;border:1px solid #D9B4AC;color:var(--vermelho);border-radius:12px;
+ padding:9px 12px;font-size:13.5px;font-weight:600;margin-top:12px;}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<h1>Gestão do dia</h1>
-<div class="sub">Marque o que acabou. O site actualiza-se sozinho e o botão de adicionar desaparece.</div>
+<h1>Cozinha</h1>
+<div class="sub">Pedidos confirmados, por ordem de hora.</div>
 <div class="hoje" id="hoje"></div>
 
 <div class="box" id="loginBox">
-  <div style="font-size:13px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin-bottom:8px;">CHAVE DE ACESSO</div>
-  <input class="fld" id="fKey" type="password" placeholder="Escreva a sua chave" autocomplete="off">
+  <div style="font-size:13px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin-bottom:8px;">CHAVE</div>
+  <input class="fld" id="fKey" type="password" placeholder="Chave da cozinha" autocomplete="off">
   <button class="btn" onclick="entrar()">Entrar</button>
   <div class="msg" id="loginMsg"></div>
 </div>
 
 <div id="painel" style="display:none">
-  <div class="tabs">
-    <button class="tabb sel" id="tabPed" onclick="verAba('ped')">Pedidos <span class="pill" id="nPed">0</span></button>
-    <button class="tabb" id="tabEsg" onclick="verAba('esg')">Esgotados</button>
+  <div class="filtros">
+    <button class="fb sel" id="f1" onclick="filtrar('activos')">A fazer</button>
+    <button class="fb" id="f2" onclick="filtrar('pronto')">Prontos</button>
+    <button class="fb" id="f3" onclick="filtrar('todos')">Todos</button>
   </div>
-
-  <div id="abaPed">
-    <div class="aviso">
-      Confirme o pedido depois de receber o comprovativo. Só então aparece à cozinha.
-    </div>
-    <div id="pedidos"></div>
-  </div>
-
-  <div id="abaEsg" style="display:none">
-    <div class="aviso">
-      Tudo o que marcar volta a estar <b>disponível automaticamente amanhã</b>.
-      Não precisa de desmarcar ao fim do dia.
-    </div>
-    <div id="lista"></div>
-  </div>
+  <div id="lista" class="grid"></div>
 </div>
 
 </div>
-
-<nav class="bar" id="barra" style="display:none">
-  <button class="lim" onclick="limparTudo()">Repor tudo disponível</button>
-  <a class="ver" href="../" target="_blank">Ver o site</a>
-</nav>
 
 <script>
-/* Substitua pelo URL do seu Worker (o mesmo do menu e da loja). */
+/* Substitua pelo URL do seu Worker (o mesmo do menu). */
 const PROMO_API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
 
-/* Lista de produtos — tem de coincidir com os nomes do menu. */
-const MENU=[
- ["BEBIDAS QUENTES",["Espresso","Espresso Duplo","Americano","Cappuccino","Latte Clássico","Mocha Chocolate","Caramelo Latte"]],
- ["MATCHA & COCO",["Iced Matcha Latte","Matcha Crème Frappuccino","Raw Coconut Latte","Iced Caramel Macchiato"]],
- ["BEBIDAS FRIAS",["Iced Latte","Iced Caramelo Latte","Café Instantâneo Gelado","Frape Chocolate","Frape Caramelo","Frape Clássico","Iced Mocha"]],
- ["SUMOS NATURAIS",["Sumo de Laranja","Sumo de Manga","Sumo de Papaia","Sumo de Ananás","Sumo de Maçã"]],
- ["DONUTS & MUFFINS",["Donut Chocolate","Donut Doce de Leite","Muffin Chocolate","Muffin Laranja"]],
- ["MERENDA & PÃO RECHEADO",["Merenda Mista","Merenda de Chouriço","Pão Rech. Frango","Pão Rech. Atum","Pão Rech. Caprese"]],
- ["TOSTAS & WRAPS",["Tosta Mista","Tosta Fiambre","Tosta Queijo","Tosta com Manteiga","Wrap de Frango","Wrap de Atum"]],
- ["ALMOÇO",["Salada Fria de Frango","Salada Fria de Atum","Sopa do Dia","Poke Bowl Frango","Poke Bowl Atum","Poke Bowl Salmão"]]
-];
-
-let KEY="", fora=[];
+const ESTADOS={confirmado:"A aguardar",preparar:"Em preparação",pronto:"Pronto",entregue:"Entregue"};
+let KEY="", pedidos=[], filtro="activos";
 const $=id=>document.getElementById(id);
 
-$("hoje").textContent = new Date().toLocaleDateString("pt-PT",
- {weekday:"long", day:"2-digit", month:"long"}).toUpperCase();
+$("hoje").textContent=new Date().toLocaleDateString("pt-PT",
+ {weekday:"long",day:"2-digit",month:"long"}).toUpperCase();
 
 async function entrar(){
  KEY=$("fKey").value.trim();
  if(!KEY){ $("loginMsg").className="msg bad"; $("loginMsg").textContent="Escreva a chave."; return; }
- $("loginMsg").className="msg"; $("loginMsg").textContent="A verificar…";
- // testa a chave com uma operação inofensiva
- const r = await pedir("/soldout-set?limpar=0&item=__teste__&on=0");
- if(!r || r.erro){ $("loginMsg").className="msg bad"; $("loginMsg").textContent=(r&&r.erro)||"Não foi possível ligar ao servidor."; return; }
- $("loginBox").style.display="none";
- $("painel").style.display="block";
- $("barra").style.display="flex";
- fora = r.itens || [];
- desenhar();
- carregarPedidos();
- setInterval(()=>{ if($("abaPed").style.display!=="none") carregarPedidos(); }, 30000);
-}
-
-async function pedir(caminho){
- try{
-  const sep = caminho.includes("?") ? "&" : "?";
-  const r = await fetch(PROMO_API+caminho+sep+"key="+encodeURIComponent(KEY), {method:"POST"});
-  return await r.json();
- }catch(e){ return null; }
-}
-
-function desenhar(){
- $("lista").innerHTML = MENU.map(([cat,itens]) =>
-  `<div class="cat">${cat}</div>` +
-  itens.map(n=>{
-   const off = fora.includes(n);
-   return `<div class="row${off?" off":""}">
-     <div class="n">${n}</div>
-     <button class="sw ${off?"no":"on"}" onclick="alternar(${JSON.stringify(n)})">${off?"ACABOU":"TEM"}</button>
-   </div>`;
-  }).join("")
- ).join("");
-}
-
-/* ---------- PEDIDOS ---------- */
-const ESTADOS={aguarda:"Aguarda comprovativo",confirmado:"Confirmado — à espera da cozinha",
- preparar:"Em preparação",pronto:"Pronto",entregue:"Entregue",cancelado:"Cancelado"};
-let pedidos=[];
-
-function verAba(q){
- const p=q==="ped";
- $("abaPed").style.display=p?"block":"none";
- $("abaEsg").style.display=p?"none":"block";
- $("tabPed").classList.toggle("sel",p);
- $("tabEsg").classList.toggle("sel",!p);
- if(p) carregarPedidos();
-}
-
-async function carregarPedidos(){
+ $("loginMsg").textContent="A verificar…"; $("loginMsg").className="msg";
  try{
   const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY));
   const d=await r.json();
-  if(d.erro) throw 0;
+  if(d.erro){ $("loginMsg").className="msg bad"; $("loginMsg").textContent=d.erro; return; }
   pedidos=d.pedidos||[];
- }catch(e){ $("pedidos").innerHTML='<div class="aviso">Não foi possível carregar os pedidos.</div>'; return; }
- $("nPed").textContent=pedidos.filter(p=>["aguarda","confirmado","preparar"].includes(p.status)).length;
- if(!pedidos.length){ $("pedidos").innerHTML='<div class="aviso">Ainda não há pedidos hoje.</div>'; return; }
- $("pedidos").innerHTML=pedidos.map(p=>{
+ }catch(e){ $("loginMsg").className="msg bad"; $("loginMsg").textContent="Sem ligação ao servidor."; return; }
+ $("loginBox").style.display="none";
+ $("painel").style.display="block";
+ desenhar();
+ setInterval(carregar, 20000);          // actualiza sozinho
+}
+
+async function carregar(){
+ try{
+  const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY));
+  const d=await r.json();
+  if(!d.erro) pedidos=d.pedidos||[];
+ }catch(e){}
+ desenhar();
+}
+
+function filtrar(f){
+ filtro=f;
+ [["activos","f1"],["pronto","f2"],["todos","f3"]].forEach(([k,id])=>
+  $(id).classList.toggle("sel", k===f));
+ desenhar();
+}
+
+function atrasado(slot){
+ if(!slot) return false;
+ const [h,m]=slot.split(":").map(Number);
+ const n=new Date();
+ return (h*60+m) < (n.getHours()*60+n.getMinutes());
+}
+
+function desenhar(){
+ let l=pedidos;
+ if(filtro==="activos") l=l.filter(p=>p.status==="confirmado"||p.status==="preparar");
+ else if(filtro==="pronto") l=l.filter(p=>p.status==="pronto");
+ if(!l.length){ $("lista").innerHTML='<div class="vazio">Nada por aqui.</div>'; return; }
+ $("lista").innerHTML=l.map(p=>{
   const ent=p.modo==="entrega";
   let acts="";
-  if(p.status==="aguarda")
-   acts=`<button class="bok" onclick="mudar('${p.id}','confirmado')">Comprovativo recebido</button>
-         <button class="bno" onclick="mudar('${p.id}','cancelado')">Cancelar</button>`;
-  else if(p.status==="confirmado")
-   acts=`<button class="bnx" onclick="mudar('${p.id}','preparar')">Pôr a preparar</button>
-         <button class="bno" onclick="mudar('${p.id}','cancelado')">Cancelar</button>`;
-  else if(p.status==="preparar")
-   acts=`<button class="bok" onclick="mudar('${p.id}','pronto')">Marcar pronto</button>`;
-  else if(p.status==="pronto")
-   acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Entregue":"Levantado"}</button>`;
+  if(p.status==="confirmado") acts=`<button class="bnx" onclick="mudar('${p.id}','preparar')">Começar</button>`;
+  else if(p.status==="preparar") acts=`<button class="bok" onclick="mudar('${p.id}','pronto')">Pronto</button>`;
+  else if(p.status==="pronto") acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Saiu":"Levantado"}</button>`;
+  const atr=(p.status!=="entregue"&&atrasado(p.slot));
   return `<div class="ped ${p.status}">
    <div class="top"><span class="hora">${p.slot||"—"}</span>
     <span class="tipo ${ent?"ent":""}">${ent?"ENTREGA":"LEVANTAR"}</span></div>
-   <div class="cli">${p.nome||"(sem nome)"} · <span class="cod">${p.code||""}</span>
-    ${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}</div>
+   <div class="cli">${p.nome||"(sem nome)"}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}</div>
    <ul>${p.itens.map(i=>`<li>${i}</li>`).join("")}</ul>
-   ${p.morada?`<div class="nt">📍 ${p.morada}</div>`:""}
-   ${p.notas?`<div class="nt">Notas: ${p.notas}</div>`:""}
-   <div class="tot">${p.total} ECV</div>
+   ${p.notas?`<div class="nt">⚠ ${p.notas}</div>`:""}
+   ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
    <div class="acts">${acts}</div>
   </div>`;
@@ -230,33 +157,12 @@ async function carregarPedidos(){
 }
 
 async function mudar(id,st){
- if(st==="cancelado" && !confirm("Cancelar este pedido?")) return;
  try{
   const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st,{method:"POST"});
   const d=await r.json();
   if(d.erro){ alert(d.erro); return; }
- }catch(e){ alert("Não foi possível guardar."); return; }
- carregarPedidos();
-}
-
-async function alternar(nome){
- const off = fora.includes(nome);
- const r = await pedir("/soldout-set?item="+encodeURIComponent(nome)+"&on="+(off?"0":"1"));
- if(!r || r.erro){ alert((r&&r.erro)||"Não foi possível guardar. Tente outra vez."); return; }
- fora = r.itens || [];
- desenhar();
- carregarPedidos();
- setInterval(()=>{ if($("abaPed").style.display!=="none") carregarPedidos(); }, 30000);
-}
-
-async function limparTudo(){
- if(!confirm("Repor todos os produtos como disponíveis?")) return;
- const r = await pedir("/soldout-set?limpar=1");
- if(!r || r.erro){ alert((r&&r.erro)||"Não foi possível."); return; }
- fora = r.itens || [];
- desenhar();
- carregarPedidos();
- setInterval(()=>{ if($("abaPed").style.display!=="none") carregarPedidos(); }, 30000);
+ }catch(e){ alert("Não foi possível guardar. Verifique a ligação."); return; }
+ carregar();
 }
 </script>
 </body>
