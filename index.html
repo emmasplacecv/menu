@@ -278,8 +278,11 @@ textarea.fld{min-height:74px;resize:vertical;}
   <h3>Finalizar encomenda</h3>
   <div class="sd">Enviamos o pedido para o nosso WhatsApp</div>
 
-  <div class="lbl">O SEU NOME</div>
-  <input class="fld" id="fName" placeholder="Como se chama?" autocomplete="name">
+  <div class="lbl">O SEU NOME *</div>
+  <input class="fld" id="fName" placeholder="Como se chama?" autocomplete="name" required>
+
+  <div class="lbl">O SEU CONTACTO *</div>
+  <input class="fld" id="fTel" placeholder="Ex: 991 22 33" inputmode="tel" autocomplete="tel" required>
 
   <div class="lbl">COMO QUER RECEBER</div>
   <div class="chips" id="modeChips">
@@ -730,7 +733,10 @@ async function sendWA(){
  if(enviando) return;
  if(!cart.length){alert("O pedido está vazio.");return;}
  const nome=$("fName").value.trim();
+ const tel=$("fTel").value.trim();
  const addr=$("fAddr").value.trim();
+ if(!nome){ alert("Escreva o seu nome — precisamos dele para identificar o pedido."); $("fName").focus(); return; }
+ if(tel.replace(/\D/g,"").length<7){ alert("Escreva um contacto válido — é como falamos consigo sobre o pedido."); $("fTel").focus(); return; }
  if(mode==="entrega"&&!addr&&!geo){alert("Indique a morada de entrega ou envie a sua localização.");return;}
  const precisa=pagaAntes();
  if(precisa&&!banco){alert("Escolha o banco onde vai fazer a transferência.");return;}
@@ -766,7 +772,8 @@ async function sendWA(){
  let L=[];
  L.push("*NOVO PEDIDO — Emma's Place*");
  L.push("Código: "+codigo);
- if(nome) L.push("Cliente: "+nome);
+ L.push("Cliente: "+nome);
+ L.push("Contacto: "+tel);
  L.push("");
  L.push("*Produtos:*");
  cart.forEach(i=>L.push(`• ${i.q}x ${i.name}${i.opts.length?" ("+i.opts.join(", ")+")":""} — ${i.price*i.q} ECV`));
@@ -809,7 +816,7 @@ async function sendWA(){
  try{
   fetch(PROMO_API+"/order",{method:"POST",headers:{"Content-Type":"application/json"},
    body:JSON.stringify({
-    code:codigo, nome:nome, modo:mode,
+    code:codigo, nome:nome, tel:tel, modo:mode,
     slot:(timeMode==="marcada"&&slotVal)?slotVal:(blocoPrep||""),
     quando:(!slotHoje&&slotQuando)?slotQuando:"hoje",
     dia:(!slotHoje&&diaISO)?diaISO:null,
@@ -942,6 +949,7 @@ function repetirUltimo(){
   for(let k=0;k<s.q;k++) addToCart(f.item.n, price, opts, f.item.nd, m, f.cat.cat, (f.item.pt!=null?f.item.pt:f.cat.pt));
  });
  if(d.nome) $("fName").value=d.nome;
+ if(d.tel) $("fTel").value=d.tel;
  if(d.addr) $("fAddr").value=d.addr;
  if(faltam.length) alert("Não foi possível repetir estes produtos:\n\n"+faltam.join("\n"));
  openCart();
