@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Cozinha — Emma's Place</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Jost:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--cream:#F3ECDD;--card:#FBF7EE;--line:#E5D9C2;--ink:#3B2314;--ink2:#7A5A3C;
+ --gold:#C89B6D;--dark:#2E2018;--vermelho:#8C2F2F;--verde:#2E6B32;}
+body{background:var(--cream);color:var(--ink);font-family:'Jost',system-ui,sans-serif;
+ padding-bottom:24px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:900px;margin:0 auto;padding:18px 14px;}
+h1{font-family:'Playfair Display',serif;font-size:24px;}
+.sub{font-size:13.5px;color:var(--ink2);font-weight:300;margin-top:3px;}
+.hoje{font-size:12.5px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-top:5px;}
+
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:16px;}
+.fld{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;
+ font-family:inherit;font-size:16px;color:var(--ink);}
+.btn{width:100%;padding:14px;border-radius:40px;background:var(--dark);color:#F7F1E4;
+ border:none;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px;}
+.msg{font-size:14px;margin-top:10px;min-height:18px;}
+.msg.bad{color:var(--vermelho);}
+
+.filtros{display:flex;gap:7px;margin:16px 0 4px;}
+.fb{flex:1;padding:11px 6px;border-radius:30px;border:2px solid var(--line);background:var(--card);
+ font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);}
+.fb.sel{background:var(--dark);color:#F7F1E4;border-color:var(--dark);}
+
+.grid{display:grid;grid-template-columns:1fr;gap:11px;margin-top:12px;}
+@media(min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+.ped{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 15px;}
+.ped.preparar{border-color:var(--gold);background:#FFF9EF;}
+.ped.pronto{border-color:#9CC29C;background:#EEF6EE;}
+.ped .top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.ped .hora{font-family:'Playfair Display',serif;font-size:30px;font-weight:800;line-height:1;}
+.ped .tipo{font-size:11.5px;letter-spacing:1.5px;font-weight:600;padding:4px 10px;border-radius:20px;
+ background:var(--dark);color:#F7F1E4;white-space:nowrap;}
+.ped .tipo.ent{background:var(--gold);color:var(--dark);}
+.ped .cli{font-size:15px;color:var(--ink);margin-top:6px;}
+.ped .cli .tel{color:var(--verde);font-weight:600;text-decoration:none;}
+.ped .meta{font-family:monospace;font-size:12px;color:var(--ink2);margin-top:3px;}
+.ped .mor{font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.4;}
+.ped ul{list-style:none;margin:10px 0 0;}
+.ped li{font-size:17px;font-weight:500;padding:5px 0;border-bottom:1px dotted var(--line);line-height:1.35;}
+.ped li:last-child{border-bottom:none;}
+.ped .nt{font-size:14px;color:#8C2F2F;margin-top:8px;font-weight:500;}
+.ped .est{font-size:11.5px;letter-spacing:1.5px;font-weight:600;color:var(--ink2);margin-top:9px;}
+.ped .acts{display:flex;gap:7px;margin-top:11px;}
+.ped .acts button{flex:1;padding:13px 6px;border-radius:30px;border:none;
+ font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;}
+.bnx{background:var(--dark);color:#F7F1E4;}
+.bok{background:var(--verde);color:#fff;}
+.vazio{text-align:center;padding:30px 12px;color:var(--ink2);font-weight:300;}
+.atr{background:#F6E9E6;border:1px solid #D9B4AC;color:var(--vermelho);border-radius:12px;
+ padding:9px 12px;font-size:13.5px;font-weight:600;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Cozinha</h1>
+<div class="sub">Pedidos confirmados, por ordem de hora.</div>
+<div class="hoje" id="hoje"></div>
+
+<div class="box" id="loginBox">
+  <div style="font-size:13px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin-bottom:8px;">CHAVE</div>
+  <input class="fld" id="fKey" type="password" placeholder="Chave da cozinha" autocomplete="off">
+  <button class="btn" onclick="entrar()">Entrar</button>
+  <div class="msg" id="loginMsg"></div>
+</div>
+
+<div id="painel" style="display:none">
+  <div class="filtros">
+    <button class="fb sel" id="f1" onclick="filtrar('activos')">A fazer</button>
+    <button class="fb" id="f2" onclick="filtrar('pronto')">Prontos</button>
+    <button class="fb" id="f3" onclick="filtrar('todos')">Todos</button>
+  </div>
+  <div id="lista" class="grid"></div>
+</div>
+
+</div>
+
+<script>
+/* Substitua pelo URL do seu Worker (o mesmo do menu). */
+const PROMO_API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
+
+const ESTADOS={confirmado:"A aguardar",preparar:"Em preparação",pronto:"Pronto",entregue:"Entregue"};
+let KEY="", pedidos=[], filtro="activos";
+const $=id=>document.getElementById(id);
+
+$("hoje").textContent=new Date().toLocaleDateString("pt-PT",
+ {weekday:"long",day:"2-digit",month:"long"}).toUpperCase();
+
+async function entrar(){
+ KEY=$("fKey").value.trim();
+ if(!KEY){ $("loginMsg").className="msg bad"; $("loginMsg").textContent="Escreva a chave."; return; }
+ $("loginMsg").textContent="A verificar…"; $("loginMsg").className="msg";
+ try{
+  const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY));
+  const d=await r.json();
+  if(d.erro){ $("loginMsg").className="msg bad"; $("loginMsg").textContent=d.erro; return; }
+  pedidos=d.pedidos||[];
+ }catch(e){ $("loginMsg").className="msg bad"; $("loginMsg").textContent="Sem ligação ao servidor."; return; }
+ $("loginBox").style.display="none";
+ $("painel").style.display="block";
+ desenhar();
+ setInterval(carregar, 20000);          // actualiza sozinho
+}
+
+async function carregar(){
+ try{
+  const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY));
+  const d=await r.json();
+  if(!d.erro) pedidos=d.pedidos||[];
+ }catch(e){}
+ desenhar();
+}
+
+function filtrar(f){
+ filtro=f;
+ [["activos","f1"],["pronto","f2"],["todos","f3"]].forEach(([k,id])=>
+  $(id).classList.toggle("sel", k===f));
+ desenhar();
+}
+
+function atrasado(slot){
+ if(!slot) return false;
+ const [h,m]=slot.split(":").map(Number);
+ const n=new Date();
+ return (h*60+m) < (n.getHours()*60+n.getMinutes());
+}
+
+function desenhar(){
+ let l=pedidos;
+ if(filtro==="activos") l=l.filter(p=>p.status==="confirmado"||p.status==="preparar");
+ else if(filtro==="pronto") l=l.filter(p=>p.status==="pronto");
+ if(!l.length){ $("lista").innerHTML='<div class="vazio">Nada por aqui.</div>'; return; }
+ $("lista").innerHTML=l.map(p=>{
+  const ent=p.modo==="entrega";
+  let acts="";
+  if(p.status==="confirmado") acts=`<button class="bnx" onclick="mudar('${p.id}','preparar')">Começar</button>`;
+  else if(p.status==="preparar") acts=`<button class="bok" onclick="mudar('${p.id}','pronto')">Pronto</button>`;
+  else if(p.status==="pronto") acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Saiu":"Levantado"}</button>`;
+  const atr=(p.status!=="entregue"&&atrasado(p.slot));
+  return `<div class="ped ${p.status}">
+   <div class="top"><span class="hora">${p.slot||"—"}</span>
+    <span class="tipo ${ent?"ent":""}">${ent?"ENTREGA":"LEVANTAR"}</span></div>
+   <div class="cli"><b>${p.nome||"(sem nome)"}</b>${p.tel?` · <a class="tel" href="tel:${p.tel.replace(/\s/g,"")}">${p.tel}</a>`:""}</div>
+   <div class="meta">${p.code||""}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}${p.criado?" · pedido às "+p.criado:""}</div>
+   <ul>${p.itens.map(i=>`<li>${i}</li>`).join("")}</ul>
+   ${p.morada?`<div class="mor">📍 ${p.morada}</div>`:""}
+   ${p.notas?`<div class="nt">⚠ ${p.notas}</div>`:""}
+   ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
+   <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
+   <div class="acts">${acts}</div>
+  </div>`;
+ }).join("");
+}
+
+async function mudar(id,st){
+ try{
+  const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st,{method:"POST"});
+  const d=await r.json();
+  if(d.erro){ alert(d.erro); return; }
+ }catch(e){ alert("Não foi possível guardar. Verifique a ligação."); return; }
+ carregar();
+}
+</script>
+</body>
+</html>
