@@ -752,8 +752,18 @@ async function testarNotificacao(){
   try{
     const r = await fetch(PROMO_API + "/push-teste?key=" + encodeURIComponent(KEY), {method:"POST"});
     const d = await r.json();
-    if(d.erro) alert(d.erro);
-  }catch(e){ alert("Falhou o teste."); }
+    if(d.erro){ alert(d.erro); return; }
+    if(!d.aparelhos){
+      alert("Nenhum aparelho registado.\n\nToque em «Activar notificações» primeiro.");
+      return;
+    }
+    const linhas = (d.resultado||[]).map(x =>
+      "• " + (x.estado===201||x.estado===200 ? "ENVIADO (" + x.estado + ")" : "FALHOU: " + x.estado)
+      + (x.resposta ? "\n  " + x.resposta : "")
+    ).join("\n");
+    alert("Aparelhos registados: " + d.aparelhos + "\n\n" + linhas +
+      "\n\nSe diz ENVIADO mas não apareceu nada, o problema está nas definições de notificações do telemóvel.");
+  }catch(e){ alert("Falhou o teste: " + e); }
 }
 
 function botaoNotificacoes(){
