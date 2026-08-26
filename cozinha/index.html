@@ -288,7 +288,13 @@ async function activarNotificacoes(){
       dizer("🔔 Activar notificações");
       return;
     }
-    const reg = await navigator.serviceWorker.ready;
+    // se o service worker não estiver pronto, não ficamos à espera para sempre
+    const reg = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise((_, rej) => setTimeout(() => rej(new Error(
+        "O service worker não está activo.\n\nConfirme que o ficheiro sw.js foi carregado nesta pasta do site, feche a app por completo e volte a abrir."
+      )), 6000))
+    ]);
     const r = await fetch(PROMO_API + "/push-chave");
     const d = await r.json();
     if(!d.chave){ alert("Não foi possível obter a chave do servidor."); return; }
@@ -332,22 +338,26 @@ async function testarNotificacao(){
   }catch(e){ alert("Falhou o teste: " + e); }
 }
 
+function tocarNotifBtn(){
+  if(typeof KEY === "undefined" || !KEY){
+    alert("Entre com a chave primeiro.");
+    return;
+  }
+  let jaActivo = false;
+  try{ jaActivo = localStorage.getItem("ep_push")==="1" && Notification.permission==="granted"; }catch(e){}
+  if(jaActivo) testarNotificacao(); else activarNotificacoes();
+}
+
 function botaoNotificacoes(){
   const btn = document.getElementById("notifBtn");
   if(!btn) return;
   let jaActivo = false;
   try{ jaActivo = localStorage.getItem("ep_push")==="1" && Notification.permission==="granted"; }catch(e){}
-  if(jaActivo){
-    btn.textContent = "🔔 Testar notificação";
-    btn.onclick = testarNotificacao;
-  }else{
-    btn.textContent = "🔔 Activar notificações";
-    btn.onclick = activarNotificacoes;
-  }
+  btn.textContent = jaActivo ? "🔔 Testar notificação" : "🔔 Activar notificações";
 }
 
 </script>
-<button class="notifBtn" id="notifBtn">🔔 Activar notificações</button>
+<button class="notifBtn" id="notifBtn" onclick="tocarNotifBtn()">🔔 Activar notificações</button>
 <button class="somBtn" id="somBtn" onclick="alternarAlerta()">🔔 Som ligado</button>
 </body>
 </html>
