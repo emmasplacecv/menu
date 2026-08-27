@@ -58,6 +58,29 @@ h1{font-family:'Playfair Display',serif;font-size:24px;}
  font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;}
 .bnx{background:var(--dark);color:#F7F1E4;}
 .bok{background:var(--verde);color:#fff;}
+.abas{display:flex;gap:8px;margin:16px 0 4px;}
+.abab{flex:1;padding:13px;border-radius:30px;border:2px solid var(--line);background:var(--card);
+ font-size:15.5px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);}
+.abab.sel{background:var(--dark);color:#F7F1E4;border-color:var(--dark);}
+.avisoStk{background:#FFF6E2;border:1px solid var(--gold);border-radius:12px;padding:11px 13px;
+ font-size:13.5px;color:#6E4B2F;line-height:1.5;margin:12px 0;}
+.scat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:18px 0 7px;}
+.srow{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);
+ border-radius:15px;padding:11px 12px;margin-bottom:9px;}
+.srow.zero{background:#F6E9E6;border-color:#D9B4AC;}
+.srow .sn{flex:1;font-size:16px;line-height:1.25;font-weight:500;}
+.srow.zero .sn{color:var(--vermelho);text-decoration:line-through;}
+.srow .sq{min-width:52px;text-align:center;font-family:'Playfair Display',serif;
+ font-size:27px;font-weight:800;color:var(--verde);}
+.srow.zero .sq{color:var(--vermelho);}
+.srow .sminus{flex:none;width:76px;height:56px;border-radius:16px;border:none;background:var(--dark);
+ color:#F7F1E4;font-size:22px;font-weight:700;cursor:pointer;font-family:inherit;}
+.srow .sminus:disabled{opacity:.3;}
+.srow .stog{flex:none;width:62px;height:56px;border-radius:16px;border:none;cursor:pointer;
+ font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.5px;}
+.stog.on{background:var(--verde);color:#fff;}
+.stog.no{background:var(--vermelho);color:#fff;}
+.semstk{font-size:13px;color:var(--ink2);font-weight:300;}
 .vazio{text-align:center;padding:30px 12px;color:var(--ink2);font-weight:300;}
 .atr{background:#F6E9E6;border:1px solid #D9B4AC;color:var(--vermelho);border-radius:12px;
  padding:9px 12px;font-size:13.5px;font-weight:600;margin-top:12px;}
@@ -89,12 +112,27 @@ h1{font-family:'Playfair Display',serif;font-size:24px;}
 </div>
 
 <div id="painel" style="display:none">
+  <div class="abas">
+    <button class="abab sel" id="abPed" onclick="verSeccao('ped')">Pedidos</button>
+    <button class="abab" id="abStk" onclick="verSeccao('stk')">Stock</button>
+  </div>
+
+  <div id="secPed">
   <div class="filtros">
     <button class="fb sel" id="f1" onclick="filtrar('activos')">A fazer</button>
     <button class="fb" id="f2" onclick="filtrar('pronto')">Prontos</button>
     <button class="fb" id="f3" onclick="filtrar('todos')">Todos</button>
   </div>
   <div id="lista" class="grid"></div>
+  </div>
+
+  <div id="secStk" style="display:none">
+    <div class="avisoStk">
+      Toque em <b>−1</b> sempre que vender. Quando chegar a <b>0</b>,
+      o produto deixa de aparecer no site.
+    </div>
+    <div id="stockLista"></div>
+  </div>
 </div>
 
 </div>
@@ -264,6 +302,94 @@ if("serviceWorker" in navigator){
 }
 
 
+
+/* ---------- STOCK DO DIA ---------- */
+const MENU_STK = [["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Americano", "m": 120, "g": 150}, {"n": "Cappuccino", "m": 140, "g": 180}, {"n": "Latte Clássico", "m": 130, "g": 170, "d": "meia de leite"}, {"n": "Mocha Chocolate", "m": 170, "g": 190}, {"n": "Caramelo Latte", "m": 180, "g": 200}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 175, "g": 200}, {"n": "Iced Caramelo Latte", "m": 275, "g": 300}, {"n": "Café Instantâneo Gelado", "m": 225, "g": 250}, {"n": "Frape Chocolate", "m": 275, "g": 300}, {"n": "Frape Caramelo", "m": 300, "g": 325}, {"n": "Frape Clássico", "m": 225, "g": 250}, {"n": "Iced Mocha", "m": 275, "g": 300}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 350}, {"n": "Sumo de Manga", "m": 450}, {"n": "Sumo de Papaia", "m": 350}, {"n": "Sumo de Ananás", "m": 500}, {"n": "Sumo de Maçã", "m": 350}]], ["DONUTS & MUFFINS", [{"n": "Donut Chocolate", "m": 135}, {"n": "Donut Doce de Leite", "m": 120}, {"n": "Muffin Chocolate", "m": 100}, {"n": "Muffin Laranja", "m": 95}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 150, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 140, "d": "chouriço, queijo"}, {"n": "Pão Rech. Frango", "m": 190, "d": "rúcula, queijo, tomate"}, {"n": "Pão Rech. Atum", "m": 190, "d": "queijo, tomate"}, {"n": "Pão Rech. Caprese", "m": 180, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta Mista", "m": 180}, {"n": "Tosta Fiambre", "m": 160}, {"n": "Tosta Queijo", "m": 160}, {"n": "Tosta com Manteiga", "m": 120}, {"n": "Wrap de Frango", "m": 400}, {"n": "Wrap de Atum", "m": 400}]], ["ALMOÇO", [{"n": "Salada Fria de Frango", "m": 420, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 420, "d": "massa espiral, legumes, molho leve"}, {"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Poke Bowl Frango", "m": 600}, {"n": "Poke Bowl Atum", "m": 700}, {"n": "Poke Bowl Salmão", "m": 700}]]];
+const CAT_COMIDA = ["DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
+let stock = {}, fora = [];
+
+function ehComida(cat){
+  const n = String(cat||"").replace(/&amp;/g,"&").trim().toUpperCase();
+  return CAT_COMIDA.includes(n);
+}
+
+function verSeccao(q){
+  const p = (q === "ped");
+  document.getElementById("secPed").style.display = p ? "block" : "none";
+  document.getElementById("secStk").style.display = p ? "none" : "block";
+  document.getElementById("abPed").classList.toggle("sel", p);
+  document.getElementById("abStk").classList.toggle("sel", !p);
+  if(!p) carregarStock();
+}
+
+async function carregarStock(){
+  try{
+    const [r1, r2] = await Promise.all([
+      fetch(PROMO_API + "/stock-dia").then(r => r.json()).catch(() => ({})),
+      fetch(PROMO_API + "/soldout").then(r => r.json()).catch(() => ({}))
+    ]);
+    stock = r1.itens || {};
+    fora  = r2.itens || [];
+  }catch(e){}
+  desenharStock();
+}
+
+function desenharStock(){
+  let h = "";
+  MENU_STK.forEach(([cat, itens], ci) => {
+    if(!ehComida(cat)) return;
+    h += `<div class="scat">${cat}</div>`;
+    itens.forEach((it, ii) => {
+      const q = stock[it.n];
+      const temStock = (q !== undefined);
+      const zero = temStock && q <= 0;
+      const marcado = fora.includes(it.n);
+      const inactivo = zero || marcado;
+      h += `<div class="srow${inactivo ? " zero" : ""}">
+        <div class="sn">${it.n}${!temStock ? '<div class="semstk">sem stock definido hoje</div>' : ""}</div>
+        ${temStock ? `<div class="sq">${q}</div>
+          <button class="sminus" onclick="baixar(${ci},${ii})" ${zero ? "disabled" : ""}>−1</button>` : ""}
+        <button class="stog ${marcado ? "no" : "on"}" onclick="alternarItem(${ci},${ii})">${marcado ? "ACABOU" : "TEM"}</button>
+      </div>`;
+    });
+  });
+  document.getElementById("stockLista").innerHTML = h;
+}
+
+/* Vendeu um: baixa imediata no ecrã, confirmação no servidor a seguir */
+async function baixar(ci, ii){
+  const nome = MENU_STK[ci][1][ii].n;
+  if(stock[nome] === undefined || stock[nome] <= 0) return;
+  stock[nome] = stock[nome] - 1;      // resposta imediata para quem está a servir
+  desenharStock();
+  try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){}
+  try{
+    const r = await fetch(PROMO_API + "/stock-baixa?key=" + encodeURIComponent(KEY) +
+                          "&item=" + encodeURIComponent(nome), {method:"POST"});
+    const d = await r.json();
+    if(d.erro){ alert(d.erro); carregarStock(); return; }
+    stock = d.itens || stock;         // o servidor manda
+    desenharStock();
+  }catch(e){
+    alert("Sem ligação — a baixa não foi guardada.");
+    carregarStock();
+  }
+}
+
+async function alternarItem(ci, ii){
+  const nome = MENU_STK[ci][1][ii].n;
+  const marcado = fora.includes(nome);
+  try{
+    const r = await fetch(PROMO_API + "/soldout-set?key=" + encodeURIComponent(KEY) +
+                          "&item=" + encodeURIComponent(nome) + "&on=" + (marcado ? "0" : "1"),
+                          {method:"POST"});
+    const d = await r.json();
+    if(d.erro){ alert(d.erro); return; }
+    fora = d.itens || [];
+    desenharStock();
+  }catch(e){ alert("Não foi possível guardar."); }
+}
+
 /* ============ REGISTAR ESTE TELEMÓVEL PARA NOTIFICAÇÕES ============ */
 function b64uParaU8(s){
   s = s.replace(/-/g,"+").replace(/_/g,"/");
@@ -322,6 +448,22 @@ async function activarNotificacoes(){
 
 async function testarNotificacao(){
   try{
+    // TESTE 1 — notificação local, mostrada pelo próprio telemóvel.
+    // Se esta não aparecer, o bloqueio está nas definições do telemóvel.
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification("Teste local", {
+        body: "Se vê isto, o telemóvel mostra notificações.",
+        icon: "icon-192.png", tag: "teste-local",
+        silent: false, renotify: true,
+        vibrate: [300,120,300,120,300]
+      });
+    }catch(e){
+      alert("O telemóvel recusou mostrar a notificação:\n\n" + e +
+            "\n\nVá a Definições → Aplicações → esta app → Notificações e active.");
+      return;
+    }
+    // TESTE 2 — notificação enviada pelo servidor (o caminho real)
     const r = await fetch(PROMO_API + "/push-teste?key=" + encodeURIComponent(KEY), {method:"POST"});
     const d = await r.json();
     if(d.erro){ alert(d.erro); return; }
@@ -334,7 +476,11 @@ async function testarNotificacao(){
       + (x.resposta ? "\n  " + x.resposta : "")
     ).join("\n");
     alert("Aparelhos registados: " + d.aparelhos + "\n\n" + linhas +
-      "\n\nSe diz ENVIADO mas não apareceu nada, o problema está nas definições de notificações do telemóvel.");
+      "\n\nDeve ter recebido DUAS notificações:\n" +
+      "1) «Teste local» — mostrada pelo telemóvel\n" +
+      "2) «Novo pedido» — enviada pelo servidor\n\n" +
+      "Se só veio a 1.ª, o envio chega mas o Android está a bloquear em segundo plano " +
+      "(Definições → Aplicações → esta app → Bateria → Sem restrições).");
   }catch(e){ alert("Falhou o teste: " + e); }
 }
 
