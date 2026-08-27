@@ -160,6 +160,7 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
   <div class="tabs">
     <button class="tabb sel" id="tabPed" onclick="verAba('ped')">Pedidos <span class="pill" id="nPed">0</span></button>
     <button class="tabb" id="tabEsg" onclick="verAba('esg')">Esgotados</button>
+    <button class="tabb" id="tabStk" onclick="verAba('stk')">Stock</button>
     <button class="tabb" id="tabMen" onclick="verAba('men')">Menu</button>
   </div>
 
@@ -168,6 +169,15 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
       Confirme o pedido depois de receber o comprovativo. Só então aparece à cozinha.
     </div>
     <div id="pedidos"></div>
+  </div>
+
+  <div id="abaStk" style="display:none">
+    <div class="aviso">
+      Quantidades que tem <b>hoje</b> de cada comida. A cozinha vai dando baixa a cada venda.
+      Quando chega a <b>0</b>, o produto aparece esgotado no site automaticamente.
+      <br><br>Deixe em branco o que não quer controlar. Amanhã recomeça do zero.
+    </div>
+    <div id="stockEdit"></div>
   </div>
 
   <div id="abaMen" style="display:none">
@@ -202,6 +212,7 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
 
 <nav class="bar" id="barra" style="display:none">
   <button class="lim" id="btnGravar" onclick="gravarMenu()" style="display:none">Guardar alterações</button>
+  <button class="lim" id="btnStock" onclick="gravarStock()" style="display:none">Guardar stock</button>
   <button class="lim" id="btnRepor" onclick="limparTudo()">Repor tudo disponível</button>
   <a class="ver" href="../" target="_blank">Ver o site</a>
 </nav>
@@ -322,6 +333,71 @@ async function alternarEstado(){
   fechado=!!d.fechado; msgFechada=d.msg||"";
   desenharEstado();
  }catch(e){ alert("Não foi possível guardar."); }
+}
+
+
+/* ---------- STOCK DO DIA (só comidas) ---------- */
+const CAT_COMIDA = ["DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
+let stock = {}, stockSujo = false;
+
+function ehComida(cat){
+  const n = String(cat||"").replace(/&amp;/g,"&").trim().toUpperCase();
+  return CAT_COMIDA.includes(n);
+}
+
+async function carregarStock(){
+  try{
+    const r = await fetch(PROMO_API+"/stock-dia");
+    const d = await r.json();
+    stock = d.itens || {};
+  }catch(e){ stock = {}; }
+  stockSujo = false;
+  $("btnStock").textContent = "Guardar stock";
+  desenharStock();
+}
+
+function desenharStock(){
+  let h = "";
+  MENU.forEach(([cat, itens]) => {
+    if(!ehComida(cat)) return;
+    h += `<div class="cat">${cat}</div>`;
+    itens.forEach(it => {
+      const q = stock[it.n];
+      const zero = (q !== undefined && q <= 0);
+      h += `<div class="mrow${zero?" rem":""}">
+        <div class="n">${it.n}${zero?'<small style="color:#8C2F2F">acabou</small>':""}</div>
+        <input value="${q===undefined?"":q}" placeholder="—" inputmode="numeric"
+               onchange="setStock(${JSON.stringify(it.n).replace(/"/g,"&quot;")}, this.value)">
+      </div>`;
+    });
+  });
+  $("stockEdit").innerHTML = h;
+}
+
+function setStock(nome, v){
+  const s = String(v).trim();
+  if(s === ""){ delete stock[nome]; }
+  else {
+    const n = parseInt(s, 10);
+    if(isFinite(n) && n >= 0) stock[nome] = n;
+  }
+  stockSujo = true;
+  $("btnStock").textContent = "Guardar stock •";
+}
+
+async function gravarStock(){
+  try{
+    const r = await fetch(PROMO_API+"/stock-set?key="+encodeURIComponent(KEY),
+      {method:"POST", headers:{"Content-Type":"application/json"},
+       body: JSON.stringify({itens: stock})});
+    const d = await r.json();
+    if(d.erro){ alert(d.erro); return; }
+    stock = d.itens || {};
+    stockSujo = false;
+    $("btnStock").textContent = "Guardar stock";
+    alert("Stock do dia guardado.");
+    desenharStock();
+  }catch(e){ alert("Não foi possível guardar."); }
 }
 
 /* ---------- EDITAR MENU ---------- */
@@ -535,14 +611,16 @@ const ESTADOS={aguarda:"Aguarda comprovativo",confirmado:"Confirmado — à espe
 let pedidos=[];
 
 function verAba(q){
- [["ped","abaPed","tabPed"],["esg","abaEsg","tabEsg"],["men","abaMen","tabMen"]].forEach(([k,aba,tab])=>{
+ [["ped","abaPed","tabPed"],["esg","abaEsg","tabEsg"],["stk","abaStk","tabStk"],["men","abaMen","tabMen"]].forEach(([k,aba,tab])=>{
   $(aba).style.display = (k===q)?"block":"none";
   $(tab).classList.toggle("sel", k===q);
  });
  $("btnGravar").style.display = (q==="men")?"block":"none";
+ $("btnStock").style.display  = (q==="stk")?"block":"none";
  $("btnRepor").style.display  = (q==="esg")?"block":"none";
  if(q==="ped") carregarPedidos();
  if(q==="men") desenharMenu();
+ if(q==="stk") carregarStock();
 }
 
 async function carregarPedidos(){
@@ -756,6 +834,22 @@ async function activarNotificacoes(){
 
 async function testarNotificacao(){
   try{
+    // TESTE 1 — notificação local, mostrada pelo próprio telemóvel.
+    // Se esta não aparecer, o bloqueio está nas definições do telemóvel.
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification("Teste local", {
+        body: "Se vê isto, o telemóvel mostra notificações.",
+        icon: "icon-192.png", tag: "teste-local",
+        silent: false, renotify: true,
+        vibrate: [300,120,300,120,300]
+      });
+    }catch(e){
+      alert("O telemóvel recusou mostrar a notificação:\n\n" + e +
+            "\n\nVá a Definições → Aplicações → esta app → Notificações e active.");
+      return;
+    }
+    // TESTE 2 — notificação enviada pelo servidor (o caminho real)
     const r = await fetch(PROMO_API + "/push-teste?key=" + encodeURIComponent(KEY), {method:"POST"});
     const d = await r.json();
     if(d.erro){ alert(d.erro); return; }
@@ -768,7 +862,11 @@ async function testarNotificacao(){
       + (x.resposta ? "\n  " + x.resposta : "")
     ).join("\n");
     alert("Aparelhos registados: " + d.aparelhos + "\n\n" + linhas +
-      "\n\nSe diz ENVIADO mas não apareceu nada, o problema está nas definições de notificações do telemóvel.");
+      "\n\nDeve ter recebido DUAS notificações:\n" +
+      "1) «Teste local» — mostrada pelo telemóvel\n" +
+      "2) «Novo pedido» — enviada pelo servidor\n\n" +
+      "Se só veio a 1.ª, o envio chega mas o Android está a bloquear em segundo plano " +
+      "(Definições → Aplicações → esta app → Bateria → Sem restrições).");
   }catch(e){ alert("Falhou o teste: " + e); }
 }
 
