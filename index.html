@@ -896,7 +896,7 @@ const FREE=750, TAXA=225, PRAZO=15;
    estimado por proximidade — falta confirmação.
    Zonas de 350 ECV ou mais: só com hora marcada (mínimo 30 min).
    Acima de FREE, a entrega é grátis apenas até ZONA_FREE_MAX.          */
-const ZONA_MARCADA_MIN = 400;   // 400+ : entrega só com hora marcada
+const ZONA_MARCADA_MIN = 350;   // 350+ : entrega só com hora marcada (inclui os 350)
 /* Antecedência mínima por preço de zona (mais longe, mais tempo) */
 function leadZona(){
  if(!zona) return 30;
