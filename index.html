@@ -2012,7 +2012,7 @@ async function carregarMenuEdit(){
  // preços alterados
  MENU.forEach(c=>c.items.forEach(i=>{
   const o=ed.p&&ed.p[i.n];
-  if(!o) return;
+  if(!o || i.top) return;   // açaí: 750/850/900 fixos no código, o painel não mexe
   if(o.m!=null) i.p=o.m;
   if(o.g!=null) i.g=o.g; else if(o.g===null && "g" in o) delete i.g;
  }));
