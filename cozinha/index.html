@@ -48,6 +48,7 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped li:last-child{border-bottom:none;}
 .ped li .art{display:flex;align-items:baseline;gap:9px;}
 .soacai{display:inline-block;padding:2px 8px;border-radius:6px;background:#4A2545;color:#F7F1E4;letter-spacing:.8px;}
+.xtop{display:inline-block;padding:1px 7px;border-radius:6px;border:2px solid #4A2545;color:#4A2545;font-weight:700;}
 .ped li .qt{flex:0 0 auto;min-width:34px;padding:3px 8px;border-radius:8px;background:var(--dark);
  color:#F7F1E4;font-size:15px;font-weight:700;text-align:center;letter-spacing:-.2px;}
 .ped li .nome{font-size:24px;font-weight:700;color:var(--ink);letter-spacing:-.45px;}
@@ -294,8 +295,15 @@ function artigo(txt){
   if(!m) return `<div class="art"><span class="nome">${txt}</span></div>`;
   const [, q, nome, opts] = m;
   return `<div class="art"><span class="qt">${q}x</span><span class="nome">${nome}</span></div>`
-       + (opts ? `<div class="opt">${opts.replace(/SÓ AÇAÍ/g,'<b class="soacai">SÓ AÇAÍ · copo cheio</b>')}${
-           /^açaí$/i.test(nome.trim()) && !/SÓ AÇAÍ|Leite em pó/i.test(opts) ? ' <b class="soacai">SEM LEITE EM PÓ · + açaí</b>' : ""}</div>` : "");
+       + (opts ? `<div class="opt">${/^açaí$/i.test(nome.trim()) ? optAcai(opts) : opts}</div>` : "");
+}
+/* Açaí: realça o que muda a preparação.
+   SÓ AÇAÍ = copo cheio só de açaí · sem granola e sem leite em pó = copo leva mais açaí · toppings extra (pagos) em destaque */
+function optAcai(opts){
+  let h = opts.replace(/SÓ AÇAÍ/g,'<b class="soacai">SÓ AÇAÍ · copo cheio</b>')
+              .replace(/topping de (caramelo|chocolate|morango)/gi,'<b class="xtop">+ topping de $1</b>');
+  if(!/SÓ AÇAÍ|Granola|Leite em pó/i.test(opts)) h += ' <b class="soacai">SEM GRANOLA NEM LEITE EM PÓ · + açaí</b>';
+  return h;
 }
 
 function desenhar(){
