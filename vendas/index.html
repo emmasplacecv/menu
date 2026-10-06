@@ -78,32 +78,31 @@ h1{font-size:19px;letter-spacing:.5px;}
 
 /* Estado seleccionado: fica assim enquanto o produto estiver no pedido
    deste cliente — confirmação visual persistente, não só um flash. */
-/* açaí */
+/* açaí: copo de 355 ml, mesmas regras do site */
 .acai-bg{position:fixed;inset:0;background:rgba(30,20,14,.55);display:none;align-items:flex-end;justify-content:center;z-index:60;padding:12px;}
 .acai-bg.on{display:flex;}
-.acai-box{background:var(--card);width:100%;max-width:520px;border-radius:20px;padding:18px 16px 16px;box-shadow:0 20px 50px rgba(0,0,0,.3);}
-.acai-box h3{font-size:20px;margin-bottom:10px;}
-.vso{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:14px;border-radius:14px;border:2px dashed #B79AB4;background:#fff;font-family:inherit;color:var(--ink);cursor:pointer;}
-.vso span{flex:1;display:flex;flex-direction:column;gap:2px;}
-.vso b{font-size:17px;letter-spacing:1.5px;}
-.vso small{font-size:12.5px;color:var(--ink2);}
-.vso em{font-style:normal;font-weight:700;}
-.vso.on{background:#4A2545;border:2px solid #4A2545;color:#F7F1E4;}
-.vso.on small{color:#E8D8E6;}
-.vso.on b::after{content:" ✓";}
-.vou{margin:14px 0 8px;font-size:12px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);font-weight:600;text-align:center;}
+.acai-box{background:var(--card);width:100%;max-width:520px;max-height:94vh;overflow-y:auto;border-radius:20px;padding:16px 16px 0;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.acai-box h3{display:flex;align-items:center;gap:9px;font-size:20px;margin-bottom:10px;}
+.acai-box h3 small{padding:3px 10px;border-radius:20px;background:#4A2545;color:#F7F1E4;font-size:12.5px;font-weight:600;letter-spacing:.3px;}
+.acai-box h3 button{margin-left:auto;padding:8px 12px;border-radius:20px;border:2px dashed #B79AB4;background:#fff;font-family:inherit;font-size:13px;font-weight:600;color:#4A2545;cursor:pointer;}
+.vpr{border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;}
+.vpr div{display:flex;justify-content:space-between;gap:10px;padding:6px 12px;font-size:13.5px;color:var(--ink2);}
+.vpr div+div{border-top:1px solid var(--line);}
+.vpr b{color:var(--ink);}
+.vpr div.on{background:#4A2545;color:#F7F1E4;font-weight:600;}
+.vpr div.on b{color:#F7F1E4;}
+.vpr div.on span::before{content:"✓ ";}
 .vtops{display:flex;flex-wrap:wrap;gap:8px;}
 .vtops .tp{padding:11px 14px;border-radius:30px;border:2px solid var(--line);background:#fff;font-family:inherit;font-size:15px;color:var(--ink);cursor:pointer;}
 .vtops .tp.on{background:var(--verde2);border-color:var(--verde2);color:#F7F1E4;font-weight:600;}
 .vtops .tp.on::before{content:"✓ ";}
-.vgrp{width:100%;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);font-weight:600;margin:6px 0 0;}
-.vtops .tp.po{border-color:#4A2545;}
-.vdica{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:14px;background:#F1EAF0;color:#4A2545;}
-.vdica.ok{background:#EAF2E4;color:#2E6B32;}
-.vdica.alerta{background:#FFF4E2;color:#7A4A12;}
-.vfalta{display:none;margin-top:10px;padding:9px 12px;border-radius:10px;background:#F6E9E6;color:var(--vermelho);font-size:13.5px;}
-.vfalta.on{display:block;}
-.vacts{display:flex;gap:10px;margin-top:16px;}
+.vtops .tp small{font-size:12px;font-weight:700;color:#4A2545;}
+.vtops .tp.xt.on{background:#4A2545;border-color:#4A2545;}
+.vtops .tp.xt.on small{color:#E8D8E6;}
+.vgrp{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);font-weight:600;margin:8px 0 0;}
+.vgrp em{font-style:normal;letter-spacing:.3px;text-transform:none;font-size:11.5px;padding:2px 8px;border-radius:20px;background:#EAF2E4;color:#2E6B32;}
+.vgrp em.pago{background:#F1EAF0;color:#4A2545;}
+.vacts{display:flex;gap:10px;margin:8px -16px 0;padding:10px 16px 14px;position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);will-change:transform;}   /* sempre à vista em ecrãs baixos */
 .vacts button{flex:1;padding:14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-family:inherit;font-size:15px;cursor:pointer;color:var(--ink);}
 .vacts .ok{flex:2;background:var(--verde2);border-color:var(--verde2);color:#F7F1E4;font-weight:600;}
 .prod.sel{border-color:var(--verde2);background:#F3F7EF;
@@ -252,7 +251,7 @@ h1{font-size:19px;letter-spacing:.5px;}
 
 <script>
 const PROMO_API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
-const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha Chocolate", "m": 200, "g": 225}, {"n": "Caramelo Latte", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 750, "sp": 850, "so": 900, "po": "Leite em pó", "d": "c/ leite em pó 750 · sem 850 · só açaí 900", "fr": ["Banana", "Morango", "Frutos vermelhos", "Kiwi"], "top": ["Banana", "Morango", "Frutos vermelhos", "Kiwi", "Granola", "Leite em pó", "Leite condensado", "Proteína"]}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frape Clássico", "m": 275, "g": 300}, {"n": "Frape Chocolate", "m": 325, "g": 350}, {"n": "Frape Caramelo", "m": 350, "g": 375}, {"n": "Iced Caramelo Latte", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 375}, {"n": "Sumo de Maçã", "m": 375}, {"n": "Sumo de Manga", "m": 400}, {"n": "Sumo de Papaia", "m": 450}, {"n": "Sumo de Ananás", "m": 500}]], ["DONUTS & MUFFINS", [{"n": "Muffin Laranja", "m": 125}, {"n": "Muffin Chocolate", "m": 150}, {"n": "Donut Chocolate", "m": 150}, {"n": "Donut Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Rech. Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Rech. Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Rech. Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta Fiambre", "m": 170}, {"n": "Tosta Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl Frango", "m": 650}, {"n": "Poke Bowl Salmão", "m": 700}, {"n": "Poke Bowl Atum", "m": 725}]]];
+const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha Chocolate", "m": 200, "g": 225}, {"n": "Caramelo Latte", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 750, "sp": 850, "so": 1000, "xp": 50, "ml": 355, "d": "copo 355 ml · 750 / 850 / 1000 · topping extra +50", "base": ["Granola", "Leite em pó"], "fr": ["Banana", "Morango", "Frutos vermelhos", "Kiwi"], "tp": ["Leite condensado", "Proteína"], "xt": ["Caramelo", "Chocolate", "Morango"], "top": ["Granola", "Leite em pó", "Banana", "Morango", "Frutos vermelhos", "Kiwi", "Leite condensado", "Proteína"]}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frape Clássico", "m": 275, "g": 300}, {"n": "Frape Chocolate", "m": 325, "g": 350}, {"n": "Frape Caramelo", "m": 350, "g": 375}, {"n": "Iced Caramelo Latte", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 375}, {"n": "Sumo de Maçã", "m": 375}, {"n": "Sumo de Manga", "m": 400}, {"n": "Sumo de Papaia", "m": 450}, {"n": "Sumo de Ananás", "m": 500}]], ["DONUTS & MUFFINS", [{"n": "Muffin Laranja", "m": 125}, {"n": "Muffin Chocolate", "m": 150}, {"n": "Donut Chocolate", "m": 150}, {"n": "Donut Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Rech. Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Rech. Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Rech. Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta Fiambre", "m": 170}, {"n": "Tosta Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl Frango", "m": 650}, {"n": "Poke Bowl Salmão", "m": 700}, {"n": "Poke Bowl Atum", "m": 725}]]];
 
 let KEY="", cat=0, activo=0, pedidos=[];
 let balcoes=[novoBalcao(),novoBalcao(),novoBalcao(),novoBalcao()];
@@ -308,7 +307,7 @@ async function aplicarEdicao(){
  if(!ed) return;
  const norm=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
  MENU.forEach(c=>c[1].forEach(i=>{
-  const o=ed.p&&ed.p[i.n]; if(!o || i.top) return;   // açaí: 750/850/900 fixos no código
+  const o=ed.p&&ed.p[i.n]; if(!o || i.top) return;   // açaí: preços fixos no código (linha do Açaí em MENU)
   if(o.m!=null) i.m=o.m;
   if(o.g!=null) i.g=o.g; else if(o.g===null && "g" in o) delete i.g;
  }));
@@ -450,7 +449,7 @@ function add(ci,ii,sz){
  const preco=(sz==="G"&&i.g)?i.g:i.m;
  const r=restam(i.n);
  if(r!==null && r<=0){ alert("Já não há "+i.n+" para hoje."); return; }
- if(i.top){ abrirAcai(i); return; }            // açaí: escolher toppings ou SÓ AÇAÍ
+ if(i.top){ abrirAcai(i); return; }            // açaí: escolher o que leva
  meter(nome,i.n,preco);
 }
 /* mete uma linha no balcão activo (base = nome do stock) */
@@ -461,41 +460,47 @@ function meter(nome,base,preco){
  try{ if(navigator.vibrate) navigator.vibrate(12); }catch(e){}
  guardar(); desenharTabs(); desenharPedido(); desenharProdutos(); desenharStock();
 }
-/* ---------- AÇAÍ: preço pelo leite em pó ----------
-   nada = SÓ AÇAÍ (900) · toppings sem leite em pó (850) · com leite em pó (750) */
+/* ---------- AÇAÍ (copo de 355 ml) — as mesmas regras do site ----------
+   com granola e/ou leite em pó = m (750) · sem os dois = sp (850) · sem nada, SÓ AÇAÍ = so (1000)
+   toppings extra (lista xt): + xp (50) cada, sobre qualquer um dos três
+   Abre com granola e leite em pó marcados. Os preços mudam-se na linha do Açaí, em MENU. */
 let acai=null;
-function vPrecoDe(i,top){ return !top.length ? i.so : (top.includes(i.po) ? i.m : i.sp); }
+function vNivel(i,top){ return !top.length ? "so" : (top.some(s=>i.base.includes(s)) ? "m" : "sp"); }
+function vPrecoDe(i,top,xt){ return i[vNivel(i,top)] + (xt?xt.length:0)*i.xp; }
+/* texto que segue para a cozinha — igual ao do site */
+function vDetalhe(i,top,xt){
+ const o = top.length ? i.top.filter(s=>top.includes(s)) : ["SÓ AÇAÍ"];
+ return o.concat(i.xt.filter(s=>xt.includes(s)).map(s=>"topping de "+s.toLowerCase())).join(", ");
+}
 function abrirAcai(i){
- acai={i,top:[]};
- $("vSoP").textContent=i.so+" ECV";
- const tp=(s,k)=>`<button type="button" class="tp${s===i.po?" po":""}" onclick="vTop(${k},this)">${esc(s)}${s===i.po?" · "+i.m:""}</button>`;
- $("vTops").innerHTML='<div class="vgrp">Frutas</div>'+i.top.map((s,k)=>i.fr.includes(s)?tp(s,k):"").join("")
-   +'<div class="vgrp">Toppings</div>'+i.top.map((s,k)=>i.fr.includes(s)?"":tp(s,k)).join("");
+ acai={i,top:i.base.slice(),xt:[]};
+ const tp=(s,l)=>`<button type="button" class="tp${l==="xt"?" xt":""}${acai[l].includes(s)?" on":""}" data-l="${l}" data-s="${esc(s)}" onclick="vTop(this)">${esc(s)}${l==="xt"?` <small>+${i.xp}</small>`:""}</button>`;
+ const g=(nome,tag,lista,l)=>`<div class="vgrp"><span>${nome}</span><em${l==="xt"?' class="pago"':""}>${tag}</em></div>`+lista.map(s=>tp(s,l)).join("");
+ $("vMl").textContent="copo "+i.ml+" ml";
+ $("vPr").innerHTML=[["m","com granola e/ou leite em pó"],["sp","sem granola nem leite em pó"],["so","só açaí, sem mais nada"]]
+   .map(([n,txt])=>`<div data-n="${n}"><span>${txt}</span><b>${i[n]}</b></div>`).join("");
+ $("vTops").innerHTML=g("Clássicos","incluído",i.base,"top")+g("Fruta","incluída",i.fr,"top")+g("Toppings","incluído",i.tp,"top")
+   +g("Toppings extra","+"+i.xp+" ECV cada",i.xt,"xt");
  vPreco(); $("acaiBg").classList.add("on");
 }
 function fecharAcai(){ $("acaiBg").classList.remove("on"); acai=null; }
 function vPreco(){
- const i=acai.i, pr=vPrecoDe(i,acai.top), so=!acai.top.length, po=acai.top.includes(i.po);
- $("vSo").classList.toggle("on",so);
- $("vOk").textContent="Adicionar · "+pr+" ECV";
- const d=$("vDica");
- d.className="vdica"+(so?"":(po?" ok":" alerta"));
- d.innerHTML= so ? "SÓ AÇAÍ · copo cheio · "+i.so+" ECV"
-   : po ? "Com leite em pó · "+i.m+" ECV"
-   : "Sem leite em pó → <b>"+i.sp+" ECV</b>. Com leite em pó fica "+i.m+".";
+ const i=acai.i, n=vNivel(i,acai.top);
+ document.querySelectorAll("#vPr div").forEach(d=>d.classList.toggle("on",d.dataset.n===n));
+ $("vOk").textContent="Adicionar · "+vPrecoDe(i,acai.top,acai.xt)+" ECV";
 }
-function vSo(){
- acai.top=[]; document.querySelectorAll("#vTops .tp").forEach(b=>b.classList.remove("on")); vPreco();
+function vSoAcai(){
+ acai.top=[]; acai.xt=[]; document.querySelectorAll("#vTops .tp").forEach(b=>b.classList.remove("on")); vPreco();
 }
-function vTop(k,el){
- const s=acai.i.top[k], j=acai.top.indexOf(s);
- if(j>=0){ acai.top.splice(j,1); el.classList.remove("on"); } else { acai.top.push(s); el.classList.add("on"); }
+function vTop(el){
+ const l=acai[el.dataset.l], s=el.dataset.s, j=l.indexOf(s);
+ if(j>=0) l.splice(j,1); else l.push(s);
+ el.classList.toggle("on",j<0);
  vPreco();
 }
 function confirmarAcai(){
  const i=acai.i;
- const det=!acai.top.length ? "SÓ AÇAÍ" : i.top.filter(s=>acai.top.includes(s)).join(", ");
- meter(i.n+" ("+det+")", i.n, vPrecoDe(i,acai.top));
+ meter(i.n+" ("+vDetalhe(i,acai.top,acai.xt)+")", i.n, vPrecoDe(i,acai.top,acai.xt));
  fecharAcai();
 }
 function mudarQtd(k,d){
@@ -821,11 +826,9 @@ async function manterEcraAceso(){
 </script>
 <div class="acai-bg" id="acaiBg" onclick="if(event.target===this)fecharAcai()">
  <div class="acai-box">
-  <h3>Açaí</h3>
-  <button type="button" class="vso" id="vSo" onclick="vSo()"><span><b>SÓ AÇAÍ</b><small>copo cheio de açaí, sem toppings</small></span><em id="vSoP"></em></button>
-  <div class="vou">ou monta com frutas e toppings</div>
+  <h3>Açaí <small id="vMl"></small><button type="button" onclick="vSoAcai()">Limpar · só açaí</button></h3>
+  <div class="vpr" id="vPr"></div>
   <div class="vtops" id="vTops"></div>
-  <div class="vdica" id="vDica"></div>
   <div class="vacts"><button type="button" onclick="fecharAcai()">Cancelar</button><button type="button" class="ok" id="vOk" onclick="confirmarAcai()">Adicionar</button></div>
  </div>
 </div>
