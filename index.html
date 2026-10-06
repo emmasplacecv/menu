@@ -926,10 +926,10 @@ const MENU=[
 
  {cat:"AÇAÍ &amp; ÁGUA DE COCO",tk:"c_acai",pt:3,note:"Disponibilidade limitada — pode acabar durante o dia",items:[
   /* AÇAÍ — copo de 355 ml, vai sempre cheio. Preços (mudam-se aqui e em /vendas):
-     p  = com granola e/ou leite em pó            sp = sem os dois (leva mais açaí)
-     so = só açaí, sem mais nada                  xp = cada topping extra da lista xt
+     p  = com granola e/ou leite em pó            sp = sem os dois, mesmo com fruta (leva mais açaí)
+     xp = cada topping extra da lista xt
      rec = escolha com estrela e "recomendamos" */
-  {n:"Açaí",d:"copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings",ml:355,p:750,sp:850,so:1000,xp:50,
+  {n:"Açaí",d:"copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings",ml:355,p:750,sp:1000,xp:50,
    base:["Granola","Leite em pó"],fr:["Banana","Morango","Frutos vermelhos","Kiwi"],tp:["Leite condensado"],rec:"Leite em pó",
    xt:["Caramelo","Chocolate","Morango"],
    top:["Granola","Leite em pó","Banana","Morango","Frutos vermelhos","Kiwi","Leite condensado"]},
@@ -994,7 +994,6 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiSub": "O copo vai sempre cheio: quanto mais açaí leva, maior o preço.",
    "acaiN_p": "com granola e/ou leite em pó",
    "acaiN_sp": "sem granola nem leite em pó",
-   "acaiN_so": "só açaí, sem mais nada",
    "acaiG1": "CLÁSSICOS",
    "acaiG2": "FRUTA",
    "acaiG3": "TOPPINGS",
@@ -1029,7 +1028,6 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiSub": "The cup always goes out full: the more açaí in it, the higher the price.",
    "acaiN_p": "with granola and/or milk powder",
    "acaiN_sp": "no granola, no milk powder",
-   "acaiN_so": "only açaí, nothing else",
    "acaiG1": "CLASSICS",
    "acaiG2": "FRUIT",
    "acaiG3": "TOPPINGS",
@@ -1064,7 +1062,6 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiSub": "Le gobelet part toujours plein : plus il contient d'açaí, plus le prix est élevé.",
    "acaiN_p": "avec granola et/ou lait en poudre",
    "acaiN_sp": "sans granola ni lait en poudre",
-   "acaiN_so": "que de l'açaí, rien d'autre",
    "acaiG1": "CLASSIQUES",
    "acaiG2": "FRUITS",
    "acaiG3": "TOPPINGS",
@@ -1099,7 +1096,6 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiSub": "Der Becher ist immer voll: je mehr Açaí drin ist, desto höher der Preis.",
    "acaiN_p": "mit Granola und/oder Milchpulver",
    "acaiN_sp": "ohne Granola und ohne Milchpulver",
-   "acaiN_so": "nur Açaí, sonst nichts",
    "acaiG1": "KLASSIKER",
    "acaiG2": "FRÜCHTE",
    "acaiG3": "TOPPINGS",
@@ -1134,7 +1130,6 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiSub": "De beker gaat altijd vol mee: hoe meer açaí erin, hoe hoger de prijs.",
    "acaiN_p": "met granola en/of melkpoeder",
    "acaiN_sp": "zonder granola en melkpoeder",
-   "acaiN_so": "alleen açaí, verder niets",
    "acaiG1": "KLASSIEKERS",
    "acaiG2": "FRUIT",
    "acaiG3": "TOPPINGS",
@@ -1564,11 +1559,10 @@ function tglSem(n,el){
 /* ---- AÇAÍ ----
    O copo (355 ml) vai sempre cheio; o preço depende de quanto açaí leva:
      com granola e/ou leite em pó ............ i.p  (750)
-     sem granola e sem leite em pó ........... i.sp (850)
-     sem nada (SÓ AÇAÍ) ...................... i.so (1000)
+     sem granola e sem leite em pó ........... i.sp (1000) — mesmo com fruta ou leite condensado
    Toppings extra (caramelo, chocolate, morango): + i.xp (50) cada, sobre qualquer um dos três.
    Abre com granola e leite em pó marcados; fruta e restantes toppings o cliente acrescenta. */
-function nivelAcai(i,top){ return !top.length ? "so" : (top.some(s=>i.base.includes(s)) ? "p" : "sp"); }
+function nivelAcai(i,top){ return top.some(s=>i.base.includes(s)) ? "p" : "sp"; }
 function precoAcaiDe(i,top,xt){ return i[nivelAcai(i,top)] + (xt?xt.length:0)*i.xp; }
 /* o que segue para a cozinha, sempre em português e pela ordem do menu (o mesmo açaí junta-se no carrinho) */
 function optsAcai(i,top,xt){
@@ -1587,7 +1581,7 @@ function acaiHTML(i){
    <div class="opttop g2">${chips}</div>`;
  const inc=t("acaiInc");
  return `<div class="acai-pr" id="acaiPr">`+
-   ["p","sp","so"].map(n=>`<div data-n="${n}"><span>${t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
+   ["p","sp"].map(n=>`<div data-n="${n}"><span>${t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
    grupo(1,"acaiG1",inc,i.base.map(s=>chip(s)).join(""))+
    grupo(2,"acaiG2",inc,i.fr.map(s=>chip(s)).join(""))+
    grupo(3,"acaiG3","",i.tp.map(s=>chip(s,t("acaiIncC"))).join("")+i.xt.map(extra).join(""));
@@ -1614,7 +1608,7 @@ function precoAcai(){
  });
  /* a conta só aparece quando há toppings pagos: sem eles, o preço é o da lista acima */
  $("optRes").innerHTML = !ex ? "" :
-  `<div class="acai-res"><span>${n==="so"?t("acaiR_so"):td(i.n)+" "+t("acaiN_"+n)}</span><b>${i[n]}</b></div>`+
+  `<div class="acai-res"><span>${cur.top.length?td(i.n)+" "+t("acaiN_"+n):t("acaiR_so")}</span><b>${i[n]}</b></div>`+
   `<div class="acai-res"><span>${t("acaiRx").replace("{n}",cur.xt.length)}</span><b>+${ex}</b></div>`;
  $("optAdd").textContent=t("acaiAdd").replace("{p}",i[n]+ex);
  const cresceu=rod.offsetHeight-alt0;              // o rodapé cresceu (apareceu a conta): a folha acompanha,
