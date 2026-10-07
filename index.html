@@ -925,7 +925,8 @@ const MENU=[
   {n:"Raw Coconut Latte",p:450,g:500},{n:"Iced Caramel Macchiato",d:"com leite de coco",p:450,g:500}]},
 
  {cat:"AÇAÍ &amp; ÁGUA DE COCO",tk:"c_acai",pt:3,note:"Disponibilidade limitada — pode acabar durante o dia",items:[
-  /* AÇAÍ — copo de 355 ml, vai sempre cheio. Preços (mudam-se aqui e em /vendas):
+  /* AÇAÍ — copo de 355 ml, vai sempre cheio. Os preços mudam-se no /admin (separador Menu);
+     os valores aqui são os de reserva, usados só enquanto o painel não tiver outros guardados.
      p  = com granola e/ou leite em pó            sp = sem os dois, mesmo com fruta (leva mais açaí)
      xp = cada topping extra da lista xt
      rec = escolha com estrela e "recomendamos" */
@@ -1406,7 +1407,7 @@ function desenharDestaque(){
   fig.querySelector(".drop-st").textContent = lojaFechada ? t("fechadoCurto") : (fim ? t("acabou") : "");
  });
  const ac=findMenuItem(DESTAQUE[0]);            // "desde X$" do texto vem do preço do menu
- sec.querySelectorAll('[data-i18n="dropSub"],[data-i18n="dropP1s"]').forEach(e=>{ e.innerHTML=t(e.dataset.i18n).replace("{p}",ac?ac.item.p:""); });
+ sec.querySelectorAll('[data-i18n="dropSub"],[data-i18n="dropP1s"]').forEach(e=>{ e.innerHTML=t(e.dataset.i18n).replace("{p}",ac?Math.min(ac.item.p,ac.item.sp||ac.item.p):""); });
  sec.style.display=visiveis?"":"none";
  sec.querySelector(".drop-media").classList.toggle("um",visiveis===1);
 }
@@ -1562,6 +1563,8 @@ function tglSem(n,el){
      sem granola e sem leite em pó ........... i.sp (1000) — mesmo com fruta ou leite condensado
    Toppings extra (caramelo, chocolate, morango): + i.xp (50) cada, sobre qualquer um dos três.
    Abre com granola e leite em pó marcados; fruta e restantes toppings o cliente acrescenta. */
+/* chaves com que o /admin guarda os três preços do açaí (iguais no /admin e no /vendas) */
+const ACAI_K={p:"Açaí · com granola e/ou leite em pó",sp:"Açaí · sem granola nem leite em pó",xp:"Açaí · topping extra"};
 function nivelAcai(i,top){ return top.some(s=>i.base.includes(s)) ? "p" : "sp"; }
 function precoAcaiDe(i,top,xt){ return i[nivelAcai(i,top)] + (xt?xt.length:0)*i.xp; }
 /* o que segue para a cozinha, sempre em português e pela ordem do menu (o mesmo açaí junta-se no carrinho) */
@@ -2363,7 +2366,11 @@ async function carregarMenuEdit(){
  // preços alterados
  MENU.forEach(c=>c.items.forEach(i=>{
   const o=ed.p&&ed.p[i.n];
-  if(!o || i.top) return;   // açaí: preços fixos no código (ver MENU), o painel não mexe
+  if(i.top){   // açaí: três preços próprios no /admin (chaves ACAI_K); sem valor no painel vale o do código
+   Object.keys(ACAI_K).forEach(k=>{ const a=ed.p&&ed.p[ACAI_K[k]]; if(a&&a.m>0) i[k]=a.m; });
+   return;
+  }
+  if(!o) return;
   if(o.m!=null) i.p=o.m;
   if(o.g!=null) i.g=o.g; else if(o.g===null && "g" in o) delete i.g;
  }));
