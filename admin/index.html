@@ -234,9 +234,24 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
 /* Substitua pelo URL do seu Worker (o mesmo do menu e da loja). */
 const PROMO_API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
 
+/* ---- Nomes dos produtos corrigidos a 08-10-2026 ----
+   O servidor pode ainda ter dados guardados com o nome antigo (preços, ordem, retirados, esgotados, stock):
+   são lidos como se tivessem o nome novo. Quando os dois existem, vale o do nome novo. */
+const NOMES_NOVOS={"Frape Clássico": "Frappé Clássico", "Frape Chocolate": "Frappé de Chocolate", "Frape Caramelo": "Frappé de Caramelo", "Caramelo Latte": "Latte de Caramelo", "Iced Caramelo Latte": "Iced Latte de Caramelo", "Mocha Chocolate": "Mocha", "Muffin Chocolate": "Muffin de Chocolate", "Muffin Laranja": "Muffin de Laranja", "Donut Chocolate": "Donut de Chocolate", "Donut Doce de Leite": "Donut de Doce de Leite", "Tosta Fiambre": "Tosta de Fiambre", "Tosta Queijo": "Tosta de Queijo", "Pão Rech. Frango": "Pão Recheado de Frango", "Pão Rech. Atum": "Pão Recheado de Atum", "Pão Rech. Caprese": "Pão Recheado Caprese", "Poke Bowl Frango": "Poke Bowl de Frango", "Poke Bowl Salmão": "Poke Bowl de Salmão", "Poke Bowl Atum": "Poke Bowl de Atum"};
+function nomeAtual(s){ return NOMES_NOVOS[s]||s; }
+function chavesAtuais(o){ const r={}; Object.keys(o||{}).forEach(k=>{ const n=nomeAtual(k); if(!(n in r)||k===n) r[n]=o[k]; }); return r; }
+function migrarNomes(ed){
+ if(!ed) return ed;
+ const e=Object.assign({},ed);
+ e.p=chavesAtuais(ed.p);
+ if(Array.isArray(ed.off)) e.off=[...new Set(ed.off.map(nomeAtual))];
+ if(ed.ord){ e.ord={}; Object.keys(ed.ord).forEach(c=>{ e.ord[c]=[...new Set((ed.ord[c]||[]).map(nomeAtual))]; }); }
+ return e;
+}
+
 /* Lista de produtos — tem de coincidir com os nomes do menu. */
-const COMBOS_BASE=[{"n": "PEQUENO-ALMOÇO", "d": "espresso + donut ou muffin de chocolate", "p": 225, "full": false}, {"n": "LANCHE", "d": "café gelado ou frape clássico + donut", "p": 405, "full": false}, {"n": "SOPA E PÃO", "d": "sopa do dia + pão recheado de frango ou caprese", "p": 500, "full": false}, {"n": "ALMOÇO LEVE", "d": "pão recheado de frango ou caprese + sumo de laranja ou maçã", "p": 570, "full": false}, {"n": "SALADA E PÃO", "d": "salada fria de frango + pão recheado de frango ou caprese", "p": 640, "full": false}, {"n": "SALADA E SUMO", "d": "salada fria de frango + sumo de laranja ou maçã", "p": 785, "full": false}, {"n": "SUPER COMBO", "d": "sopa + pão recheado de frango ou caprese + café gelado ou frape clássico", "p": 760, "full": true}];
-const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha Chocolate", "m": 200, "g": 225}, {"n": "Caramelo Latte", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "d": "copo de 355 ml · preços nas três linhas abaixo"}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frape Clássico", "m": 275, "g": 300}, {"n": "Frape Chocolate", "m": 325, "g": 350}, {"n": "Frape Caramelo", "m": 350, "g": 375}, {"n": "Iced Caramelo Latte", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 375}, {"n": "Sumo de Maçã", "m": 375}, {"n": "Sumo de Manga", "m": 400}, {"n": "Sumo de Papaia", "m": 450}, {"n": "Sumo de Ananás", "m": 500}]], ["DONUTS & MUFFINS", [{"n": "Muffin Laranja", "m": 125}, {"n": "Muffin Chocolate", "m": 150}, {"n": "Donut Chocolate", "m": 150}, {"n": "Donut Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Rech. Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Rech. Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Rech. Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta Fiambre", "m": 170}, {"n": "Tosta Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl Frango", "m": 650}, {"n": "Poke Bowl Salmão", "m": 700}, {"n": "Poke Bowl Atum", "m": 725}]]];
+const COMBOS_BASE=[{"n": "PEQUENO-ALMOÇO", "d": "espresso + donut ou muffin de chocolate", "p": 225, "full": false}, {"n": "LANCHE", "d": "café gelado ou frappé clássico + donut", "p": 405, "full": false}, {"n": "SOPA E PÃO", "d": "sopa do dia + pão recheado de frango ou caprese", "p": 500, "full": false}, {"n": "ALMOÇO LEVE", "d": "pão recheado de frango ou caprese + sumo de laranja ou maçã", "p": 570, "full": false}, {"n": "SALADA E PÃO", "d": "salada fria de frango + pão recheado de frango ou caprese", "p": 640, "full": false}, {"n": "SALADA E SUMO", "d": "salada fria de frango + sumo de laranja ou maçã", "p": 785, "full": false}, {"n": "SUPER COMBO", "d": "sopa + pão recheado de frango ou caprese + café gelado ou frappé clássico", "p": 760, "full": true}];
+const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "d": "copo de 355 ml · preços nas três linhas abaixo"}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 375}, {"n": "Sumo de Maçã", "m": 375}, {"n": "Sumo de Manga", "m": 400}, {"n": "Sumo de Papaia", "m": 450}, {"n": "Sumo de Ananás", "m": 500}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
 
 let KEY="", fora=[];
 const $=id=>document.getElementById(id);
@@ -255,7 +270,7 @@ async function entrar(){
  $("loginBox").style.display="none";
  $("painel").style.display="block";
  $("barra").style.display="flex";
- fora = r.itens || [];
+ fora = (r.itens || []).map(nomeAtual);
  desenhar();
  carregarPedidos();
  carregarMenuEdit();
@@ -378,7 +393,7 @@ async function carregarStock(){
   try{
     const r = await fetch(PROMO_API+"/stock-dia");
     const d = await r.json();
-    stock = d.itens || {};
+    stock = chavesAtuais(d.itens || {});
   }catch(e){ stock = {}; }
   stockSujo = false;
   $("btnStock").textContent = "Guardar stock";
@@ -421,7 +436,7 @@ async function gravarStock(){
        body: JSON.stringify({itens: stock})});
     const d = await r.json();
     if(d.erro){ alert(d.erro); return; }
-    stock = d.itens || {};
+    stock = chavesAtuais(d.itens || {});
     stockSujo = false;
     $("btnStock").textContent = "Guardar stock";
     alert("Stock do dia guardado.");
@@ -450,6 +465,7 @@ async function carregarMenuEdit(){
   const d=await r.json();
   if(!d.erro && d.edit) edit={p:d.edit.p||{},off:d.edit.off||[],add:d.edit.add||[],ord:d.edit.ord||{},
    cp:d.edit.cp||{},coff:d.edit.coff||[],cadd:d.edit.cadd||[],cord:d.edit.cord||[]};
+  edit=migrarNomes(edit);
  }catch(e){}
  limparAcaiAntigo();
  desenharMenu();
@@ -750,7 +766,7 @@ async function alternar(ci,ii){
  const off = fora.includes(nome);
  const r = await pedir("/soldout-set?item="+encodeURIComponent(nome)+"&on="+(off?"0":"1"));
  if(!r || r.erro){ alert((r&&r.erro)||"Não foi possível guardar. Tente outra vez."); return; }
- fora = r.itens || [];
+ fora = (r.itens || []).map(nomeAtual);
  desenhar();
 }
 
@@ -758,7 +774,7 @@ async function limparTudo(){
  if(!confirm("Repor todos os produtos como disponíveis?")) return;
  const r = await pedir("/soldout-set?limpar=1");
  if(!r || r.erro){ alert((r&&r.erro)||"Não foi possível."); return; }
- fora = r.itens || [];
+ fora = (r.itens || []).map(nomeAtual);
  desenhar();
 }
 
