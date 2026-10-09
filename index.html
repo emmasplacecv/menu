@@ -367,6 +367,13 @@ textarea.fld{min-height:74px;resize:vertical;}
  color:var(--ink);font-size:17px;line-height:1;cursor:pointer;font-family:inherit;}
 .qty b{min-width:17px;text-align:center;font-size:15.5px;}
 .crow .cp2{font-weight:600;min-width:58px;text-align:right;font-size:15.5px;}
+/* carrinho: juntar mais é a acção principal — o "+" vai cheio e um pouco maior, o "−" fica discreto */
+.crow .qty{gap:8px;}
+.crow .qty button{width:34px;height:34px;border-color:#CDBFA8;color:var(--ink2);font-size:18px;transition:transform .12s ease;}
+.crow .qty button.mais{background:var(--roxo);border-color:var(--roxo);color:#FBF4E6;font-size:21px;font-weight:500;
+ box-shadow:0 3px 9px rgba(74,37,69,.24);}
+.crow .qty button:active{transform:scale(.92);}
+.crow .qty b{min-width:19px;font-size:16.5px;font-weight:600;}
 .tot{display:flex;justify-content:space-between;padding:8px 0;font-size:15.5px;}
 .tot.grand{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;
  border-top:2px solid var(--dark);margin-top:8px;padding-top:12px;}
@@ -773,6 +780,13 @@ textarea.fld{min-height:74px;resize:vertical;}
  font-size:24px;line-height:38px;text-align:center;font-weight:500;}
 @media(min-width:720px){.camp{padding:18px 22px;}.camp b{font-size:25px;}.camp small{font-size:13.5px;}}
 .warn.campw{background:#F3E8F0;border-color:#C9A9C2;color:var(--roxo);}
+.warn.campmais{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 9px 9px 13px;}
+.warn.campmais span{min-width:0;font-weight:500;}
+.warn.campmais button{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:10px 15px 10px 12px;
+ background:var(--roxo);color:#FBF4E6;font:600 14px/1 'Jost',sans-serif;white-space:nowrap;cursor:pointer;
+ box-shadow:0 3px 9px rgba(74,37,69,.24);transition:transform .12s ease;}
+.warn.campmais button i{font-style:normal;font-size:18px;line-height:.8;}
+.warn.campmais button:active{transform:scale(.95);}
 .campopt{background:#F3E8F0;border:1px solid #C9A9C2;color:var(--roxo);border-radius:12px;padding:9px 12px;
  font-size:13.5px;line-height:1.45;margin:0 0 12px;}
 .horanota{display:none;font-size:13px;line-height:1.45;margin-top:8px;color:var(--ink2);}
@@ -1957,14 +1971,14 @@ function renderCart(){
  $("toCheckout").disabled=false;
  $("cartBody").innerHTML=cart.map(i=>`<div class="crow">
    <div class="cinfo">${td(i.name)}${i.opts.length?`<small>${i.opts.map(o=>o==="SÓ AÇAÍ"?`<b class="sotag">${td(o)}</b>`:td(o)).join(" · ")}</small>`:""}</div>
-   <div class="qty"><button onclick="chg('${i.key.replace(/'/g,"\\'")}',-1)">−</button><b>${i.q}</b>
-   <button onclick="chg('${i.key.replace(/'/g,"\\'")}',1)">+</button></div>
+   <div class="qty"><button type="button" aria-label="−1 ${esc(td(i.name))}" onclick="chg('${i.key.replace(/'/g,"\\'")}',-1)">−</button><b>${i.q}</b>
+   <button type="button" class="mais" aria-label="+1 ${esc(td(i.name))}" onclick="chg('${i.key.replace(/'/g,"\\'")}',1)">+</button></div>
    <div class="cp2">${i.price*i.q}</div></div>`).join("")+totalsHTML();
 }
 /* ============================================================
    OPÇÕES DO DIA, ligadas no /admin (09-10-2026)
    1) "só hora marcada"  — esconde "Assim que possível"
-   2) campanha do açaí   — 2.º com −67% · 3.º grátis
+   2) campanha do açaí   — 2 açaís: 2.º com −50% · 3 açaís: 1 grátis
    Ficam guardadas no servidor junto dos preços do menu (edit.p), com as duas chaves abaixo
    — as MESMAS do /admin, não mudar só aqui. Cada uma guarda {m: último dia, g: primeiro dia ou nada}
    (dias contados desde 01-01-2026, pela hora de Cabo Verde): vale de g — ou desde já — até ao fim de m,
@@ -2053,9 +2067,9 @@ function acertarHora(){
 
 /* ---------- CAMPANHA AÇAÍ ----------
    Só existe no site, onde o açaí é sempre pago por transferência; ao balcão (/vendas) o preço é o normal.
-   Uma oferta por pedido:   2 açaís -> o mais barato com −67%   ·   3 ou mais -> o mais barato é grátis.
+   Uma oferta por pedido:   2 açaís -> o mais barato com −50%   ·   3 ou mais -> o mais barato é grátis.
    Não acumula com códigos promocionais (fica o maior). Para mudar a percentagem basta este número. */
-const CAMP_PCT2=67, CAMP_PROD="Açaí";
+const CAMP_PCT2=50, CAMP_PROD="Açaí";
 /* QUANDO é a campanha, para os textos:
    campDiaTxt  = "amanhã, sábado" enquanto o dia dela ainda não chegou (senão "")
    campQuando  = isso, ou "só hoje" no último dia, ou "" (vários dias, já a decorrer) */
@@ -2083,6 +2097,8 @@ function campCalc(){
  return z;
 }
 function descCampBruto(){ return campCalc().v; }
+/* botão do aviso "junte mais 1 açaí": mais um igual ao que já está no pedido */
+function campJuntar(){ const it=cart.find(i=>i.name===CAMP_PROD); if(it) chg(it.key,1); }
 /* faixa no topo do menu: aparece com a campanha anunciada ou a aplicar-se, e enquanto houver açaí */
 function desenharCamp(){
  const b=$("campBanner"); if(!b) return;
@@ -2276,11 +2292,12 @@ function totalsHTML(){
  if(anul) h+=`<div class="warn">${t("naoacum")} ${anul}</div>`;
  else if(!d5 && mode==="recolha" && !descPromoBruto() && subComDesc()>0)
   h+=`<div class="warn">${t("incent")}</div>`;
- if(mode==="recolha" && temAcai() && !dc)
+ if(mode==="recolha" && temAcai() && !campAcai)        // em dia de campanha o carrinho fala só da campanha
   h+=`<div class="warn">${t("acaiDesc")}</div>`;
  /* campanha do açaí: o que falta para a oferta seguinte, e a regra quando já se aplica */
- if(campAcai && cp.n===1) h+=`<div class="warn campw">${ct("campMais1")}</div>`;
- else if(dc && cp.n===2) h+=`<div class="warn campw">${ct("campMais2")}</div>`;
+ const maisUm=k=>`<div class="warn campw campmais"><span>${ct(k)}</span><button type="button" onclick="campJuntar()"><i aria-hidden="true">+</i>1 ${esc(td(CAMP_PROD))}</button></div>`;
+ if(campAcai && cp.n===1) h+=maisUm("campMais1");
+ else if(dc && cp.n===2) h+=maisUm("campMais2");
  if(dc) h+=`<div class="note" style="border:none;padding-top:0;margin-top:2px">${campNotaDia()+ct("campNota")}</div>`;
  /* campanha anunciada mas este pedido é para levantar antes do dia dela: dizê-lo, para ninguém contar com o desconto */
  if(!campAcai && campMostra() && temAcai()) h+=`<div class="warn campw">${ct("campAinda")}</div>`;
@@ -3016,7 +3033,7 @@ function capaLista(){
  });
  return l.length?l:[0];
 }
-/* texto de uma foto: frase + resposta, ou o quadro da campanha (3 açaís -> 1 grátis · 2 açaís -> 2.º com −67%) */
+/* texto de uma foto: frase + resposta, ou o quadro da campanha (3 açaís -> 1 grátis · 2 açaís -> 2.º com −50%) */
 function capaTexto(i){
  const sec=document.querySelector(".home-hero.capa"), c=CAPA[i], pt=(LANG==="pt"), q=$("capaCamp");
  sec.classList.toggle("camp",!!c.camp);
