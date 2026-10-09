@@ -1362,7 +1362,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    chaves camp… = faixa, carrinho e folha do açaí · capaCamp… e cc… = foto da campanha na capa */
 (function(){
  const R={
-  pt:{soHoje:"só hoje",campTag:"CAMPANHA AÇAÍ{h} · SÓ NO SITE",campLinha:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −{x}%",
+  pt:{soHoje:"só hoje",amanha:"amanhã",campPara:"Para pedidos levantados {d}.",campAinda:"A campanha é {d}: este pedido é para levantar antes, por isso ainda não tem o desconto.",campTag:"CAMPANHA AÇAÍ{h} · SÓ NO SITE",campLinha:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −{x}%",
    campNota:"Só em encomendas feitas aqui, pagas por transferência. Ao balcão não há desconto. Uma oferta por pedido.",
    campTot2:"Campanha açaí · 2.º com −{x}%",campTot3:"Campanha açaí · 1 grátis em 3",
    campMais1:"Junte mais 1 açaí: o 2.º fica com −{x}%.",campMais2:"Junte mais 1 açaí: com 3, 1 é grátis.",
@@ -1371,7 +1371,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"açaís no carrinho",ccGratis:"1 é GRÁTIS",ccPct:"o 2.º com −{x}%",ccNota:"Ao balcão não há desconto. Uma oferta por pedido.",
    sohora:"Neste momento só aceitamos pedidos com hora marcada.",sohoraerro:"Escolha a hora do seu pedido para continuar.",
    cfgmudou:"As condições do pedido mudaram entretanto. Confira o total e envie de novo."},
-  en:{soHoje:"today only",campTag:"AÇAÍ DEAL{h} · ONLINE ONLY",campLinha:"3 açaís: 1 is free · 2 açaís: 2nd one {x}% off",
+  en:{soHoje:"today only",amanha:"tomorrow",campPara:"For orders picked up {d}.",campAinda:"The deal is {d}: this order is picked up before that, so the discount does not apply yet.",campTag:"AÇAÍ DEAL{h} · ONLINE ONLY",campLinha:"3 açaís: 1 is free · 2 açaís: 2nd one {x}% off",
    campNota:"Only for orders placed here and paid by bank transfer. No discount at the counter. One offer per order.",
    campTot2:"Açaí deal · 2nd at {x}% off",campTot3:"Açaí deal · 1 free in 3",
    campMais1:"Add 1 more açaí: the 2nd is {x}% off.",campMais2:"Add 1 more açaí: with 3, 1 is free.",
@@ -1380,7 +1380,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"açaís in your cart",ccGratis:"1 is FREE",ccPct:"2nd one {x}% off",ccNota:"No discount at the counter. One offer per order.",
    sohora:"Right now we only take orders with a set time.",sohoraerro:"Pick a time for your order to continue.",
    cfgmudou:"The order conditions have just changed. Check the total and send again."},
-  fr:{soHoje:"aujourd'hui seulement",campTag:"OFFRE AÇAÍ{h} · EN LIGNE UNIQUEMENT",campLinha:"3 açaís : 1 offert · 2 açaís : le 2e à −{x} %",
+  fr:{soHoje:"aujourd'hui seulement",amanha:"demain",campPara:"Pour les commandes retirées {d}.",campAinda:"L'offre est valable {d} : cette commande est retirée avant, la remise ne s'applique donc pas encore.",campTag:"OFFRE AÇAÍ{h} · EN LIGNE UNIQUEMENT",campLinha:"3 açaís : 1 offert · 2 açaís : le 2e à −{x} %",
    campNota:"Uniquement pour les commandes passées ici et payées par virement. Pas de remise au comptoir. Une offre par commande.",
    campTot2:"Offre açaí · 2e à −{x} %",campTot3:"Offre açaí · 1 offert sur 3",
    campMais1:"Ajoutez 1 açaí : le 2e est à −{x} %.",campMais2:"Ajoutez 1 açaí : avec 3, 1 est offert.",
@@ -1389,7 +1389,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"açaís dans le panier",ccGratis:"1 est OFFERT",ccPct:"le 2e à −{x} %",ccNota:"Pas de remise au comptoir. Une offre par commande.",
    sohora:"En ce moment, nous n'acceptons que les commandes à heure fixée.",sohoraerro:"Choisissez l'heure de votre commande pour continuer.",
    cfgmudou:"Les conditions de la commande viennent de changer. Vérifiez le total et renvoyez."},
-  de:{soHoje:"nur heute",campTag:"AÇAÍ-AKTION{h} · NUR ONLINE",campLinha:"3 Açaís: 1 gratis · 2 Açaís: der 2. mit −{x} %",
+  de:{soHoje:"nur heute",amanha:"morgen",campPara:"Für Bestellungen mit Abholung {d}.",campAinda:"Die Aktion gilt {d}: Diese Bestellung wird vorher abgeholt, daher noch ohne Rabatt.",campTag:"AÇAÍ-AKTION{h} · NUR ONLINE",campLinha:"3 Açaís: 1 gratis · 2 Açaís: der 2. mit −{x} %",
    campNota:"Nur für Bestellungen hier auf der Website, per Überweisung bezahlt. Kein Rabatt an der Theke. Ein Angebot pro Bestellung.",
    campTot2:"Açaí-Aktion · 2. mit −{x} %",campTot3:"Açaí-Aktion · 1 von 3 gratis",
    campMais1:"Noch 1 Açaí dazu: der 2. kostet {x} % weniger.",campMais2:"Noch 1 Açaí dazu: bei 3 ist 1 gratis.",
@@ -1398,7 +1398,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"Açaís im Warenkorb",ccGratis:"1 ist GRATIS",ccPct:"der 2. mit −{x} %",ccNota:"Kein Rabatt an der Theke. Ein Angebot pro Bestellung.",
    sohora:"Im Moment nehmen wir nur Bestellungen mit fester Uhrzeit an.",sohoraerro:"Bitte wähle eine Uhrzeit für deine Bestellung.",
    cfgmudou:"Die Bestellbedingungen haben sich gerade geändert. Prüfe die Summe und sende erneut."},
-  nl:{soHoje:"alleen vandaag",campTag:"AÇAÍ-ACTIE{h} · ALLEEN ONLINE",campLinha:"3 açaís: 1 gratis · 2 açaís: de 2e met −{x}%",
+  nl:{soHoje:"alleen vandaag",amanha:"morgen",campPara:"Voor bestellingen die {d} worden afgehaald.",campAinda:"De actie geldt {d}: deze bestelling wordt eerder afgehaald, dus nog zonder korting.",campTag:"AÇAÍ-ACTIE{h} · ALLEEN ONLINE",campLinha:"3 açaís: 1 gratis · 2 açaís: de 2e met −{x}%",
    campNota:"Alleen voor bestellingen hier op de site, betaald per overschrijving. Geen korting aan de balie. Eén aanbieding per bestelling.",
    campTot2:"Açaí-actie · 2e met −{x}%",campTot3:"Açaí-actie · 1 van 3 gratis",
    campMais1:"Voeg nog 1 açaí toe: de 2e krijgt −{x}%.",campMais2:"Voeg nog 1 açaí toe: bij 3 is er 1 gratis.",
@@ -1850,7 +1850,7 @@ function acaiHTML(i){
  const grupo=(n,k,tag,chips)=>`<div class="acai-h"><div class="lbl"><i>${n}</i>${t(k)}</div>${tag?`<em>${tag}</em>`:""}</div>
    <div class="opttop g2">${chips}</div>`;
  const inc=t("acaiInc");
- return (campAcai?`<div class="campopt">${ct("campOpt")}</div>`:"")+`<div class="acai-pr" id="acaiPr">`+
+ return (campMostra()?`<div class="campopt">${ct("campOpt")}${campDiaTxt()?" "+ct("campPara"):""}</div>`:"")+`<div class="acai-pr" id="acaiPr">`+
    ["p","sp"].map(n=>`<div data-n="${n}"><span>${t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
    grupo(1,"acaiG1",inc,i.base.map(s=>chip(s)).join(""))+
    grupo(2,"acaiG2",inc,i.fr.map(s=>chip(s)).join(""))+
@@ -1974,7 +1974,9 @@ function renderCart(){
 const CFG_ASAP="__cfg:asap_off", CFG_CAMP="__cfg:camp_acai";
 const CFG_DIA0=Date.UTC(2026,0,1)/864e5;
 let asapOff=false, campAcai=false;
-let campAte=0, campServ=0;   // campAte = último dia da campanha (0 = desligada) · campServ = dia do próximo levantamento, dito pelo servidor (0 = ainda não se sabe)
+/* cfgAsap / cfgCamp = {de, ate} das opções que ainda não acabaram (ou null)
+   campServ = dia do próximo levantamento, dito pelo servidor nos horários (0 = ainda não se sabe) */
+let cfgAsap=null, cfgCamp=null, campServ=0;
 function diaCV(){
  const agora=new Date(); let y=0,m=0,d=0;
  try{
@@ -1985,21 +1987,33 @@ function diaCV(){
  return Math.round(Date.UTC(y,m-1,d)/864e5-CFG_DIA0)+1;
 }
 function numDia(iso){ const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(iso||""); return m ? Math.round(Date.UTC(+m[1],+m[2]-1,+m[3])/864e5-CFG_DIA0)+1 : 0; }
-function campVale(){ return campAte>0 && campServ>0 && campServ<=campAte; }
+/* AS OPÇÕES VALEM PELO DIA EM QUE O PEDIDO É LEVANTADO, não pelo dia em que é feito.
+   O servidor diz, nos horários, para que dia fica o próximo levantamento (campServ):
+     · dentro dos dias da opção -> aplica-se (asapOff / campAcai);
+     · antes do primeiro dia    -> a campanha só se ANUNCIA (campMostra), ainda sem desconto;
+     · depois do último dia     -> nada (fechámos por esse dia, ou o pedido passa para outro).
+   Por isso uma campanha "só amanhã" é anunciada já hoje, e quem encomenda depois de fecharmos — para
+   levantar amanhã — já a tem. Enquanto o servidor não disser o dia, a campanha fica desligada. */
+function acertarOpcoes(){
+ const hoje=diaCV(), dia=campServ;
+ const aplica=c=>!!(c && dia>0 && dia>=c.de && dia<=c.ate);
+ campAcai = aplica(cfgCamp);
+ asapOff = cfgAsap ? (dia>0 ? aplica(cfgAsap) : hoje>=cfgAsap.de) : false;
+}
+function campMostra(){ return !!(cfgCamp && campServ>0 && campServ<=cfgCamp.ate); }     // anunciada ou já a aplicar-se
+function cfgSinal(){ return asapOff+"|"+campAcai+"|"+campMostra()+"|"+campQuando(); }
 function lerConfig(ed){
  const hoje=diaCV(), p=(ed&&ed.p)||{};
- const vale=o=>!!(o && o.m>0 && hoje<=o.m && !(o.g>0 && hoje<o.g));
- asapOff=vale(p[CFG_ASAP]);
- campAte=vale(p[CFG_CAMP]) ? p[CFG_CAMP].m : 0;
- campAcai=campVale();
+ const viva=o=>(o && o.m>0 && hoje<=o.m) ? {de:(o.g>0?o.g:0), ate:o.m} : null;
+ cfgAsap=viva(p[CFG_ASAP]); cfgCamp=viva(p[CFG_CAMP]);
+ acertarOpcoes();
 }
-/* A CAMPANHA É DO DIA. O servidor diz, pelos horários, para que dia fica o próximo levantamento: se já só
-   pode ser depois do último dia da campanha (fechámos por hoje, ou o pedido passa para outro dia), ela não
-   se aplica nem aparece. Enquanto o servidor não responder, fica desligada. Devolve true se mudou. */
+/* chegou do servidor o dia do próximo levantamento; devolve true se alguma opção mudou com isso */
 function notarServico(hoje,iso){
+ const antes=cfgSinal();
  campServ = hoje ? diaCV() : (numDia(iso)||campServ);
- const antes=campAcai; campAcai=campVale();
- return antes!==campAcai;
+ acertarOpcoes();
+ return antes!==cfgSinal();
 }
 /* volta a perguntar ao servidor (ao abrir o fecho do pedido e mesmo antes de enviar):
    o cliente pode ter a página aberta desde antes de se ligar ou desligar uma opção */
@@ -2014,7 +2028,7 @@ async function carregarConfig(){
  }catch(e){}
 }
 function aplicarConfig(){
- if(campAte>0 && !campServ) fillSlots();        // campanha em data: falta saber para que dia fica o levantamento
+ if((cfgCamp||cfgAsap) && !campServ) fillSlots();   // há opções em vigor: falta saber para que dia fica o levantamento
  acertarHora();
  desenharCamp();
  if(typeof _capaPronta!=="undefined" && _capaPronta) capaCampanha();
@@ -2028,10 +2042,12 @@ function acertarHora(){
  a.style.display = asapOff ? "none" : "";
  if(nota){ nota.style.display = asapOff ? "block" : "none"; nota.textContent = t("sohora"); }
  if(asapOff && timeMode!=="marcada"){
-  timeMode="marcada"; slotVal="";
+  timeMode="marcada";
   a.classList.remove("sel"); m.classList.add("sel");
   $("slotBox").style.display="block";
-  if($("chkSheet").classList.contains("on")) fillSlots();
+  const sel=$("fSlot");
+  if(sel && sel.value) slotVal=sel.value;            // horários já carregados: fica o primeiro, o cliente pode mudar
+  else{ slotVal=""; if($("chkSheet").classList.contains("on")) fillSlots(); }
  }
 }
 
@@ -2040,8 +2056,22 @@ function acertarHora(){
    Uma oferta por pedido:   2 açaís -> o mais barato com −67%   ·   3 ou mais -> o mais barato é grátis.
    Não acumula com códigos promocionais (fica o maior). Para mudar a percentagem basta este número. */
 const CAMP_PCT2=67, CAMP_PROD="Açaí";
-function campUltimo(){ return campAte>0 && campAte===diaCV(); }      // a campanha acaba hoje: os textos dizem "só hoje"
-function ct(k){ return String(t(k)||"").replace(/\{x\}/g,CAMP_PCT2).replace(/\{h\}/g, campUltimo() ? " · "+t("soHoje") : ""); }
+/* QUANDO é a campanha, para os textos:
+   campDiaTxt  = "amanhã, sábado" enquanto o dia dela ainda não chegou (senão "")
+   campQuando  = isso, ou "só hoje" no último dia, ou "" (vários dias, já a decorrer) */
+function diaSemana(n){ try{ return new Intl.DateTimeFormat(LANG,{weekday:"long",timeZone:"UTC"}).format(new Date((CFG_DIA0+n-1)*864e5)); }catch(e){ return ""; } }
+function campDiaTxt(){
+ if(!cfgCamp) return "";
+ const h=diaCV(), d=cfgCamp.de;
+ if(!(d>h)) return "";
+ return d===h+1 ? t("amanha")+", "+diaSemana(d) : diaSemana(d);
+}
+function campQuando(){ return cfgCamp ? (campDiaTxt() || (cfgCamp.ate===diaCV() ? t("soHoje") : "")) : ""; }
+function campNotaDia(){ return campDiaTxt() ? ct("campPara")+" " : ""; }      // "Para pedidos levantados amanhã, sábado. "
+function ct(k){
+ const q=campQuando();
+ return String(t(k)||"").replace(/\{x\}/g,CAMP_PCT2).replace(/\{h\}/g, q ? " · "+q : "").replace(/\{d\}/g, campDiaTxt());
+}
 function campCalc(){
  const z={v:0,tipo:0,n:0};
  if(!campAcai || !pagaAntes()) return z;
@@ -2053,12 +2083,12 @@ function campCalc(){
  return z;
 }
 function descCampBruto(){ return campCalc().v; }
-/* faixa no topo do menu: aparece com a campanha ligada e enquanto houver açaí */
+/* faixa no topo do menu: aparece com a campanha anunciada ou a aplicar-se, e enquanto houver açaí */
 function desenharCamp(){
  const b=$("campBanner"); if(!b) return;
- const ver=campAcai && !lojaFechada && !!findMenuItem(CAMP_PROD) && !esgotados.includes(CAMP_PROD);
+ const ver=campMostra() && !lojaFechada && !!findMenuItem(CAMP_PROD) && !esgotados.includes(CAMP_PROD);
  b.style.display = ver ? "flex" : "none";
- if(ver) b.innerHTML='<span><em>'+ct("campTag").split(" · ").map(x=>x.replace(/ /g,"\u00a0")).join("\u00a0· ")+'</em><b>'+ct("campLinha")+'</b><small>'+ct("campNota")+'</small></span><i aria-hidden="true">+</i>';
+ if(ver) b.innerHTML='<span><em>'+ct("campTag").split(" · ").map(x=>x.replace(/ /g,"\u00a0")).join("\u00a0· ")+'</em><b>'+ct("campLinha")+'</b><small>'+campNotaDia()+ct("campNota")+'</small></span><i aria-hidden="true">+</i>';
 }
 
 /* Valor bruto do desconto do código promocional */
@@ -2251,7 +2281,9 @@ function totalsHTML(){
  /* campanha do açaí: o que falta para a oferta seguinte, e a regra quando já se aplica */
  if(campAcai && cp.n===1) h+=`<div class="warn campw">${ct("campMais1")}</div>`;
  else if(dc && cp.n===2) h+=`<div class="warn campw">${ct("campMais2")}</div>`;
- if(dc) h+=`<div class="note" style="border:none;padding-top:0;margin-top:2px">${ct("campNota")}</div>`;
+ if(dc) h+=`<div class="note" style="border:none;padding-top:0;margin-top:2px">${campNotaDia()+ct("campNota")}</div>`;
+ /* campanha anunciada mas este pedido é para levantar antes do dia dela: dizê-lo, para ninguém contar com o desconto */
+ if(!campAcai && campMostra() && temAcai()) h+=`<div class="warn campw">${ct("campAinda")}</div>`;
  if(mode==="entrega"){
   const txZona=taxa();
   h+= (txZona===0)
@@ -2391,12 +2423,13 @@ async function sendWA(){
  /* última verificação das opções do dia: se a campanha acabou entretanto (ou passou a ser só hora
     marcada), o cliente vê o total certo antes de transferir */
  {
-  const cfg0=asapOff+"|"+campAcai, tot0=total();
+  const cfg0=cfgSinal(), tot0=total(), tm0=timeMode;
   await carregarConfig();
-  if(cfg0!==asapOff+"|"+campAcai){
+  if(cfg0!==cfgSinal()){
    aplicarConfig();
    if(total()!==tot0){ enviando=false; alert(t("cfgmudou")); return; }
-   if(asapOff && !(timeMode==="marcada" && slotVal)){ enviando=false; alert(t("sohoraerro")); return; }
+   /* passou a ser só hora marcada: o cliente tem de ver (e poder mudar) a hora antes de enviar */
+   if(timeMode!==tm0 || (asapOff && !(timeMode==="marcada" && slotVal))){ enviando=false; alert(t("sohoraerro")); return; }
   }
  }
  // 1º: reservar o bloco de preparação. A capacidade é partilhada entre
@@ -2417,10 +2450,15 @@ async function sendWA(){
    blocoPrep=d.slot||null;
    if(d.quando){ slotQuando=d.quando; slotHoje=(d.hoje!==false); }
    if(d.dia) diaISO=d.dia;
-   /* a campanha é do dia: se este pedido afinal fica para depois dela, o total muda e o cliente tem de o ver */
+   /* as opções valem pelo dia do levantamento: se este pedido afinal fica para outro dia, o total ou a hora
+      podem mudar, e o cliente tem de o ver antes de transferir */
    if(d.quando){
-    const tot0=total();
-    if(notarServico(slotHoje,diaISO)){ aplicarConfig(); if(total()!==tot0){ enviando=false; alert(t("cfgmudou")); return; } }
+    const tot0=total(), tm0=timeMode;
+    if(notarServico(slotHoje,diaISO)){
+     aplicarConfig();
+     if(total()!==tot0){ enviando=false; alert(t("cfgmudou")); return; }
+     if(timeMode!==tm0){ enviando=false; alert(t("sohoraerro")); return; }
+    }
    }
   }catch(e){
    enviando=false;
@@ -2669,8 +2707,8 @@ function openCheckout(){
  if(!cart.length)return;
  if(!codigo) codigo=novoCodigo();
  acertarHora(); refreshChk(); fillSlots(); show("chkSheet");
- const cfg0=asapOff+"|"+campAcai;          // as opções do dia podem ter mudado desde que a página abriu
- carregarConfig().then(()=>{ if(cfg0!==asapOff+"|"+campAcai) aplicarConfig(); });
+ const cfg0=cfgSinal();                    // as opções do dia podem ter mudado desde que a página abriu
+ carregarConfig().then(()=>{ if(cfg0!==cfgSinal()) aplicarConfig(); });
 }
 function refreshChk(){
  if(promo){                       // o código pode deixar de fazer sentido com o carrinho actual
@@ -2972,8 +3010,8 @@ function capaLista(){
  const l=[];
  CAPA.forEach((c,i)=>{
   const f=findMenuItem(c.prod); if(!f || esgotados.includes(f.item.n)) return;
-  if(c.camp){ if(campAcai) l.unshift(i); return; }
-  if(campAcai && c.prod===CAMP_PROD) return;
+  if(c.camp){ if(campMostra()) l.unshift(i); return; }
+  if(campMostra() && c.prod===CAMP_PROD) return;
   l.push(i);
  });
  return l.length?l:[0];
@@ -2984,11 +3022,12 @@ function capaTexto(i){
  sec.classList.toggle("camp",!!c.camp);
  if(c.camp){
   $("capaA").textContent=ct("capaCampA");
-  $("home-title").innerHTML=esc(ct("capaCampB"))+(campUltimo()?' <em class="cc-hoje">'+esc(t("soHoje"))+'</em>':"");
+  const qd=campQuando();
+  $("home-title").innerHTML=esc(ct("capaCampB"))+(qd?' <em class="cc-hoje">'+esc(qd)+'</em>':"");
   if(q){ q.hidden=false; q.innerHTML=
    '<div class="cc-l"><b>3</b><span><small>'+ct("ccNoCarr")+'</small><strong>'+ct("ccGratis")+'</strong></span></div>'+
    '<div class="cc-l"><b>2</b><span><small>'+ct("ccNoCarr")+'</small><strong>'+ct("ccPct")+'</strong></span></div>'+
-   '<p>'+ct("ccNota")+'</p>'; }
+   '<p>'+campNotaDia()+ct("ccNota")+'</p>'; }
  }else{
   $("capaA").textContent = pt ? c.a : ht("heroKicker");
   $("home-title").textContent = pt ? c.b : ht("heroTitle");
@@ -3045,8 +3084,8 @@ function capaRelogio(){
 }
 /* a campanha ligou-se ou desligou-se: a capa abre na foto da campanha (ou volta à primeira) e mede-se de novo */
 function capaCampanha(){
- if(campAcai===_capaCamp) return;
- _capaCamp=campAcai;
+ if(campMostra()===_capaCamp) return;
+ _capaCamp=campMostra();
  _capaK=capaLista()[0];
  desenharCapa(true); capaMedir(); capaRelogio();
 }
