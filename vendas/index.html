@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="/admin/icon-192.png">
 <title>Vendas ao balcão — Emma's Place</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{--cream:#F7F1E4;--card:#FFFCF6;--line:#E7DCC8;--ink:#34251D;--ink2:#785B42;
  --gold:#B8783D;--verde:#4E5937;--verde2:#2F4029;--vermelho:#8C2F2F;}
@@ -202,6 +202,82 @@ h1{font-size:19px;letter-spacing:.5px;}
 .tam-ops button:active{transform:scale(.97);background:#F3F7EF;border-color:var(--verde2);}
 .tam-box .cancel{width:100%;margin-top:12px;padding:14px;border-radius:13px;border:1px solid var(--line);
  background:transparent;color:var(--ink2);font:600 14px/1 inherit;cursor:pointer;}
+
+/* ===== 08-10-2026 (noite): LEGÍVEL AO SOL =====
+   O texto já tinha contraste; o que desaparecia à luz do dia eram os limites dos cartões
+   (contorno creme sobre branco) e os tons médios (dourado). Agora: contorno castanho,
+   tabuleiro mais escuro por trás, nomes maiores e mais carregados, seleccionado bem diferente. */
+:root{--borda:#6F5846;--tinta:#1F140E;--tab:#E6D9C1;--ink2:#5A4332;}
+.grid{background:var(--tab);padding:18px 9px 10px;border-radius:14px;row-gap:18px;}
+.pw{position:relative;display:flex;}
+.pw .prod{width:100%;}
+.prod{border:2px solid var(--borda);background:#fff;box-shadow:0 2px 0 rgba(52,37,29,.18);padding-top:22px;}
+.prod b{font-size:19px;font-weight:700;color:var(--tinta);line-height:1.22;}   /* +10% */
+.prod>span.preco{font-weight:700;color:var(--verde2);}
+.prod .catnome{color:#6B4A1E;}
+.prod .stk{font-size:13px;background:#F3E7D2;}
+.prod .stk.ok{color:#2E5A24;} .prod .stk.baixo{color:#7A4E0D;}
+.prod.fora{opacity:.45;}
+/* seleccionado: fundo verde-claro e contorno grosso. A quantidade (esquerda) e o X (direita)
+   ficam a cavalo na aresta de cima: o cartão não muda de tamanho ao seleccionar, nada salta. */
+.prod.sel{background:#CDE2B8;border-color:var(--verde2);
+ box-shadow:inset 0 0 0 2px var(--verde2), 0 2px 0 rgba(47,64,41,.35);}
+.prod .qtd-badge{min-width:34px;height:34px;font-size:17px;top:-15px;left:8px;right:auto;border:2px solid #fff;}
+/* X: tira uma unidade deste produto; à última, o cartão deixa de estar seleccionado */
+.tira{position:absolute;right:8px;top:-15px;width:44px;height:34px;border-radius:10px;border:2px solid #fff;
+ background:var(--vermelho);color:#fff;cursor:pointer;display:flex;padding:0;
+ align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(52,37,29,.3);}
+.tira svg,.rm svg,.fecha svg{width:18px;height:18px;stroke:currentColor;stroke-width:3.6;stroke-linecap:round;fill:none;pointer-events:none;}
+.tira::before{content:"";position:absolute;inset:-7px;}      /* área de toque maior que o desenho */
+.tira:active{transform:scale(.92);}
+/* categorias, pesquisa e clientes: limites visíveis */
+.catrow button{border:2px solid var(--borda);background:#fff;color:var(--tinta);font-family:inherit;font-weight:700;}
+.catrow button.sel{background:var(--ink);border-color:var(--ink);color:#fff;}
+.fld,.buscabox input{border:2px solid #A8937B;color:var(--tinta);font-family:inherit;}
+.notas{font-size:16px;line-height:1.35;}
+.tab{border:2px solid var(--borda);color:var(--tinta);font-family:inherit;font-size:14px;font-weight:600;}
+.tab.sel{color:#fff;}
+.tab.sel{border-color:var(--verde2);}
+.addtab{border:2px dashed #7A4E0D;color:#7A4E0D;}
+.fecha{width:28px;height:28px;bottom:-10px;right:-8px;background:var(--ink);color:#fff;
+ border:2px solid var(--cream);display:flex;align-items:center;justify-content:center;}
+.fecha svg{width:13px;height:13px;}
+.fecha::before{content:"";position:absolute;inset:-6px;}
+.tam-ops button,.vtops .tp,.vacts button{border-color:var(--borda);}
+/* pedido: linhas maiores e um × para tirar a linha inteira */
+.linha .nm{font-size:16px;font-weight:600;color:var(--tinta);}
+.linha .nm small{font-size:13px;font-weight:400;}
+.linha .pr{font-size:15px;color:var(--tinta);}
+.qtd b{min-width:20px;text-align:center;font-size:17px;}
+.qtd button{width:40px;height:40px;border:2px solid var(--borda);font-family:inherit;font-size:24px;font-weight:700;
+ line-height:1;color:var(--tinta);padding:0;}
+.linha .rm{flex:0 0 40px;width:40px;height:40px;border-radius:10px;border:2px solid var(--vermelho);
+ background:#fff;color:var(--vermelho);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;}
+/* um só botão: Por pagar <-> Pago */
+.pagbtn{width:100%;margin:12px 0 4px;padding:17px;border-radius:13px;border:2px solid var(--vermelho);
+ background:#fff;color:var(--vermelho);font-family:inherit;font-size:18px;font-weight:700;line-height:1;
+ letter-spacing:.8px;text-transform:uppercase;cursor:pointer;}
+.pagbtn.sim{background:#2E6B32;border-color:#2E6B32;color:#fff;}
+.tagpag{padding:9px 13px;font-family:inherit;font-size:12.5px;font-weight:700;letter-spacing:.6px;
+ text-transform:uppercase;border:2px solid var(--vermelho);white-space:nowrap;}
+.tagpag.sim{background:#2E6B32;border-color:#2E6B32;color:#fff;}
+.tagpag.nao{background:#fff;color:var(--vermelho);}
+.limpar{border:2px solid var(--vermelho);color:var(--vermelho);font-family:inherit;font-size:15px;font-weight:700;padding:14px;}
+.envia{font-family:inherit;font-size:17px;font-weight:700;padding:17px;}
+.ped .it{color:var(--ink2);font-size:13.5px;}
+/* "Anular": qualquer coisa eliminada volta com um toque, por isso já não se pergunta antes */
+.anular{position:fixed;left:12px;right:12px;bottom:calc(64px + env(safe-area-inset-bottom));z-index:70;display:none;
+ align-items:center;gap:12px;max-width:520px;margin:0 auto;padding:12px 12px 12px 16px;border-radius:14px;
+ background:var(--tinta);color:#fff;font-size:15px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.35);}
+.anular.on{display:flex;}
+.anular span{flex:1;}
+.anular button{border:0;border-radius:10px;padding:11px 16px;background:#fff;color:var(--tinta);
+ font-family:inherit;font-size:15px;font-weight:700;line-height:1;cursor:pointer;}
+@media(max-width:520px){ .prod b{font-size:17.5px;} .prod{padding-top:22px;}
+ .grid{padding:18px 7px 8px;row-gap:18px;} }   /* +10% no telemóvel */
+/* histórico no telemóvel: código + pagamento + estado numa linha, artigos por baixo a toda a largura */
+@media(max-width:520px){ .ped{flex-wrap:wrap;row-gap:6px;} .ped>div:first-child{flex:1;min-width:0;}
+ .ped>.it{order:5;flex:1 1 100%;} }
 </style>
 </head>
 <body>
@@ -216,6 +292,7 @@ h1{font-size:19px;letter-spacing:.5px;}
 </div>
 
 <button class="somBtn" id="somBtn" onclick="alternarAlerta()" style="display:none">🔔 Som ligado</button>
+<div class="anular" id="anular" role="status"><span id="anularTxt"></span><button type="button" onclick="anular()">Anular</button></div>
 
 <div id="painel" style="display:none">
   <div class="top">
@@ -242,14 +319,11 @@ h1{font-size:19px;letter-spacing:.5px;}
   <div class="box">
     <div class="sec">Pedido do balcão <span id="tabNome"></span></div>
     <div id="linhas"></div>
-    <div class="pagrow">
-      <button class="sim" id="pgSim" onclick="setPago(true)">Pago</button>
-      <button class="nao" id="pgNao" onclick="setPago(false)">Por pagar</button>
-    </div>
+    <button class="pagbtn" id="pgBtn" type="button" aria-pressed="false" onclick="alternarPagoBalcao()">Por pagar</button>
     <textarea class="fld notas" id="fNotas" placeholder="Notas para a cozinha (sem açúcar, para viagem, alergias…)" onchange="guardarNotas(this.value)"></textarea>
     <div class="tot"><span>Total</span><b id="total">0 ECV</b></div>
     <button class="envia" id="btnEnviar" onclick="enviar()">Enviar para a cozinha</button>
-    <button class="limpar" onclick="limpar()">Limpar este balcão</button>
+    <button class="limpar" onclick="limpar()">Eliminar este pedido</button>
     <div class="msg" id="envMsg"></div>
   </div>
 
@@ -301,6 +375,7 @@ let esgotados=[], stock={};
 const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const IC_X='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
 $("hoje").textContent=new Date().toLocaleDateString("pt-PT",
  {weekday:"long",day:"2-digit",month:"long"}).toUpperCase();
@@ -413,12 +488,31 @@ function juntarCliente(){
 function fecharCliente(i,ev){
  if(ev) ev.stopPropagation();
  if(balcoes.length<=1) return;
- if(balcoes[i].itens.length && !confirm("Fechar este cliente? O pedido por enviar perde-se.")) return;
+ const tinha=balcoes[i].itens.length>0;
+ if(tinha) lembrarParaAnular("Cliente "+(i+1)+" fechado");
  balcoes.splice(i,1);
  if(activo>=balcoes.length) activo=balcoes.length-1;
- guardar(); desenharTabs(); desenharPedido();
+ guardar(); desenharTudo();
 }
 function setPago(v){ balcoes[activo].pago=v; guardar(); desenharTabs(); desenharPedido(); }
+function alternarPagoBalcao(){ setPago(!balcoes[activo].pago); }   // um só botão: Por pagar <-> Pago
+
+/* ---------- ANULAR ----------
+   Guarda os balcões tal como estavam antes de eliminar; "Anular" repõe-nos. Fica 7 segundos. */
+let _antes=null, _antesT=0;
+function lembrarParaAnular(txt){
+ _antes=JSON.stringify({b:balcoes,a:activo});
+ $("anularTxt").textContent=txt;
+ $("anular").classList.add("on");
+ clearTimeout(_antesT); _antesT=setTimeout(esquecerAnular,7000);
+}
+function esquecerAnular(){ _antes=null; clearTimeout(_antesT); $("anular").classList.remove("on"); }
+function anular(){
+ if(!_antes) return;
+ try{ const o=JSON.parse(_antes); balcoes=o.b; activo=Math.min(o.a,balcoes.length-1); }catch(e){}
+ esquecerAnular(); guardar(); desenharTudo();
+}
+function desenharTudo(){ desenharTabs(); desenharPedido(); desenharProdutos(); desenharStock(); }
 function guardarNotas(v){ balcoes[activo].notas=v.trim(); guardar(); }
 function desenharTabs(){
  $("tabs").innerHTML=balcoes.map((b,i)=>{
@@ -427,7 +521,7 @@ function desenharTabs(){
    ${n?`<span class="pg ${b.pago?"sim":"nao"}"></span>`:""}
    <b>${i+1}</b>${b.nome?esc(b.nome.slice(0,12)):"Cliente"}
    ${n?`<span class="n">${n}</span>`:""}
-   ${balcoes.length>1?`<span class="fecha" onclick="fecharCliente(${i},event)">×</span>`:""}</button>`;
+   ${balcoes.length>1?`<span class="fecha" onclick="fecharCliente(${i},event)">${IC_X}</span>`:""}</button>`;
  }).join("") + `<button class="addtab" onclick="juntarCliente()">+ Cliente</button>`;
  $("tabNome").textContent=balcoes[activo].nome?("— "+balcoes[activo].nome):("— "+(activo+1));
  $("fNome").value=balcoes[activo].nome||"";
@@ -479,8 +573,18 @@ function cartaoProduto(ci,ii,i,catNome){
  const preco=i.top?(i.m+"–"+i.sp):(i.g?(i.m+"–"+i.g):i.m);
  const q=balcoes[activo].itens.filter(v=>(v.base||v.nome)===i.n).reduce((t,v)=>t+v.q,0);
  const badge=q>0?`<span class="qtd-badge">${q}</span>`:"";
- return `<button class="prod${fora?" fora":""}${q>0?" sel":""}" onclick="add(${ci},${ii})">
-  ${badge}${cat}<b>${esc(i.n)}</b><span class="preco">${preco} ECV</span>${stk}</button>`;
+ const tira=q>0?`<button type="button" class="tira" onclick="tirarUm(${ci},${ii})" aria-label="Retirar ${esc(i.n)} do pedido">${IC_X}</button>`:"";
+ return `<div class="pw"><button class="prod${fora?" fora":""}${q>0?" sel":""}" onclick="add(${ci},${ii})">
+  ${badge}${cat}<b>${esc(i.n)}</b><span class="preco">${preco} ECV</span>${stk}</button>${tira}</div>`;
+}
+/* X do cartão: tira uma unidade (a última linha desse produto — tamanho ou açaí escolhido por último).
+   Quando chega a zero, o cartão deixa de estar seleccionado. */
+function tirarUm(ci,ii){
+ const nome=MENU[ci][1][ii].n, b=balcoes[activo];
+ let k=-1; b.itens.forEach((v,j)=>{ if((v.base||v.nome)===nome) k=j; });
+ if(k<0) return;
+ try{ if(navigator.vibrate) navigator.vibrate(25); }catch(e){}
+ mudarQtd(k,-1);
 }
 function desenharProdutos(){
  const lista=produtosAMostrar();
@@ -583,18 +687,27 @@ function desenharPedido(){
     <b>${x.q}</b><button onclick="mudarQtd(${k},1)">+</button></div>
    <div class="nm">${esc(x.nome)}<small>${tamanhoTxt(x)}${x.preco} ECV cada</small></div>
    <div class="pr">${x.preco*x.q}</div>
+   <button type="button" class="rm" onclick="tirarLinha(${k})" aria-label="Eliminar ${esc(x.nome)}">${IC_X}</button>
   </div>`).join("") : '<div class="vazio">Toca nos produtos acima para montar o pedido.</div>';
  $("total").textContent=totalBalcao()+" ECV";
  $("btnEnviar").disabled = !b.itens.length;
- $("pgSim").classList.toggle("sel", b.pago===true);
- $("pgNao").classList.toggle("sel", b.pago!==true);
+ const pg=$("pgBtn"), pago=b.pago===true;
+ pg.classList.toggle("sim", pago);
+ pg.textContent = pago ? "✓ Pago" : "Por pagar";
+ pg.setAttribute("aria-pressed", pago?"true":"false");
  $("fNotas").value=b.notas||"";
+}
+function tirarLinha(k){
+ const b=balcoes[activo]; if(!b.itens[k]) return;
+ lembrarParaAnular(b.itens[k].nome+" eliminado");
+ b.itens.splice(k,1);
+ guardar(); desenharTudo();
 }
 function limpar(){
  if(!balcoes[activo].itens.length) return;
- if(!confirm("Limpar o balcão "+(activo+1)+"?")) return;
+ lembrarParaAnular("Pedido do cliente "+(activo+1)+" eliminado");
  balcoes[activo]=novoBalcao();
- guardar(); desenharTabs(); desenharPedido();
+ guardar(); desenharTudo();
 }
 
 /* ---------- STOCK ---------- */
@@ -639,6 +752,7 @@ async function enviar(){
  const b=balcoes[activo];
  if(!b.itens.length) return;
  const btn=$("btnEnviar"); btn.disabled=true;
+ esquecerAnular();
  const msg=$("envMsg"); msg.className="msg"; msg.textContent="A enviar…";
  const code=novoCodigo();
  // ocupa lugar na cozinha como qualquer outro pedido, mas sem antecedência mínima
