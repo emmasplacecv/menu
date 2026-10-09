@@ -43,6 +43,24 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
 .ebtn{padding:12px 18px;border-radius:30px;border:none;font-size:14.5px;font-weight:600;
  cursor:pointer;font-family:inherit;background:var(--vermelho);color:#fff;white-space:nowrap;}
 .estado.off .ebtn{background:var(--verde);}
+/* opções do dia: só hora marcada · campanha do açaí */
+.estado.cfg{display:block;margin-top:10px;border-color:var(--line);background:var(--card);}
+.estado.cfg .et{color:var(--ink);font-size:17px;}
+.estado.cfg .ebts{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px;}
+.estado.cfg .ebl{flex-basis:100%;font-size:12px;letter-spacing:1.5px;font-weight:600;color:var(--ink2);text-transform:uppercase;}
+.estado.cfg .ebtn{background:var(--dark);padding:11px 18px;}
+.estado.cfg .ebtn.sec{background:transparent;color:var(--dark);border:2px solid var(--dark);padding:9px 16px;}
+.estado.cfg.on.hora{border-color:#B5791F;background:#FFF6E2;}
+.estado.cfg.on.hora .et{color:#8A5A12;}
+.estado.cfg.on.camp{border-color:#4A2545;background:#F3E8F0;}
+.estado.cfg.on.camp .et{color:#4A2545;}
+.estado.cfg.on .ebtn{background:var(--vermelho);}
+.estado.cfg.marc{border-style:dashed;}
+.estado.cfg.marc.hora{border-color:#B5791F;background:#FFFBF0;}
+.estado.cfg.marc.hora .et{color:#8A5A12;}
+.estado.cfg.marc.camp{border-color:#4A2545;background:#FAF4F8;}
+.estado.cfg.marc.camp .et{color:#4A2545;}
+.estado.cfg.marc .ebtn{background:var(--vermelho);}
 .tabs{display:flex;gap:8px;margin-top:18px;}
 .tabb{flex:1;padding:12px;border-radius:30px;border:2px solid var(--line);background:var(--card);
  font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);}
@@ -159,6 +177,23 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
       <div class="es" id="entSub"></div>
     </div>
     <button class="ebtn" id="entBtn" onclick="alternarEntregas()">—</button>
+  </div>
+
+  <!-- OPÇÕES DO DIA: desligam-se sozinhas à meia-noite do último dia escolhido -->
+  <div class="estado cfg hora" id="cfgBoxAsap">
+    <div>
+      <div class="et" id="cfgTxtAsap">A carregar…</div>
+      <div class="es" id="cfgSubAsap"></div>
+    </div>
+    <div class="ebts" id="cfgBtsAsap"></div>
+  </div>
+
+  <div class="estado cfg camp" id="cfgBoxCamp">
+    <div>
+      <div class="et" id="cfgTxtCamp">A carregar…</div>
+      <div class="es" id="cfgSubCamp"></div>
+    </div>
+    <div class="ebts" id="cfgBtsCamp"></div>
   </div>
 
   <div class="tabs">
@@ -466,9 +501,113 @@ async function carregarMenuEdit(){
   if(!d.erro && d.edit) edit={p:d.edit.p||{},off:d.edit.off||[],add:d.edit.add||[],ord:d.edit.ord||{},
    cp:d.edit.cp||{},coff:d.edit.coff||[],cadd:d.edit.cadd||[],cord:d.edit.cord||[]};
   edit=migrarNomes(edit);
+  if(!d.erro) editLido=true;
  }catch(e){}
  limparAcaiAntigo();
  desenharMenu();
+ desenharCfg();
+}
+
+/* ============================================================
+   OPÇÕES DO DIA (09-10-2026)
+   1) só hora marcada  — esconde "Assim que possível" no site
+   2) campanha do açaí — 3 açaís: 1 grátis · 2 açaís: 2.º com −67%; só no site
+   Ficam guardadas junto dos preços do menu (edit.p), com as duas chaves abaixo — as MESMAS que o
+   site lê, não mudar só aqui. Cada uma guarda {m: último dia, g: primeiro dia ou nada} (dias contados
+   desde 01-01-2026, pela hora de Cabo Verde): vale de g — ou desde já — até ao fim de m, e depois
+   desliga-se sozinha. Os dias contam pelo dia em que o pedido é LEVANTADO: "só amanhã" (g = m = amanhã)
+   apanha também os pedidos feitos hoje depois de a loja fechar, e o site anuncia a campanha já hoje.
+   ============================================================ */
+const CFG_ASAP="__cfg:asap_off", CFG_CAMP="__cfg:camp_acai";
+const CFG_DIA0=Date.UTC(2026,0,1)/864e5;
+let editLido=false;
+function diaCV(){
+ const agora=new Date(); let y=0,m=0,d=0;
+ try{
+  new Intl.DateTimeFormat("en-GB",{timeZone:"Atlantic/Cape_Verde",year:"numeric",month:"numeric",day:"numeric"})
+   .formatToParts(agora).forEach(x=>{ if(x.type==="year") y=+x.value; if(x.type==="month") m=+x.value; if(x.type==="day") d=+x.value; });
+ }catch(e){}
+ if(!y||!m||!d){ y=agora.getFullYear(); m=agora.getMonth()+1; d=agora.getDate(); }
+ return Math.round(Date.UTC(y,m-1,d)/864e5-CFG_DIA0)+1;
+}
+function cfgVal(k){ const o=edit&&edit.p&&edit.p[k]; return {ate:(o&&o.m>0)?o.m:0, de:(o&&o.g>0)?o.g:0}; }
+/* 0 = desligada · 1 = ligada agora · 2 = marcada (começa noutro dia) */
+function cfgEstado(k){ const v=cfgVal(k), h=diaCV(); if(!v.ate || h>v.ate) return 0; return (v.de && h<v.de) ? 2 : 1; }
+function cfgDia(n){
+ return new Date((CFG_DIA0+n-1)*864e5).toLocaleDateString("pt-PT",{weekday:"long",day:"2-digit",month:"2-digit",timeZone:"UTC"});
+}
+function cfgQuando(n){ const h=diaCV(); return (n===h?"hoje, ":(n===h+1?"amanhã, ":""))+cfgDia(n); }
+const CFG_UI=[
+ {k:CFG_ASAP, id:"Asap",
+  off:"«ASSIM QUE POSSÍVEL» ACTIVO", offSub:"O cliente pode pedir para já ou marcar a hora.",
+  on:"SÓ HORA MARCADA", onSub:"«Assim que possível» está escondido no site.", fim:"depois volta sozinho",
+  marc:"SÓ HORA MARCADA · MARCADO", marcSub:"«Assim que possível» fica escondido para os pedidos levantados {d}, incluindo os feitos na véspera depois de a loja fechar",
+  f3:"Vale para os pedidos levantados amanhã ({d}), incluindo os feitos hoje depois de a loja fechar. Depois volta sozinho.",
+  lig:"Desactivar", bOff:"Voltar a permitir já",
+  perg:"Desactivar «assim que possível»?\n\nO site passa a aceitar só pedidos com hora marcada."},
+ {k:CFG_CAMP, id:"Camp",
+  off:"CAMPANHA AÇAÍ DESLIGADA", offSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −67%. Só no site, com transferência.",
+  on:"CAMPANHA AÇAÍ LIGADA", onSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −67%. Só no site.", fim:"depois desliga-se sozinha",
+  marc:"CAMPANHA AÇAÍ MARCADA", marcSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −67%. Só no site. O site já a anuncia; o desconto vale para pedidos levantados {d}, incluindo os feitos na véspera depois de a loja fechar",
+  f3:"Vale só para pedidos levantados amanhã ({d}), incluindo os feitos hoje depois de a loja fechar.\nO site começa já a anunciá-la e desliga-a sozinho no fim desse dia.",
+  lig:"Ligar", bOff:"Desligar já",
+  perg:"Ligar a campanha do açaí?\n\n3 açaís no carrinho: 1 é grátis.\n2 açaís no carrinho: o 2.º com −67%.\n\nSó nas encomendas do site (transferência), para levantar nos dias da campanha. Ao balcão o preço continua o normal."}
+];
+function desenharCfg(){
+ CFG_UI.forEach((u,i)=>{
+  const box=$("cfgBox"+u.id); if(!box) return;
+  if(!editLido){ $("cfgTxt"+u.id).textContent="Sem ligação"; $("cfgSub"+u.id).textContent="Não foi possível ler o estado. Actualize a página."; $("cfgBts"+u.id).innerHTML=""; return; }
+  const est=cfgEstado(u.k), v=cfgVal(u.k);
+  box.classList.toggle("on",est===1);
+  box.classList.toggle("marc",est===2);
+  $("cfgTxt"+u.id).textContent = est===1 ? u.on : (est===2 ? u.marc : u.off);
+  $("cfgSub"+u.id).textContent =
+     est===1 ? u.onSub+" Até ao fim de "+cfgQuando(v.ate)+"; "+u.fim+"."
+   : est===2 ? u.marcSub.replace("{d}",cfgQuando(v.de))+"; "+u.fim+"."
+   : u.offSub;
+  $("cfgBts"+u.id).innerHTML =
+     est===1 ? `<button class="ebtn" onclick="mudarCfg(${i},0)">${u.bOff}</button>`
+   : est===2 ? `<button class="ebtn" onclick="mudarCfg(${i},0)">Cancelar</button>`
+   : `<span class="ebl">${u.lig}</span><button class="ebtn" onclick="mudarCfg(${i},1)">Só hoje</button>`+
+     `<button class="ebtn sec" onclick="mudarCfg(${i},3)">Só amanhã</button><button class="ebtn sec" onclick="mudarCfg(${i},2)">Hoje e amanhã</button>`;
+ });
+}
+/* modo: 0 = desligar · 1 = só hoje · 2 = hoje e amanhã (desde já) · 3 = só amanhã (começa à meia-noite).
+   Grava por cima do que está NO SERVIDOR (e não do que está neste ecrã), para não levar de arrasto
+   alterações de menu ainda por guardar. No fim confirma que o servidor ficou mesmo com a opção. */
+let cfgOcupado=false;
+async function mudarCfg(i,modo){
+ const u=CFG_UI[i], k=u.k, h=diaCV();
+ if(cfgOcupado) return;
+ const alvo = modo===1 ? {m:h,g:null} : (modo===2 ? {m:h+1,g:null} : (modo===3 ? {m:h+1,g:h+1} : null));
+ const frase = modo===1 ? "Vale para pedidos levantados hoje; depois desliga-se sozinha."
+             : modo===2 ? "Vale para pedidos levantados hoje e amanhã; depois desliga-se sozinha."
+             :            u.f3.replace("{d}",cfgDia(h+1));
+ if(alvo && !confirm(u.perg+"\n\n"+frase)) return;
+ cfgOcupado=true;
+ try{
+  const r0=await fetch(PROMO_API+"/menu-edit");
+  const d0=await r0.json();
+  if(d0.erro){ alert(d0.erro); return; }
+  const s=d0.edit||{};
+  const meus=Object.keys(edit.p||{}).filter(x=>x.indexOf("__cfg:")!==0).length;
+  if(meus && !Object.keys(s.p||{}).length){
+   alert("O servidor devolveu o menu vazio. Por segurança não gravei nada.\n\nActualize a página e tente de novo."); return;
+  }
+  const novo={p:Object.assign({},s.p||{}),off:s.off||[],add:s.add||[],ord:s.ord||{},cp:s.cp||{},coff:s.coff||[],cadd:s.cadd||[],cord:s.cord||[]};
+  if(alvo) novo.p[k]={m:alvo.m,g:alvo.g}; else delete novo.p[k];
+  const r=await fetch(PROMO_API+"/menu-set?key="+encodeURIComponent(KEY),
+   {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(novo)});
+  const d=await r.json();
+  if(d.erro){ alert(d.erro); return; }
+  const g=d.edit&&d.edit.p&&d.edit.p[k], fm=(g&&g.m>0)?g.m:0, fg=(g&&g.g>0)?g.g:0;
+  if(fm!==(alvo?alvo.m:0) || fg!==((alvo&&alvo.g)||0)){
+   alert("O servidor não guardou esta opção como pedido — confirme no site antes de contar com ela.\n\nÉ preciso acrescentá-la no servidor (Worker) antes de a poder usar."); return;
+  }
+  if(alvo) edit.p[k]={m:alvo.m,g:alvo.g}; else delete edit.p[k];
+  desenharCfg();
+ }catch(e){ alert("Não foi possível guardar. Verifique a ligação."); }
+ finally{ cfgOcupado=false; }
 }
 
 function precoDe(nome, base){
