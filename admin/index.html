@@ -511,7 +511,7 @@ async function carregarMenuEdit(){
 /* ============================================================
    OPÇÕES DO DIA (09-10-2026)
    1) só hora marcada  — esconde "Assim que possível" no site
-   2) campanha do açaí — 3 açaís: 1 grátis · 2 açaís: 2.º com −67%; só no site
+   2) campanha do açaí — 3 açaís: 1 grátis · 2 açaís: 2.º com −50%; só no site
    Ficam guardadas junto dos preços do menu (edit.p), com as duas chaves abaixo — as MESMAS que o
    site lê, não mudar só aqui. Cada uma guarda {m: último dia, g: primeiro dia ou nada} (dias contados
    desde 01-01-2026, pela hora de Cabo Verde): vale de g — ou desde já — até ao fim de m, e depois
@@ -546,12 +546,12 @@ const CFG_UI=[
   lig:"Desactivar", bOff:"Voltar a permitir já",
   perg:"Desactivar «assim que possível»?\n\nO site passa a aceitar só pedidos com hora marcada."},
  {k:CFG_CAMP, id:"Camp",
-  off:"CAMPANHA AÇAÍ DESLIGADA", offSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −67%. Só no site, com transferência.",
-  on:"CAMPANHA AÇAÍ LIGADA", onSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −67%. Só no site.", fim:"depois desliga-se sozinha",
-  marc:"CAMPANHA AÇAÍ MARCADA", marcSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −67%. Só no site. O site já a anuncia; o desconto vale para pedidos levantados {d}, incluindo os feitos na véspera depois de a loja fechar",
+  off:"CAMPANHA AÇAÍ DESLIGADA", offSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −50%. Só no site, com transferência.",
+  on:"CAMPANHA AÇAÍ LIGADA", onSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −50%. Só no site.", fim:"depois desliga-se sozinha",
+  marc:"CAMPANHA AÇAÍ MARCADA", marcSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −50%. Só no site. O site já a anuncia; o desconto vale para pedidos levantados {d}, incluindo os feitos na véspera depois de a loja fechar",
   f3:"Vale só para pedidos levantados amanhã ({d}), incluindo os feitos hoje depois de a loja fechar.\nO site começa já a anunciá-la e desliga-a sozinho no fim desse dia.",
   lig:"Ligar", bOff:"Desligar já",
-  perg:"Ligar a campanha do açaí?\n\n3 açaís no carrinho: 1 é grátis.\n2 açaís no carrinho: o 2.º com −67%.\n\nSó nas encomendas do site (transferência), para levantar nos dias da campanha. Ao balcão o preço continua o normal."}
+  perg:"Ligar a campanha do açaí?\n\n3 açaís no carrinho: 1 é grátis.\n2 açaís no carrinho: o 2.º com −50%.\n\nSó nas encomendas do site (transferência), para levantar nos dias da campanha. Ao balcão o preço continua o normal."}
 ];
 function desenharCfg(){
  CFG_UI.forEach((u,i)=>{
