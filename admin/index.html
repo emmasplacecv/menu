@@ -77,6 +77,9 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
 .ped .tipo.ent{background:var(--gold);color:var(--dark);}
 .ped .cli{font-size:14.5px;margin-top:6px;}
 .ped .cod{font-family:monospace;font-size:12.5px;color:var(--ink2);}
+.ped .feito{font-size:13.5px;color:var(--ink2);margin-top:5px;line-height:1.45;}
+.ped .feito b{color:var(--ink);font-weight:600;}
+.ped .atraso{font-size:13.5px;font-weight:600;color:#8C2F2F;margin-top:5px;}
 .ped ul{list-style:none;margin:8px 0 0;}
 .ped li{font-size:14.5px;padding:3px 0;border-bottom:1px dotted var(--line);}
 .ped li:last-child{border-bottom:none;}
@@ -827,6 +830,73 @@ function verAba(q){
  if(q==="stk") carregarStock();
 }
 
+/* QUANDO O PEDIDO FOI FEITO (não confundir com a hora do levantamento, que é p.slot).
+   O servidor guarda a hora em p.criado ("22:04") e o código interno do pedido (p.id) começa pelo instante
+   exacto em que foi registado. Mostra-se dia e hora ao segundo; se o id não bater com p.criado, fica só a hora. */
+const PRAZO_COMP=15;      // minutos que o site dá ao cliente para transferir e anexar o comprovativo
+function feitoEm(p){
+ try{
+  const ms=parseInt(String(p.id||"").slice(0,8),36);
+  if(isFinite(ms) && ms>1.6e12 && ms<4e12){
+   const d=new Date(ms), tz={timeZone:"Atlantic/Cape_Verde"};
+   const hm=d.toLocaleTimeString("pt-PT",Object.assign({hour:"2-digit",minute:"2-digit",hour12:false},tz));
+   const min=x=>{ const m=/^(\d{1,2}):(\d{2})/.exec(x||""); return m ? (+m[1])*60+(+m[2]) : -1; };
+   const dif=Math.abs(min(hm)-min(p.criado));
+   if(!p.criado || dif<=1 || dif>=1439)
+    return {ms:ms, txt:d.toLocaleDateString("pt-PT",Object.assign({weekday:"short",day:"2-digit",month:"2-digit"},tz))+" às "+
+                       d.toLocaleTimeString("pt-PT",Object.assign({hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false},tz))};
+  }
+ }catch(e){}
+ return p.criado ? {ms:0, txt:"às "+p.criado} : null;
+}
+function haQuanto(ms){
+ const m=Math.max(0,Math.floor((Date.now()-ms)/60000));
+ if(m<1) return "agora mesmo";
+ if(m<60) return "há "+m+" min";
+ if(m<1440) return "há "+Math.floor(m/60)+" h "+String(m%60).padStart(2,"0")+" min";
+ return "há "+Math.floor(m/1440)+" dia(s)";
+}
+/* linha "Pedido feito: …" de cada cartão, e o aviso quando o prazo do comprovativo já passou */
+function linhaFeito(p){
+ const f=feitoEm(p); if(!f) return "";
+ let h=`<div class="feito">Pedido feito: <b>${f.txt}</b>${f.ms?" · "+haQuanto(f.ms):""}</div>`;
+ if(f.ms && p.status==="aguarda" && !p.balcao && (Date.now()-f.ms)>PRAZO_COMP*60000)
+  h+=`<div class="atraso" data-atraso="${String(p.code||"").replace(/"/g,"")}">Passaram os ${PRAZO_COMP} min dados ao cliente para o comprovativo. Sem comprovativo, pode cancelar.</div>`;
+ return h;
+}
+
+/* O CLIENTE JÁ ANEXOU O COMPROVATIVO? A lista de pedidos não o diz: pergunta-se ao servidor, pedido a pedido,
+   só para os que aguardam comprovativo. Se a pergunta não tiver resposta clara, o cartão fica como antes. */
+const _compTem=new Map();      // código do pedido -> true (anexado no site) | false (ainda não)
+let _compOcupado=false;
+async function verComprovativos(){
+ if(_compOcupado) return;
+ _compOcupado=true;
+ try{
+  const alvos=pedidos.filter(p=>p.status==="aguarda" && !p.balcao && p.code && _compTem.get(p.code)!==true);
+  for(const p of alvos){
+   try{
+    const ctl=(typeof AbortController!=="undefined") ? new AbortController() : null;
+    const r=await fetch(PROMO_API+"/comprovativo?code="+encodeURIComponent(p.code)+"&key="+encodeURIComponent(KEY), ctl?{signal:ctl.signal}:undefined);
+    const tipo=(r.headers.get("content-type")||"").toLowerCase();
+    if(r.ok && /^(image\/|application\/pdf|application\/octet-stream)/.test(tipo)) _compTem.set(p.code,true);
+    else if((r.ok && tipo.includes("json")) || r.status===404 || r.status===400 || r.status===410) _compTem.set(p.code,false);
+    if(ctl) try{ ctl.abort(); }catch(e){}       // só interessa saber se existe: não se descarrega a foto
+   }catch(e){ /* sem resposta legível: não se afirma nada */ }
+  }
+ }finally{ _compOcupado=false; }
+ desenharComprovativos();
+}
+function desenharComprovativos(){
+ document.querySelectorAll("#pedidos [data-comp]").forEach(el=>{
+  const v=_compTem.get(el.dataset.comp);
+  if(v===true)  el.innerHTML='<b style="color:#2E6B32">✓ Comprovativo anexado no site</b> · ';
+  if(v===false) el.innerHTML='<b style="color:#8C2F2F">Sem comprovativo anexado no site</b> · ';
+ });
+ /* com o comprovativo já anexado, o aviso do prazo deixa de fazer sentido: falta só confirmar */
+ document.querySelectorAll("#pedidos [data-atraso]").forEach(el=>{ el.style.display = _compTem.get(el.dataset.atraso)===true ? "none" : ""; });
+}
+
 async function carregarPedidos(){
  try{
   // pedidos de hoje + dos 2 dias seguintes (encomendas feitas fora de horas
@@ -868,16 +938,19 @@ async function carregarPedidos(){
    <div class="cli"><b>${p.nome||"(sem nome)"}</b>${p.tel?` · <a href="tel:${p.tel.replace(/\s/g,"")}" style="color:var(--verde);font-weight:600;text-decoration:none">${p.tel}</a>`:""}
     · <span class="cod">${p.code||""}</span>
     ${p._futuro?' · <b style="color:#8A5A12">'+(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
+   ${linhaFeito(p)}
    <ul>${p.itens.map(i=>`<li>${i}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${p.zona}${p.morada?" — "+p.morada:""}</div>`:(p.morada?`<div class="mor">📍 ${p.morada}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${p.piso}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${p.taxaAndar} ECV</div>`:""}
    ${p.notas?`<div class="nt">Notas: ${p.notas}</div>`:""}
    <div class="tot">${p.total} ECV</div>
    ${p.balcao?`<div class="nt"><b style="color:${p.balcaoPago?"#3F6B33":"#8C2F2F"}">BALCÃO · ${p.balcaoPago?"PAGO":"POR PAGAR"}</b></div>`:
-     (p.code?`<div class="nt"><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a> <span style="opacity:.65">(abre em separador novo; dá erro se o cliente ainda não anexou)</span></div>`:"")}
+     (p.code?`<div class="nt"><span data-comp="${String(p.code).replace(/"/g,"")}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a> <span style="opacity:.65">(abre em separador novo; dá erro se o cliente ainda não anexou)</span></div>`:"")}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
    <div class="acts">${acts}<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')">🗑 Apagar</button></div>
   </div>`;
  }).join("");
+ desenharComprovativos();
+ verComprovativos();
 }
 
 async function apagar(id,code){
