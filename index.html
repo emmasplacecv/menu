@@ -780,6 +780,8 @@ textarea.fld{min-height:74px;resize:vertical;}
  font-size:24px;line-height:38px;text-align:center;font-weight:500;}
 @media(min-width:720px){.camp{padding:18px 22px;}.camp b{font-size:25px;}.camp small{font-size:13.5px;}}
 .warn.campw{background:#F3E8F0;border-color:#C9A9C2;color:var(--roxo);}
+.warn.falta{margin:10px 0 12px;border-color:#8C2F2F;background:#F6E9E6;color:#8C2F2F;font-size:14px;}
+.warn.falta b:first-child{display:block;margin-bottom:3px;font-size:15.5px;}
 .warn.campmais{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 9px 9px 13px;}
 .warn.campmais span{min-width:0;font-weight:500;}
 .warn.campmais button{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:10px 15px 10px 12px;
@@ -1089,10 +1091,11 @@ textarea.fld{min-height:74px;resize:vertical;}
 <div class="sheet" id="doneSheet">
   <div class="grab"></div>
   <h3 id="okTit" data-i18n="okTitulo"></h3>
+  <!-- o pedido já ficou registado, mas ainda não está concluído: é a primeira coisa que o cliente lê -->
+  <div class="warn falta" id="okPrazo" style="display:none"></div>
   <div class="sd" data-i18n="okSub"></div>
   <div class="okcode" id="okCode"></div>
   <div id="okPay"></div>
-  <div class="warn" id="okPrazo" style="display:none"></div>
   <div id="okCompBox" style="display:none">
     <div class="lbl" data-i18n="okComp"></div>
     <label class="okfile" for="fComp" data-i18n="okCompHint"></label>
@@ -1421,6 +1424,28 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"açaís in je mandje",ccGratis:"1 is GRATIS",ccPct:"de 2e met −{x}%",ccNota:"Geen korting aan de balie. Eén aanbieding per bestelling.",
    sohora:"Op dit moment nemen we alleen bestellingen met een vast tijdstip aan.",sohoraerro:"Kies een tijdstip voor je bestelling om verder te gaan.",
    cfgmudou:"De voorwaarden van de bestelling zijn zojuist gewijzigd. Controleer het totaal en verstuur opnieuw."}
+ };
+ for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
+})();
+/* ---- "O pedido ainda não está concluído": textos mais claros sobre a transferência (09-10-2026) ----
+   okFalta = aviso no topo, depois de confirmar · reserva = aviso antes de confirmar, em pedidos para outro dia */
+(function(){
+ const R={
+  pt:{okTitulo:"Falta pagar e enviar o pedido",
+   okFalta:"<b>O pedido ainda não está concluído.</b>Só conta depois de transferir e anexar o comprovativo aqui no site. Tem <b>{p} minutos</b>: sem comprovativo, o pedido é cancelado e não é preparado.",
+   reserva:"<b>Sem transferência e comprovativo, o pedido não fica concluído.</b><br>Reservamos o seu lugar <b>{q}</b> assim que recebermos o comprovativo. Na manhã do dia confirmamos consigo antes de preparar."},
+  en:{okTitulo:"Still to do: pay and send your order",
+   okFalta:"<b>Your order is not complete yet.</b>It only counts once you transfer and attach the receipt here on the site. You have <b>{p} minutes</b>: without a receipt, the order is cancelled and not prepared.",
+   reserva:"<b>Without the transfer and the receipt, the order is not complete.</b><br>We reserve your slot <b>{q}</b> as soon as we receive the receipt. On the morning we confirm with you before preparing."},
+  fr:{okTitulo:"Il reste à payer et à envoyer la commande",
+   okFalta:"<b>La commande n'est pas encore finalisée.</b>Elle ne compte qu'après le virement et l'ajout du justificatif ici, sur le site. Vous avez <b>{p} minutes</b> : sans justificatif, la commande est annulée et n'est pas préparée.",
+   reserva:"<b>Sans virement ni justificatif, la commande n'est pas finalisée.</b><br>Nous réservons votre créneau <b>{q}</b> dès réception du justificatif. Le matin même, nous confirmons avant de préparer."},
+  de:{okTitulo:"Noch offen: bezahlen und Bestellung senden",
+   okFalta:"<b>Die Bestellung ist noch nicht abgeschlossen.</b>Sie zählt erst nach der Überweisung und dem Anhängen des Belegs hier auf der Website. Sie haben <b>{p} Minuten</b>: Ohne Beleg wird storniert und nichts zubereitet.",
+   reserva:"<b>Ohne Überweisung und Beleg ist die Bestellung nicht abgeschlossen.</b><br>Wir reservieren Ihren Termin <b>{q}</b>, sobald der Beleg da ist. Am Morgen bestätigen wir vor der Zubereitung."},
+  nl:{okTitulo:"Nog te doen: betalen en bestelling versturen",
+   okFalta:"<b>Uw bestelling is nog niet afgerond.</b>Ze telt pas na de overschrijving en het toevoegen van het betaalbewijs hier op de site. U heeft <b>{p} minuten</b>: zonder bewijs wordt geannuleerd en niets bereid.",
+   reserva:"<b>Zonder overschrijving en betaalbewijs is de bestelling niet afgerond.</b><br>We reserveren uw tijd <b>{q}</b> zodra we het bewijs ontvangen. 's Ochtends bevestigen we voor we beginnen."}
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
@@ -2594,7 +2619,7 @@ function mostrarConfirmacao(precisa, d){
    '<div class="okstep"><b>2</b><span>'+t("okPasso2").replace("{c}",esc(d.code))+'</span></div>'+
    '<div class="okstep"><b>3</b><span>'+t("okPasso3")+'</span></div>'+
    '<div class="okstep"><b>4</b><span>'+t("okPasso4")+'</span></div>';
-  $("okPrazo").innerHTML=t("prazo").replace("{p}",PRAZO);
+  $("okPrazo").innerHTML=t("okFalta").replace("{p}",PRAZO);
   $("okPrazo").style.display="block";
   $("okCompBox").style.display="block";
  }else{
@@ -2679,6 +2704,7 @@ function waPronto(){ return !!ultimoPedido && (!ultimoPedido.precisa || !!compFi
 function mostrarWa(){
  const box=$("okWaBox"); if(!box) return;
  if(!ultimoPedido){ box.style.display="none"; return; }
+ const pz=$("okPrazo"); if(pz) pz.style.display=(ultimoPedido.precisa && !waFeito) ? "block" : "none";   // enviado: o aviso já não faz falta
  const a=$("okWa1"), pronto=waPronto();
  a.classList.toggle("off", !pronto);
  a.setAttribute("aria-disabled", pronto?"false":"true");
