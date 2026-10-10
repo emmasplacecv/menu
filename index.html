@@ -780,8 +780,6 @@ textarea.fld{min-height:74px;resize:vertical;}
  font-size:24px;line-height:38px;text-align:center;font-weight:500;}
 @media(min-width:720px){.camp{padding:18px 22px;}.camp b{font-size:25px;}.camp small{font-size:13.5px;}}
 .warn.campw{background:#F3E8F0;border-color:#C9A9C2;color:var(--roxo);}
-.warn.falta{margin:10px 0 12px;border-color:#8C2F2F;background:#F6E9E6;color:#8C2F2F;font-size:14px;}
-.warn.falta b:first-child{display:block;margin-bottom:3px;font-size:15.5px;}
 .warn.campmais{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 9px 9px 13px;}
 .warn.campmais span{min-width:0;font-weight:500;}
 .warn.campmais button{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:10px 15px 10px 12px;
@@ -818,6 +816,52 @@ textarea.fld{min-height:74px;resize:vertical;}
  .capa .capa-camp p{grid-column:1/-1;}
 }
 @media(prefers-reduced-motion:reduce){.capa .capa-txt.entra .capa-camp{animation:none;}}
+
+/* ===== PEDIDO REGISTADO: janela de pagamento (09-10-2026, noite) =====
+   Três zonas sempre à vista: topo (estado do pedido + relógio), dados da conta e, em baixo, os botões de
+   anexar o comprovativo e de enviar. Só o meio desliza.
+   Estados (classe na folha): est-pagar = falta transferir e anexar · est-enviar = falta enviar · est-feito. */
+#doneSheet{padding:0;max-height:94vh;max-height:94dvh;overflow:hidden;flex-direction:column;}
+#doneSheet.on{display:flex;}
+.pg-topo{flex:none;display:flex;align-items:center;gap:12px;padding:17px 16px 16px;background:#8C2F2F;color:#FFF6EC;
+ transition:background-color .35s ease;}
+.pg-tt{flex:1;min-width:0;}
+.sheet .pg-topo h3{margin:0;font-family:'Playfair Display',serif;font-size:22px;line-height:1.18;color:inherit;}
+.pg-topo p{margin:6px 0 0;font-size:14px;line-height:1.45;color:inherit;}
+.pg-rel{flex:none;min-width:78px;padding:8px 10px 7px;border-radius:14px;background:rgba(255,246,236,.16);
+ border:1px solid rgba(255,246,236,.45);text-align:center;}
+.pg-rel b{display:block;font:700 23px/1.1 'Jost',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.5px;}
+.pg-rel small{display:block;margin-top:3px;font-size:10.5px;line-height:1.2;letter-spacing:.5px;text-transform:uppercase;}
+#doneSheet.est-enviar .pg-topo{background:var(--roxo);}
+#doneSheet.est-feito .pg-topo{background:#2E6B32;}
+.pg-corpo{flex:1 1 auto;min-height:0;overflow-y:auto;padding:14px 16px 12px;-webkit-overflow-scrolling:touch;}
+.pg-corpo .sd{margin-bottom:0;}
+#doneSheet.pagar #okCode,#doneSheet.pagar #okSubRef{display:none;}      /* a referência já está no quadro da conta */
+.pgdados{border:1.5px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden;margin-bottom:12px;}
+.pgvalor{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 14px;background:#F3E8F0;color:var(--roxo);}
+.pgvalor span{font-size:12.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;}
+.pgvalor b{font-family:'Playfair Display',serif;font-size:27px;font-weight:800;white-space:nowrap;}
+.pgdados .ln{display:flex;align-items:center;gap:10px;min-height:46px;padding:6px 10px 6px 14px;border-top:1px solid var(--line);font-size:15px;}
+.pgdados .ln span{flex:none;width:74px;color:var(--ink2);font-size:13px;}
+.pgdados .ln b{flex:1;min-width:0;font-weight:600;color:var(--ink);overflow-wrap:anywhere;}
+.pgcop{flex:none;min-height:34px;padding:7px 13px;border-radius:999px;border:1.5px solid var(--roxo);background:transparent;color:var(--roxo);
+ font:600 12.5px/1 'Jost',sans-serif;cursor:pointer;}
+.pgcop.ok{background:var(--roxo);color:#FBF4E6;}
+.pg-pe{flex:none;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:var(--cream);border-top:1px solid var(--line);
+ box-shadow:0 -8px 18px rgba(52,37,29,.09);}
+.pg-pe .okfile{display:flex;align-items:center;justify-content:center;gap:9px;box-sizing:border-box;margin:0;padding:15px 14px;border:0;border-radius:40px;
+ background:var(--roxo);color:#FBF4E6;font:600 16.5px/1.2 'Jost',sans-serif;text-align:center;cursor:pointer;box-shadow:0 5px 14px rgba(74,37,69,.26);}
+.pg-pe .okfile svg{flex:none;width:20px;height:20px;}
+.pg-pe .okfile small{font-weight:400;font-size:13px;opacity:.9;}
+#doneSheet.est-enviar .pg-pe .okfile,#doneSheet.est-feito .pg-pe .okfile{padding:9px 12px;background:transparent;color:#2E6B32;
+ border:1.5px solid #9CC29C;box-shadow:none;font-size:14px;}
+.pg-pe #okCompMsg{margin-top:6px;text-align:center;}
+.pg-pe #okCompMsg:empty{display:none;}
+.pg-pe .okwa{margin-top:10px;padding:0;border:0;border-radius:40px;background:transparent;}
+.pg-pe .okwa-btn{margin-top:0;border-radius:40px;padding:15px 14px;font-size:16.5px;}
+.pg-pe .okwa-btn.b2{margin-top:9px;padding:12px 14px;font-size:15px;}
+.pg-pe .okwa-falta{margin-top:6px;}
+.pg-pe .go{margin-top:10px;}
 </style>
 </head>
 <body>
@@ -1088,17 +1132,22 @@ textarea.fld{min-height:74px;resize:vertical;}
 </div>
 
 <!-- PEDIDO REGISTADO -->
-<div class="sheet" id="doneSheet">
-  <div class="grab"></div>
-  <h3 id="okTit" data-i18n="okTitulo"></h3>
-  <!-- o pedido já ficou registado, mas ainda não está concluído: é a primeira coisa que o cliente lê -->
-  <div class="warn falta" id="okPrazo" style="display:none"></div>
-  <div class="sd" data-i18n="okSub"></div>
-  <div class="okcode" id="okCode"></div>
-  <div id="okPay"></div>
+<div class="sheet" id="doneSheet" role="dialog" aria-modal="true" aria-labelledby="okTit">
+  <!-- topo: diz em que ponto está o pedido (texto e cor mudam em desenharTopoPg) -->
+  <div class="pg-topo">
+    <div class="pg-tt"><h3 id="okTit"></h3><p id="okSubTopo"></p></div>
+    <div class="pg-rel" id="okRel" style="display:none"><b id="okRelT">15:00</b><small id="okRelL"></small></div>
+  </div>
+  <!-- meio: dados para a transferência (é a única zona que desliza) -->
+  <div class="pg-corpo">
+    <div class="sd" id="okSubRef" data-i18n="okSub"></div>
+    <div class="okcode" id="okCode"></div>
+    <div id="okPay"></div>
+  </div>
+  <!-- fundo: os botões ficam sempre à vista -->
+  <div class="pg-pe">
   <div id="okCompBox" style="display:none">
-    <div class="lbl" data-i18n="okComp"></div>
-    <label class="okfile" for="fComp" data-i18n="okCompHint"></label>
+    <label class="okfile" for="fComp" id="okAnexarBtn"></label>
     <input type="file" id="fComp" accept="image/*,application/pdf" style="display:none"
            onchange="enviarComprovativo(this)">
     <div id="okCompMsg"></div>
@@ -1106,8 +1155,6 @@ textarea.fld{min-height:74px;resize:vertical;}
   <!-- ÚLTIMO PASSO, OBRIGATÓRIO: enviar o pedido pelo WhatsApp. Fica fora da caixa do comprovativo
        para aparecer também nos pedidos pagos ao balcão. "Fechar" só aparece depois deste toque. -->
   <div class="okwa" id="okWaBox" style="display:none">
-    <div class="lbl" data-i18n="okWaTit"></div>
-    <p data-i18n="okWaSub"></p>
     <a class="okwa-btn off" id="okWa1" target="_blank" rel="noopener" aria-disabled="true" onclick="return waAberto()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg><span data-i18n="okWa1"></span></a>
     <div class="okwa-falta" id="okWaFalta" data-i18n="okWaFalta"></div>
     <div id="okWaDepois" style="display:none">
@@ -1117,6 +1164,7 @@ textarea.fld{min-height:74px;resize:vertical;}
     </div>
   </div>
   <button class="go" id="okFecharBtn" onclick="closeAll()" data-i18n="okFechar" style="display:none"></button>
+  </div>
 </div>
 
 <script>
@@ -1427,25 +1475,45 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
-/* ---- "O pedido ainda não está concluído": textos mais claros sobre a transferência (09-10-2026) ----
-   okFalta = aviso no topo, depois de confirmar · reserva = aviso antes de confirmar, em pedidos para outro dia */
+/* ---- Aviso antes de confirmar, em pedidos para outro dia: sem transferência e comprovativo não fica concluído ---- */
 (function(){
  const R={
-  pt:{okTitulo:"Falta pagar e enviar o pedido",
-   okFalta:"<b>O pedido ainda não está concluído.</b>Só conta depois de transferir e anexar o comprovativo aqui no site. Tem <b>{p} minutos</b>: sem comprovativo, o pedido é cancelado e não é preparado.",
-   reserva:"<b>Sem transferência e comprovativo, o pedido não fica concluído.</b><br>Reservamos o seu lugar <b>{q}</b> assim que recebermos o comprovativo. Na manhã do dia confirmamos consigo antes de preparar."},
-  en:{okTitulo:"Still to do: pay and send your order",
-   okFalta:"<b>Your order is not complete yet.</b>It only counts once you transfer and attach the receipt here on the site. You have <b>{p} minutes</b>: without a receipt, the order is cancelled and not prepared.",
-   reserva:"<b>Without the transfer and the receipt, the order is not complete.</b><br>We reserve your slot <b>{q}</b> as soon as we receive the receipt. On the morning we confirm with you before preparing."},
-  fr:{okTitulo:"Il reste à payer et à envoyer la commande",
-   okFalta:"<b>La commande n'est pas encore finalisée.</b>Elle ne compte qu'après le virement et l'ajout du justificatif ici, sur le site. Vous avez <b>{p} minutes</b> : sans justificatif, la commande est annulée et n'est pas préparée.",
-   reserva:"<b>Sans virement ni justificatif, la commande n'est pas finalisée.</b><br>Nous réservons votre créneau <b>{q}</b> dès réception du justificatif. Le matin même, nous confirmons avant de préparer."},
-  de:{okTitulo:"Noch offen: bezahlen und Bestellung senden",
-   okFalta:"<b>Die Bestellung ist noch nicht abgeschlossen.</b>Sie zählt erst nach der Überweisung und dem Anhängen des Belegs hier auf der Website. Sie haben <b>{p} Minuten</b>: Ohne Beleg wird storniert und nichts zubereitet.",
-   reserva:"<b>Ohne Überweisung und Beleg ist die Bestellung nicht abgeschlossen.</b><br>Wir reservieren Ihren Termin <b>{q}</b>, sobald der Beleg da ist. Am Morgen bestätigen wir vor der Zubereitung."},
-  nl:{okTitulo:"Nog te doen: betalen en bestelling versturen",
-   okFalta:"<b>Uw bestelling is nog niet afgerond.</b>Ze telt pas na de overschrijving en het toevoegen van het betaalbewijs hier op de site. U heeft <b>{p} minuten</b>: zonder bewijs wordt geannuleerd en niets bereid.",
-   reserva:"<b>Zonder overschrijving en betaalbewijs is de bestelling niet afgerond.</b><br>We reserveren uw tijd <b>{q}</b> zodra we het bewijs ontvangen. 's Ochtends bevestigen we voor we beginnen."}
+  pt:{reserva:"<b>Sem transferência e comprovativo, o pedido não fica concluído.</b><br>Reservamos o seu lugar <b>{q}</b> assim que recebermos o comprovativo. Na manhã do dia confirmamos consigo antes de preparar."},
+  en:{reserva:"<b>Without the transfer and the receipt, the order is not complete.</b><br>We reserve your slot <b>{q}</b> as soon as we receive the receipt. On the morning we confirm with you before preparing."},
+  fr:{reserva:"<b>Sans virement ni justificatif, la commande n'est pas finalisée.</b><br>Nous réservons votre créneau <b>{q}</b> dès réception du justificatif. Le matin même, nous confirmons avant de préparer."},
+  de:{reserva:"<b>Ohne Überweisung und Beleg ist die Bestellung nicht abgeschlossen.</b><br>Wir reservieren Ihren Termin <b>{q}</b>, sobald der Beleg da ist. Am Morgen bestätigen wir vor der Zubereitung."},
+  nl:{reserva:"<b>Zonder overschrijving en betaalbewijs is de bestelling niet afgerond.</b><br>We reserveren uw tijd <b>{q}</b> zodra we het bewijs ontvangen. 's Ochtends bevestigen we voor we beginnen."}
+ };
+ for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
+})();
+/* ---- JANELA DE PAGAMENTO: textos do topo, do relógio e dos botões ({b} = nome do botão de enviar) ---- */
+(function(){
+ const R={
+  pt:{okT1:"O pedido ainda não está concluído",okS1:"Transfira e anexe o comprovativo. Sem comprovativo, o pedido é cancelado.",
+   okS1b:"O prazo terminou. Anexe já o comprovativo, ou o pedido é cancelado.",okT2:"Falta só enviar o pedido",
+   okS2:"Comprovativo escolhido ✓ Toque em «{b}» para concluir.",okS2b:"Toque em «{b}» para concluir.",
+   okS3:"Recebemos o seu pedido. Confirmamos pelo contacto que indicou.",okTempo:"para anexar",
+   okAnexar:"Anexar comprovativo",okAnexarSub:"foto ou PDF",okTrocar:"Comprovativo escolhido ✓ · trocar",okDescr:"Descrição",copiar:"Copiar",copiado:"Copiado ✓"},
+  en:{okT1:"Your order is not complete yet",okS1:"Transfer and attach the receipt. Without a receipt, the order is cancelled.",
+   okS1b:"Time is up. Attach the receipt now, or the order is cancelled.",okT2:"One step left: send your order",
+   okS2:"Receipt selected ✓ Tap “{b}” to finish.",okS2b:"Tap “{b}” to finish.",
+   okS3:"We have your order. We will confirm using the contact you gave.",okTempo:"to attach",
+   okAnexar:"Attach receipt",okAnexarSub:"photo or PDF",okTrocar:"Receipt selected ✓ · change",okDescr:"Reference",copiar:"Copy",copiado:"Copied ✓"},
+  fr:{okT1:"La commande n'est pas encore finalisée",okS1:"Faites le virement et joignez le justificatif. Sans justificatif, la commande est annulée.",
+   okS1b:"Le délai est écoulé. Joignez le justificatif maintenant, sinon la commande est annulée.",okT2:"Dernière étape : envoyez la commande",
+   okS2:"Justificatif choisi ✓ Touchez « {b} » pour terminer.",okS2b:"Touchez « {b} » pour terminer.",
+   okS3:"Nous avons votre commande. Nous confirmons via le contact indiqué.",okTempo:"pour joindre",
+   okAnexar:"Joindre le justificatif",okAnexarSub:"photo ou PDF",okTrocar:"Justificatif choisi ✓ · changer",okDescr:"Motif",copiar:"Copier",copiado:"Copié ✓"},
+  de:{okT1:"Die Bestellung ist noch nicht abgeschlossen",okS1:"Überweisen und Beleg anhängen. Ohne Beleg wird die Bestellung storniert.",
+   okS1b:"Die Zeit ist abgelaufen. Beleg jetzt anhängen, sonst wird storniert.",okT2:"Letzter Schritt: Bestellung senden",
+   okS2:"Beleg ausgewählt ✓ Zum Abschließen auf „{b}“ tippen.",okS2b:"Zum Abschließen auf „{b}“ tippen.",
+   okS3:"Wir haben Ihre Bestellung. Wir bestätigen über den angegebenen Kontakt.",okTempo:"zum Anhängen",
+   okAnexar:"Beleg anhängen",okAnexarSub:"Foto oder PDF",okTrocar:"Beleg ausgewählt ✓ · ändern",okDescr:"Zweck",copiar:"Kopieren",copiado:"Kopiert ✓"},
+  nl:{okT1:"Uw bestelling is nog niet afgerond",okS1:"Maak over en voeg het betaalbewijs toe. Zonder bewijs wordt de bestelling geannuleerd.",
+   okS1b:"De tijd is om. Voeg nu het betaalbewijs toe, anders wordt geannuleerd.",okT2:"Laatste stap: verstuur uw bestelling",
+   okS2:"Betaalbewijs gekozen ✓ Tik op ‘{b}’ om af te ronden.",okS2b:"Tik op ‘{b}’ om af te ronden.",
+   okS3:"We hebben uw bestelling. We bevestigen via het opgegeven contact.",okTempo:"om toe te voegen",
+   okAnexar:"Betaalbewijs toevoegen",okAnexarSub:"foto of pdf",okTrocar:"Bewijs gekozen ✓ · wijzigen",okDescr:"Omschrijving",copiar:"Kopiëren",copiado:"Gekopieerd ✓"}
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
@@ -2606,31 +2674,75 @@ async function sendWA(){
 let ultimoPedido=null;
 function mostrarConfirmacao(precisa, d){
  ultimoPedido=d; d.precisa=!!precisa; waFeito=false;
+ pgFim = precisa ? Date.now()+PRAZO*60000 : 0;          // o relógio começa quando o pedido fica registado
  $("okCode").innerHTML='<small>'+t("okRef")+'</small><b>'+esc(d.code)+'</b>';
  if(precisa && d.banco){
+  const cop=v=>'<button type="button" class="pgcop" onclick="copiar(this,\''+String(v).replace(/[^\w .-]/g,"")+'\')">'+t("copiar")+'</button>';
   $("okPay").innerHTML=
-   '<div class="okpay">'+
+   '<div class="pgdados">'+
+    '<div class="pgvalor"><span>'+t("okPagar")+'</span><b>'+d.total+' ECV</b></div>'+
     '<div class="ln"><span>'+t("okBanco")+'</span><b>'+esc(d.banco.b)+'</b></div>'+
     '<div class="ln"><span>'+t("okTitular")+'</span><b>'+esc(d.banco.t)+'</b></div>'+
-    '<div class="ln"><span>'+esc(d.banco.lbl)+'</span><b>'+esc(d.banco.c)+'</b></div>'+
-    '<div class="ln"><span>'+t("okPagar")+'</span><b>'+d.total+' ECV</b></div>'+
+    '<div class="ln"><span>'+esc(d.banco.lbl)+'</span><b>'+esc(d.banco.c)+'</b>'+cop(d.banco.c)+'</div>'+
+    '<div class="ln"><span>'+t("okDescr")+'</span><b>'+esc(d.code)+'</b>'+cop(d.code)+'</div>'+
    '</div>'+
    '<div class="okstep"><b>1</b><span>'+t("okPasso1").replace("{v}",d.total)+'</span></div>'+
    '<div class="okstep"><b>2</b><span>'+t("okPasso2").replace("{c}",esc(d.code))+'</span></div>'+
    '<div class="okstep"><b>3</b><span>'+t("okPasso3")+'</span></div>'+
    '<div class="okstep"><b>4</b><span>'+t("okPasso4")+'</span></div>';
-  $("okPrazo").innerHTML=t("okFalta").replace("{p}",PRAZO);
-  $("okPrazo").style.display="block";
   $("okCompBox").style.display="block";
  }else{
   $("okPay").innerHTML='<div class="okpay">'+t("okBalcao")+'</div>';
-  $("okPrazo").style.display="none";
   $("okCompBox").style.display="none";
  }
+ $("doneSheet").classList.toggle("pagar", !!(precisa && d.banco));
  $("okCompMsg").textContent="";
  compFicheiro=null; compEstado=""; mostrarWa();
  const fc=$("fComp"); if(fc) fc.value="";
  show("doneSheet");
+ desenharTopoPg();                 // show() fecha os outros painéis e pára o relógio: arranca-se outra vez aqui
+ const corpo=document.querySelector("#doneSheet .pg-corpo"); if(corpo) corpo.scrollTop=0;
+}
+/* ---------- JANELA DE PAGAMENTO: topo, relógio e copiar ----------
+   pagar  = falta transferir e anexar (topo vermelho, relógio a contar)
+   enviar = falta só enviar o pedido (comprovativo escolhido, ou pedido que se paga ao balcão)
+   feito  = enviado */
+let pgFim=0, pgT=0;
+function pgEstado(){
+ if(!ultimoPedido) return "";
+ if(waFeito) return "feito";
+ return (ultimoPedido.precisa && !compFicheiro) ? "pagar" : "enviar";
+}
+function pgRelogio(){
+ const el=$("okRelT"); if(!el) return;
+ const seg=Math.max(0,Math.round((pgFim-Date.now())/1000));
+ el.textContent=String(Math.floor(seg/60)).padStart(2,"0")+":"+String(seg%60).padStart(2,"0");
+ if(seg<=0 && pgEstado()==="pagar") $("okSubTopo").innerHTML=t("okS1b");
+}
+function pgParar(){ clearInterval(pgT); pgT=0; }
+function desenharTopoPg(){
+ const sh=$("doneSheet"), e=pgEstado(); if(!sh || !e) return;
+ ["pagar","enviar","feito"].forEach(x=>sh.classList.toggle("est-"+x, x===e));
+ $("okTit").innerHTML=t(e==="pagar" ? "okT1" : (e==="enviar" ? "okT2" : "okTituloFim"));
+ $("okSubTopo").innerHTML = e==="pagar" ? t((pgFim && Date.now()>=pgFim) ? "okS1b" : "okS1")
+   : e==="enviar" ? t(ultimoPedido.precisa ? "okS2" : "okS2b").replace("{b}",t("okWa1"))
+   : t("okS3");
+ $("okRel").style.display = e==="pagar" ? "" : "none";
+ $("okRelL").textContent=t("okTempo");
+ pgParar();
+ if(e==="pagar"){ pgRelogio(); pgT=setInterval(pgRelogio,1000); }
+ const lb=$("okAnexarBtn");
+ if(lb) lb.innerHTML = compFicheiro ? esc(t("okTrocar"))
+   : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/></svg>'+
+     '<span>'+esc(t("okAnexar"))+' <small>· '+esc(t("okAnexarSub"))+'</small></span>';
+}
+/* copiar o número da conta ou a referência, para colar na aplicação do banco */
+function copiar(btn,txt){
+ const feito=()=>{ btn.textContent=t("copiado"); btn.classList.add("ok"); setTimeout(()=>{ btn.textContent=t("copiar"); btn.classList.remove("ok"); },1600); };
+ const antigo=()=>{ try{ const ta=document.createElement("textarea"); ta.value=txt; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.opacity="0";
+   document.body.appendChild(ta); ta.select(); const r=document.execCommand("copy"); ta.remove(); if(r) feito(); }catch(e){} };
+ try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(feito,antigo); return; } }catch(e){}
+ antigo();
 }
 /* Reduz a foto no telemóvel antes de enviar — rede fraca é a regra, não a excepção. */
 function prepararFicheiro(f){
@@ -2704,7 +2816,6 @@ function waPronto(){ return !!ultimoPedido && (!ultimoPedido.precisa || !!compFi
 function mostrarWa(){
  const box=$("okWaBox"); if(!box) return;
  if(!ultimoPedido){ box.style.display="none"; return; }
- const pz=$("okPrazo"); if(pz) pz.style.display=(ultimoPedido.precisa && !waFeito) ? "block" : "none";   // enviado: o aviso já não faz falta
  const a=$("okWa1"), pronto=waPronto();
  a.classList.toggle("off", !pronto);
  a.setAttribute("aria-disabled", pronto?"false":"true");
@@ -2716,8 +2827,8 @@ function mostrarWa(){
  $("okWa2").style.display = pode ? "" : "none";
  $("okWaDica").textContent = compFicheiro ? t(pode?"okWa2Dica":"okWaAnexo") : "";
  $("okFecharBtn").style.display = waFeito ? "" : "none";
- const h=$("okTit"); h.dataset.i18n = waFeito ? "okTituloFim" : "okTitulo"; h.innerHTML=t(h.dataset.i18n);
  box.style.display="block";
+ desenharTopoPg();
 }
 /* toque em "Enviar pedido": o WhatsApp abre com este mesmo toque (é uma ligação normal) */
 function waAberto(){
@@ -2743,7 +2854,7 @@ async function partilharComprovativo(){
 
 /* ---------- SHEETS ---------- */
 function show(id){closeAll();$("ov").classList.add("on");$(id).classList.add("on");document.body.style.overflow="hidden";}
-function closeAll(){$("ov").classList.remove("on");
+function closeAll(){pgParar();$("ov").classList.remove("on");
  ["optSheet","cartSheet","chkSheet","doneSheet"].forEach(i=>$(i).classList.remove("on"));document.body.style.overflow="";}
 function openCart(){renderCart();show("cartSheet");}
 function openCheckout(){
