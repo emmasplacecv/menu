@@ -836,8 +836,8 @@ textarea.fld{min-height:74px;resize:vertical;}
    Fundo de cor inteira (amarelo-sol) com a percentagem em grande. O número vai mudando:
    5% (todo o pedido, com hora marcada) e, com a campanha do açaí ligada no /admin, 15% e 25%.
    O texto é texto a sério (não é imagem nem vídeo): fica nítido em qualquer ecrã e muda com a língua.
-   O movimento é só CSS (transform/opacity). Quem pediu "menos movimento" no telemóvel vê tudo parado.
-   Os tempos das animações dividem todos 9,9 s (3 números × 3,3 s = MUR_BATIDA): a volta fecha sem salto.
+   O movimento é só CSS (transform/opacity). Quem pediu "menos movimento" no telemóvel vê as formas paradas,
+   mas as passagens continuam a mudar (só com fade). Tempos de cada passagem: MUR_T1 e MUR_T2, mais abaixo.
    Liga/desliga em CAPA_MURAL, mais abaixo. Os textos estão nas chaves mur… dos 5 idiomas. */
 .home-hero.capa{--mur-sol:#FFC736;--mur-coral:#FF5A76;--mur-mar:#12B5A6;--mur-nata:#FFF8E8;--n5:clamp(80px,26.5vw,108px);}
 .home-hero.capa::after{transition:opacity .9s ease;}
@@ -893,11 +893,14 @@ textarea.fld{min-height:74px;resize:vertical;}
 .capa .mur-l b{font-weight:600;white-space:nowrap;background:linear-gradient(transparent 60%,var(--mur-nata) 60%,var(--mur-nata) 94%,transparent 94%);}
 .capa .mur-n{margin-top:1px;font:500 10px/1.3 'Jost',sans-serif;color:var(--roxo);max-width:30em;opacity:.85;}   /* nota curta, numa linha, discreta */
 /* cada vez que o número muda: o novo "carimba" e a frase sobe */
-.capa .mur.bate .mur-5{animation:murCarimbo .6s cubic-bezier(.34,1.56,.64,1) both;}
-.capa .mur.bate .mur-l{animation:capaSobe .45s .14s ease both;}
-.capa .mur.bate .mur-n{animation:murNota .5s .22s ease both;}
+.capa .mur.bate .mur-5{animation:murCarimbo .9s cubic-bezier(.34,1.56,.64,1) both;}
+.capa .mur.bate .mur-l{animation:capaSobe .7s .2s ease both;}
+.capa .mur.bate .mur-n{animation:murNota .8s .35s ease both;}
+/* a passagem que sai apaga-se devagar antes de entrar a seguinte (também com "reduzir animações": é só opacidade) */
+.capa .mur{transition:opacity .45s ease;}
+.capa .mur.sai{opacity:0;}
 @keyframes murCarimbo{0%{opacity:0;transform:rotate(-16deg) scale(.55)}60%{opacity:1}100%{opacity:1;transform:rotate(-5deg) scale(1)}}
-@keyframes murNota{from{opacity:0}to{opacity:1}}
+@keyframes murNota{from{opacity:0}to{opacity:.85}}
 @keyframes murBalanco{from{transform:rotate(-1.4deg) scale(1)}to{transform:rotate(1.6deg) scale(1.04)}}
 @keyframes murEtiqueta{from{transform:rotate(-2deg)}to{transform:rotate(-4.5deg) translateY(-1px)}}
 @keyframes murAceno{0%,72%,100%{transform:rotate(-4deg)}80%{transform:rotate(-9deg)}88%{transform:rotate(-1deg)}}
@@ -3489,44 +3492,54 @@ const CAPA=[
  {mural:true, mais:2500}
 ];
 const CAPA_MURAL=true;
-const CAPA_SEG=6500, MUR_BATIDA=3300;                 // MUR_BATIDA = tempo de cada número do mural (5% · 750$ · 675$ · 600$)
-let _capaK=0, _capaT=0, _capaPts="", _capaCamp="", _murB=0, _murT=0;
+const CAPA_SEG=6500;
+/* tempo de cada passagem do mural: 5% e 750$ = MUR_T1; 675$ e 600$ (campanha) = MUR_T2, um pouco mais para se ler.
+   MUR_SAI = quanto dura o apagar da passagem antes de entrar a seguinte */
+const MUR_T1=5000, MUR_T2=6000, MUR_SAI=450;
+let _capaK=0, _capaT=0, _capaPts="", _capaCamp="", _murB=0, _murT=0, _murS=0;
 /* as "batidas" do mural: a regra dos 5%; o preço do açaí no site (com os 5%) enquanto houver açaí;
    e, com a campanha dos escalões anunciada, o preço por copo de cada escalão.
    n = o que aparece em grande · o = a etiqueta ao lado · c = tamanho ("d3" para preços com 4 algarismos) */
 function murBatidas(){
- const b=[{n:DESC_ONLINE+"%", o:t("murOff"), c:(DESC_ONLINE>=10?"d2":""), k:t("murK"), l:t("murL"), nota:t("murN")}];
+ const b=[{ms:MUR_T1, n:DESC_ONLINE+"%", o:t("murOff"), c:(DESC_ONLINE>=10?"d2":""), k:t("murK"), l:t("murL"), nota:t("murN")}];
  if(!findMenuItem(CAMP_PROD) || esgotados.includes(CAMP_PROD)) return b;
  const pb=acaiMenuP(), v1=precoOnline(pb);
- if(pb && v1<pb) b.push({acai:1, n:v1+"$", o:t("murAcaiO"), c:"d3", k:t("murK"), l:t("murAcaiL"), nota:t("murAcaiN").replace("{pb}",pb)});
+ if(pb && v1<pb) b.push({ms:MUR_T1, acai:1, n:v1+"$", o:t("murAcaiO"), c:"d3", k:t("murK"), l:t("murAcaiL"), nota:t("murAcaiN").replace("{pb}",pb)});
  if(escMostra()){
   const q=escPeriodo(), k=td(CAMP_PROD)+(q ? " · "+q : "!");                  // "Açaí · 12 – 18 de out."
-  if(escOff(2)>0) b.push({acai:1, n:ESC_PRECO2+"$", o:t("murCada"), c:"d3", k:k, l:t("murL2"), nota:t("murN2")});
-  if(escOff(3)>0) b.push({acai:1, n:ESC_PRECO3+"$", o:t("murCada"), c:"d3", k:k, l:t("murL3"), nota:t("murN2")});
+  if(escOff(2)>0) b.push({ms:MUR_T2, acai:1, n:ESC_PRECO2+"$", o:t("murCada"), c:"d3", k:k, l:t("murL2"), nota:t("murN2")});
+  if(escOff(3)>0) b.push({ms:MUR_T2, acai:1, n:ESC_PRECO3+"$", o:t("murCada"), c:"d3", k:k, l:t("murL3"), nota:t("murN2")});
  }
  return b;
 }
-/* mostra a batida k (com "bate" o número carimba e a frase sobe) */
+/* mostra a batida k. Com "bate": a anterior apaga-se devagar (MUR_SAI) e a nova entra (o número carimba e a frase sobe) */
 function murPor(k,bate){
  const m=$("capaMural"); if(!m) return;
  const b=murBatidas(); _murB=((k%b.length)+b.length)%b.length;
  const x=b[_murB];
- $("murK").textContent=x.k; $("murOff").textContent=x.o;
- $("murNum").textContent=x.n; $("murL").innerHTML=x.l; $("murN").textContent=x.nota;
- m.classList.toggle("d2",x.c==="d2"); m.classList.toggle("d3",x.c==="d3");
- const sec=m.closest(".home-hero"); if(sec){ sec.classList.toggle("mur2",_murB>0); sec.classList.toggle("mur-acai",!!x.acai); }
- if(bate){ m.classList.remove("bate"); void m.offsetWidth; m.classList.add("bate"); }
+ const poe=()=>{
+  $("murK").textContent=x.k; $("murOff").textContent=x.o;
+  $("murNum").textContent=x.n; $("murL").innerHTML=x.l; $("murN").textContent=x.nota;
+  m.classList.toggle("d2",x.c==="d2"); m.classList.toggle("d3",x.c==="d3");
+  const sec=m.closest(".home-hero"); if(sec){ sec.classList.toggle("mur2",_murB>0); sec.classList.toggle("mur-acai",!!x.acai); }
+  if(bate){ m.classList.remove("bate"); void m.offsetWidth; m.classList.add("bate"); }
+ };
+ clearTimeout(_murS);
+ if(bate && m.dataset.vista){ m.classList.add("sai"); _murS=setTimeout(()=>{ poe(); m.classList.remove("sai"); },MUR_SAI); }
+ else{ m.classList.remove("sai"); poe(); }
+ m.dataset.vista="1";
 }
 /* enquanto o mural está à vista, o número vai mudando sozinho (se houver mais do que uma batida) */
+function murDur(k){ const b=murBatidas(), x=b[((k%b.length)+b.length)%b.length]; return (x&&x.ms)||MUR_T1; }
 function murRelogio(){
- clearInterval(_murT); _murT=0;
+ clearTimeout(_murT); _murT=0;
  if(!(CAPA[_capaK]&&CAPA[_capaK].mural) || murBatidas().length<2) return;
- let parado=false; try{ parado=window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
- if(parado) return;
- _murT=setInterval(()=>{ if(!document.hidden) murPor(_murB+1,true); },MUR_BATIDA);
+ /* com "reduzir animações" no telemóvel as passagens rodam na mesma (é o anúncio), mas só com o fade: as formas ficam paradas */
+ const passo=()=>{ _murT=setTimeout(()=>{ if(!document.hidden) murPor(_murB+1,true); passo(); },murDur(_murB)); };
+ passo();
 }
 function capaDur(i){
- if(CAPA[i]&&CAPA[i].mural){ const n=murBatidas().length; if(n>1) return n*MUR_BATIDA-60; }     // dá a volta completa aos números e segue
+ if(CAPA[i]&&CAPA[i].mural){ const b=murBatidas(); if(b.length>1) return b.reduce((t,x)=>t+(x.ms||MUR_T1),0)-60; }     // dá a volta completa aos números e segue
  return CAPA_SEG+((CAPA[i]&&CAPA[i].mais)||0);
 }
 function capaLista(){
