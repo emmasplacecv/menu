@@ -1186,8 +1186,8 @@ textarea.fld{min-height:74px;resize:vertical;}
 </footer>
 </div>
 
-<audio id="bgm" loop preload="none" src="COLOQUE-AQUI-O-LINK-DA-MUSICA.mp3"></audio>
-<button class="musicbtn" id="musicBtn" onclick="alternarMusica()" aria-label="Música ambiente">
+<audio id="bgm" loop preload="none" src="musica-ambiente.mp3"></audio>
+<button class="musicbtn" id="musicBtn" onclick="alternarMusica()" aria-label="Desligar a música ambiente">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>
   </svg>
@@ -3679,28 +3679,77 @@ function pulsar(){
  b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse");
 }
 
+/* ---------- MÚSICA AMBIENTE (11-10-2026) ----------
+   Os browsers não deixam tocar som antes do primeiro toque/clique na página. Por isso a música começa no
+   PRIMEIRO TOQUE EM QUALQUER SÍTIO (não é preciso botão de play), com o volume a subir devagar.
+   O botão redondo serve para desligar (e voltar a ligar). Quem desliga fica desligado nas visitas seguintes.
+   Pára sozinha quando a pessoa muda de separador ou bloqueia o telemóvel, e volta quando regressa.
+   O ficheiro só é descarregado no primeiro toque. Sem o ficheiro musica-ambiente.mp3 na raiz, o botão esconde-se.
+   Música actual: "Coffee Jazz · Coffee Shop Music" (alex-morgan, Pixabay, licença Pixabay), em repetição sem salto. */
 (function(){
  const a=document.getElementById("bgm"), btn=document.getElementById("musicBtn");
  if(!a||!btn) return;
- if(/COLOQUE-AQUI/.test(a.getAttribute("src")||"")){ btn.style.display="none"; return; }   // ainda sem música: esconder
- let alvo=0.55, fadeT=null;
+ const VOL=0.3;                                   // ambiente: baixo
+ let fadeT=null, ligada=false, partiu=false;
+ let desligou=false; try{ desligou = localStorage.getItem("ep_musica")==="0"; }catch(e){}
+ function semMusica(){ btn.style.display="none"; ligada=false; }
+ a.addEventListener("error", semMusica);
+ /* volume pelo Web Audio: no iPhone o volume do <audio> não se pode mudar (tocaria no máximo) */
+ let ac=null, ganho=null;
+ function prepara(){
+  if(ac) return;
+  try{ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+   ac=new AC(); const src=ac.createMediaElementSource(a); ganho=ac.createGain(); ganho.gain.value=0;
+   src.connect(ganho); ganho.connect(ac.destination); a.volume=1;
+  }catch(e){ ac=null; ganho=null; }
+ }
  function fade(ligar){
-  clearInterval(fadeT);
-  if(ligar){ a.volume=0; a.play().catch(()=>{}); }
+  clearInterval(fadeT); clearTimeout(fadeT);
+  if(ligar){
+   prepara();
+   if(ac){ try{ ac.resume(); }catch(e){} }
+   const pr=a.play(); if(pr&&pr.catch) pr.catch(()=>{ btn.classList.remove("on"); ligada=false; });
+  }
+  if(ganho){                                      // sobe em 3 s, desce em 0,8 s
+   const t=ac.currentTime, g=ganho.gain; g.cancelScheduledValues(t); g.setValueAtTime(g.value,t);
+   g.linearRampToValueAtTime(ligar?VOL:0, t+(ligar?3:0.8));
+   if(!ligar) fadeT=setTimeout(()=>{ if(!ligada) a.pause(); },900);
+   return;
+  }
+  if(ligar) a.volume=0;                           // sem Web Audio: pelo volume do próprio <audio>
   fadeT=setInterval(()=>{
-   a.volume = Math.max(0, Math.min(1, a.volume + (ligar?0.04:-0.04)));
-   if(ligar && a.volume>=alvo-.01){ a.volume=alvo; clearInterval(fadeT); }
+   a.volume = Math.max(0, Math.min(1, a.volume + (ligar?0.02:-0.04)));
+   if(ligar && a.volume>=VOL-.01){ a.volume=VOL; clearInterval(fadeT); }
    if(!ligar && a.volume<=0.01){ a.volume=0; a.pause(); clearInterval(fadeT); }
-  }, 60);
+  }, 80);
+ }
+ function liga(ligar){
+  ligada=ligar; btn.classList.toggle("on", ligar);
+  btn.setAttribute("aria-label", ligar ? "Desligar a música ambiente" : "Ligar a música ambiente");
+  fade(ligar);
  }
  window.alternarMusica=function(){
-  const ligar=!btn.classList.contains("on");
-  btn.classList.toggle("on", ligar);
-  fade(ligar);
+  const ligar=!ligada;
+  liga(ligar); partiu=true;
   try{ localStorage.setItem("ep_musica", ligar?"1":"0"); }catch(e){}
+  try{ mtr(ligar?"musica_ligada":"musica_desligada"); mtrTag("musica", ligar?"ligada":"desligada"); }catch(e){}
  };
- /* Nunca liga sozinha — precisa sempre de um toque. É a única forma
-    fiável em todos os browsers, e é a promessa que fazemos ao cliente. */
+ window.epMusicaEstado=()=>({ligada, vol: ganho ? +ganho.gain.value.toFixed(2) : +a.volume.toFixed(2)});   // para testes
+ /* primeiro toque em qualquer sítio (menos no próprio botão, que trata de si) */
+ const EV=["pointerup","touchend","click","keydown"];
+ function primeiro(e){
+  if(partiu) return;
+  if(e && e.target && e.target.closest && e.target.closest("#musicBtn")) return;
+  partiu=true; EV.forEach(n=>document.removeEventListener(n,primeiro,true));
+  if(!desligou){ liga(true); try{ mtrTag("musica","automatica"); }catch(e){} }
+ }
+ EV.forEach(n=>document.addEventListener(n,primeiro,{capture:true,passive:true}));
+ /* muda de separador / bloqueia o ecrã: pausa; ao voltar, retoma se estava a tocar */
+ document.addEventListener("visibilitychange",()=>{
+  if(!ligada) return;
+  if(document.hidden){ clearInterval(fadeT); clearTimeout(fadeT); a.pause(); if(ganho) ganho.gain.value=0; }
+  else{ if(!ganho) a.volume=0; fade(true); }
+ });
 })();
 
 carregarEstado();
