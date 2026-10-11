@@ -832,6 +832,147 @@ textarea.fld{min-height:74px;resize:vertical;}
 }
 @media(prefers-reduced-motion:reduce){.capa .capa-txt.entra .capa-camp{animation:none;}}
 
+/* ===== CAPA: MURAL DOS DESCONTOS — o primeiro banner, animado (10-10-2026) =====
+   Fundo de cor inteira (amarelo-sol) com a percentagem em grande. O número vai mudando:
+   5% (todo o pedido, com hora marcada) e, com a campanha do açaí ligada no /admin, 15% e 25%.
+   O texto é texto a sério (não é imagem nem vídeo): fica nítido em qualquer ecrã e muda com a língua.
+   O movimento é só CSS (transform/opacity). Quem pediu "menos movimento" no telemóvel vê tudo parado.
+   Os tempos das animações dividem todos 9,9 s (3 números × 3,3 s = MUR_BATIDA): a volta fecha sem salto.
+   Liga/desliga em CAPA_MURAL, mais abaixo. Os textos estão nas chaves mur… dos 5 idiomas. */
+.home-hero.capa{--mur-sol:#FFC736;--mur-coral:#FF5A76;--mur-mar:#12B5A6;--mur-nata:#FFF8E8;--n5:clamp(80px,26.5vw,108px);}
+.home-hero.capa::after{transition:opacity .9s ease;}
+.home-hero.capa.mural::after{opacity:0;}
+.capa .capa-mural{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--mur-sol);
+ opacity:0;transition:opacity .9s ease;}
+.capa .capa-mural.on{opacity:1;}
+/* formas soltas do fundo (cada uma com o seu vaivém) */
+.capa .capa-mural i{position:absolute;display:block;}
+.capa .mur-a{--ty:-39%;right:-9%;top:0;width:44%;height:0;padding-top:44%;border-radius:46% 54% 42% 58%/55% 44% 56% 45%;background:var(--mur-coral);
+ transform:translateY(var(--ty));animation:murMancha 4.95s ease-in-out infinite alternate;}
+.capa .mur-b{--ty:61%;right:-7%;bottom:0;width:38%;height:0;padding-top:38%;border-radius:58% 42% 51% 49%/44% 57% 43% 56%;background:var(--mur-mar);
+ transform:translateY(var(--ty));animation:murMancha 4.95s -2s ease-in-out infinite alternate-reverse;}
+.capa .mur-p{right:22%;top:9px;width:52px;height:32px;
+ background-image:radial-gradient(circle,var(--roxo) 1.7px,transparent 1.9px);background-size:10px 10px;opacity:.85;
+ animation:murPontos 2.475s ease-in-out infinite alternate;}
+.capa .capa-mural svg{position:absolute;display:block;overflow:visible;}
+.capa .mur-s1{left:46%;top:10%;width:16px;height:16px;color:var(--mur-nata);animation:murBrilho 1.65s ease-in-out infinite;}
+.capa .mur-s2{right:6%;top:40%;width:26px;height:26px;color:var(--mur-nata);animation:murBrilho 3.3s -1.2s ease-in-out infinite;}
+.capa .mur-z{right:9%;bottom:10%;width:62px;height:14px;color:var(--roxo);animation:murOnda 1.65s ease-in-out infinite alternate;}
+.capa.mur2 .mur-s1{visibility:hidden;}
+.capa .mur-fotos{display:none;}
+@keyframes murMancha{from{transform:translateY(var(--ty)) rotate(0deg) scale(1)}to{transform:translateY(calc(var(--ty) + 4%)) rotate(22deg) scale(1.09)}}
+@keyframes murPontos{from{transform:translate(0,0)}to{transform:translate(7px,-5px)}}
+@keyframes murBrilho{0%,100%{transform:scale(.5) rotate(0deg);opacity:.55}50%{transform:scale(1.2) rotate(45deg);opacity:1}}
+@keyframes murOnda{from{transform:translateX(-7px) rotate(-4deg)}to{transform:translateX(7px) rotate(4deg)}}
+@keyframes murBoia{from{transform:translateY(-6px) rotate(-1.5deg)}to{transform:translateY(6px) rotate(1.5deg)}}
+
+/* o texto do mural vive dentro do painel da capa (assim a altura mede-se como nas outras fotos) */
+.capa .mur{display:grid;gap:5px;justify-items:start;color:var(--roxo);}
+.capa .mur[hidden]{display:none;}
+.capa.mural .capa-txt{width:100%;max-width:none;--tom:var(--roxo);--tom2:var(--roxo);}
+.capa.mural .capa-a,.capa.mural .capa-txt h1{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+ clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;}
+.capa.mural .capa-sub,.capa.mural .capa-camp{display:none;}
+.capa.mural .capa-acoes{display:none;}
+.capa.mural .capa-pts button{background:rgba(74,37,69,.25);}
+.capa .mur-k{margin:0 0 -2px 3px;font:600 21px/1 'Caveat',cursive;color:var(--roxo);transform:rotate(-4deg);transform-origin:left bottom;
+ animation:murAceno 3.3s ease-in-out infinite;}
+.capa .mur-l1{display:flex;align-items:center;gap:13px;}
+/* o número: a caixa tem sempre a altura do "5%"; com dois algarismos (15%, 25%) a letra encolhe para caber */
+.capa .mur-5{flex:none;display:flex;align-items:center;height:calc(var(--n5)*.84);margin:0 0 7px -3px;
+ font:800 var(--n5)/.84 'Playfair Display',serif;font-variant-numeric:lining-nums;letter-spacing:-4px;color:var(--roxo);
+ text-shadow:3px 3px 0 var(--mur-nata),7px 7px 0 var(--mur-coral);transform:rotate(-5deg);}
+.capa .mur.d2 .mur-5{font-size:calc(var(--n5)*.76);letter-spacing:-3px;}
+.capa .mur.d3 .mur-5{font-size:calc(var(--n5)*.6);letter-spacing:-2px;}
+.capa .mur-5>span{display:inline-block;animation:murBalanco 1.65s ease-in-out infinite alternate;}
+.capa .mur-t{display:grid;gap:7px;justify-items:start;min-width:0;}
+.capa .mur-off{display:inline-block;padding:4px 10px 5px;border-radius:7px;background:var(--roxo);color:var(--mur-sol);
+ font:600 clamp(16px,5vw,20px)/1.1 'Jost',sans-serif;letter-spacing:.2px;transform:rotate(-2deg);box-shadow:3px 3px 0 var(--mur-nata);
+ animation:murEtiqueta 1.65s ease-in-out infinite alternate;}
+.capa .mur-l{max-width:13.5em;font:500 clamp(13px,3.9vw,15px)/1.24 'Jost',sans-serif;color:var(--roxo);text-wrap:balance;}
+.capa .mur-l b{font-weight:600;white-space:nowrap;background:linear-gradient(transparent 60%,var(--mur-nata) 60%,var(--mur-nata) 94%,transparent 94%);}
+.capa .mur-n{margin-top:1px;font:500 10px/1.3 'Jost',sans-serif;color:var(--roxo);max-width:30em;opacity:.85;}   /* nota curta, numa linha, discreta */
+/* cada vez que o número muda: o novo "carimba" e a frase sobe */
+.capa .mur.bate .mur-5{animation:murCarimbo .6s cubic-bezier(.34,1.56,.64,1) both;}
+.capa .mur.bate .mur-l{animation:capaSobe .45s .14s ease both;}
+.capa .mur.bate .mur-n{animation:murNota .5s .22s ease both;}
+@keyframes murCarimbo{0%{opacity:0;transform:rotate(-16deg) scale(.55)}60%{opacity:1}100%{opacity:1;transform:rotate(-5deg) scale(1)}}
+@keyframes murNota{from{opacity:0}to{opacity:1}}
+@keyframes murBalanco{from{transform:rotate(-1.4deg) scale(1)}to{transform:rotate(1.6deg) scale(1.04)}}
+@keyframes murEtiqueta{from{transform:rotate(-2deg)}to{transform:rotate(-4.5deg) translateY(-1px)}}
+@keyframes murAceno{0%,72%,100%{transform:rotate(-4deg)}80%{transform:rotate(-9deg)}88%{transform:rotate(-1deg)}}
+/* fora do mural (a capa está noutra foto) o movimento pára: não gasta bateria */
+.capa:not(.mural) .capa-mural *,.capa:not(.mural) .mur,.capa:not(.mural) .mur *{animation-play-state:paused;}
+@media(min-width:720px){
+ /* ecrã médio e largo: o número à esquerda, o texto e a nota ao lado, um copo em círculo à direita */
+ .home-hero.capa{--n5:132px;}
+ .capa .mur{grid-template-columns:auto minmax(0,1fr);column-gap:22px;row-gap:0;align-items:center;}
+ .capa .mur-l1{display:contents;}
+ .capa .mur-k{grid-column:1/-1;margin:0 0 -3px 6px;font-size:29px;}
+ .capa .mur-5{grid-column:1;grid-row:2/span 2;margin:0 0 4px -5px;letter-spacing:-5px;
+  text-shadow:4px 4px 0 var(--mur-nata),9px 9px 0 var(--mur-coral);}
+ .capa .mur.d2 .mur-5{letter-spacing:-4px;}
+ .capa .mur.d3 .mur-5{letter-spacing:-3px;}
+ .capa .mur-t{grid-column:2;grid-row:2;align-self:end;gap:10px;}
+ .capa .mur-off{padding:5px 13px 7px;border-radius:9px;font-size:26px;box-shadow:4px 4px 0 var(--mur-nata);}
+ .capa .mur-l{max-width:13em;font-size:18px;line-height:1.22;}
+ .capa .mur-n{grid-column:2;grid-row:3;align-self:start;margin-top:9px;font-size:13px;max-width:29em;}
+ .capa.mural .capa-acoes{display:block;margin-top:14px;}
+ .capa.mural .capa-cta{background:var(--roxo);color:var(--mur-sol);}
+ .capa.mural .capa-pts{margin-top:14px;}
+ .capa .mur-a{--ty:-55%;right:-12%;width:46%;padding-top:46%;}
+ .capa .mur-b{--ty:79%;right:16%;width:34%;padding-top:34%;}
+ .capa .mur-p{right:31%;top:auto;bottom:18px;width:70px;height:40px;background-size:10px 10px;}
+ .capa .mur-s1,.capa.mur2 .mur-s1{left:auto;right:34%;top:13%;width:24px;height:24px;visibility:visible;}
+ .capa .mur-s2{right:3%;top:auto;bottom:9%;width:30px;height:30px;}
+ .capa .mur-z{right:27%;bottom:auto;top:26%;width:70px;height:16px;}
+ .capa .mur-fotos{display:block;position:absolute;inset:0;}
+ .capa .mur-f{position:absolute;display:block;border-radius:50%;border:7px solid var(--mur-nata);background-color:#EADBC6;background-repeat:no-repeat;}
+ .capa .mur-f1{right:-22px;top:50%;width:196px;height:196px;margin-top:-104px;box-shadow:8px 8px 0 var(--roxo);
+  background-image:url('img/capa-1.webp');background-size:243% auto;background-position:79% 46%;
+  animation:murBoia 2.475s ease-in-out infinite alternate;}
+ .capa .mur-f2{display:none;}
+ /* passagens do açaí (750$ · 675$ · 600$): a foto grande passa a ser o açaí; a pequena sai */
+ .capa .mur-f{transition:background-image .6s ease,opacity .6s ease;}
+ .capa.mur-acai .mur-f1{background-image:url('img/capa-4.webp');background-size:243% auto;background-position:50% 42%;}
+ .capa.mur-acai .mur-f2{opacity:0;}
+}
+@media(min-width:900px){
+ .home-hero.capa{--n5:152px;}
+ .capa .mur{column-gap:26px;}
+ .capa .mur-k{font-size:31px;}
+ .capa .mur-5{letter-spacing:-6px;text-shadow:4px 4px 0 var(--mur-nata),10px 10px 0 var(--mur-coral);}
+ .capa .mur.d2 .mur-5{letter-spacing:-5px;}
+ .capa .mur-off{padding:6px 16px 8px;border-radius:10px;font-size:31px;box-shadow:5px 5px 0 var(--mur-nata);}
+ .capa .mur-l{font-size:21px;}
+ .capa .mur-n{font-size:13.5px;}
+ .capa .mur-f1{right:4%;width:216px;height:216px;margin-top:-114px;border-width:8px;}
+ .capa .mur-a{--ty:-38%;right:-5%;width:41%;padding-top:41%;}
+ .capa .mur-b{--ty:63%;right:26%;width:30%;padding-top:30%;}
+ .capa .mur-p{right:44%;}
+ .capa .mur-s1,.capa.mur2 .mur-s1{right:46%;}
+ .capa .mur-z{right:30%;top:12%;width:86px;height:19px;}
+}
+@media(min-width:1021px){
+ /* ecrã largo: junta-se o matcha, num círculo mais pequeno */
+ .home-hero.capa{--n5:166px;}
+ .capa .mur-5{margin-bottom:9px;letter-spacing:-7px;text-shadow:4px 4px 0 var(--mur-nata),11px 11px 0 var(--mur-coral);}
+ .capa .mur.d2 .mur-5{letter-spacing:-6px;}
+ .capa .mur-off{font-size:34px;}
+ .capa .mur-l{font-size:22px;}
+ .capa .mur-n{font-size:14px;}
+ .capa .mur-f1{right:6%;width:230px;height:230px;margin-top:-120px;}
+ .capa .mur-f2{display:block;right:calc(6% + 196px);top:50%;width:140px;height:140px;margin-top:-12px;box-shadow:7px 7px 0 var(--mur-mar);
+  background-image:url('img/capa-3.webp');background-size:270% auto;background-position:51% 30%;
+  animation:murBoia 2.475s -1.2s ease-in-out infinite alternate-reverse;}
+ .capa .mur-b{right:29%;}
+ .capa .mur-z{right:35%;}
+}
+@media(prefers-reduced-motion:reduce){
+ .capa .capa-mural,.home-hero.capa::after{transition:none;}
+ .capa .capa-mural *,.capa .mur,.capa .mur *{animation:none!important;}
+}
+
 /* ===== PEDIDO REGISTADO: janela de pagamento (09-10-2026, noite) =====
    Três zonas sempre à vista: topo (estado do pedido + relógio), dados da conta e, em baixo, os botões de
    anexar o comprovativo e de enviar. Só o meio desliza.
@@ -908,17 +1049,33 @@ textarea.fld{min-height:74px;resize:vertical;}
 <div id="bannerFechado" class="fechado" style="display:none"></div>
 
 <main id="inicio">
-  <section class="home-hero capa" aria-labelledby="home-title">
+  <section class="home-hero capa mural" aria-labelledby="home-title">
     <div class="capa-fotos" aria-hidden="true">
-      <div class="hero-slide on" style="--px:80%;background-image:url('img/capa-1.webp')"></div>
+      <div class="hero-slide" style="--px:80%;background-image:url('img/capa-1.webp')"></div>
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-2.webp')"></div>
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-3.webp')"></div>
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-4.webp')"></div>
     </div>
+    <!-- MURAL DOS DESCONTOS: fundo de cor em movimento (só decoração; o texto está no painel, em #capaMural) -->
+    <div class="capa-mural on" id="capaMuralFundo" aria-hidden="true">
+      <i class="mur-a"></i><i class="mur-b"></i><i class="mur-p"></i>
+      <svg class="mur-s1" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c1 7 4 10 12 12-8 2-11 5-12 12-1-7-4-10-12-12 8-2 11-5 12-12z"/></svg>
+      <svg class="mur-s2" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c1 7 4 10 12 12-8 2-11 5-12 12-1-7-4-10-12-12 8-2 11-5 12-12z"/></svg>
+      <svg class="mur-z" viewBox="0 0 92 20" fill="none"><path stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" d="M3 14c7-12 13-12 20 0s13 12 20 0 13-12 20 0 13 12 20 0"/></svg>
+      <div class="mur-fotos"><span class="mur-f mur-f2"></span><span class="mur-f mur-f1"></span></div>
+    </div>
     <div class="capa-txt entra">
       <p class="capa-a" id="capaA"></p>
-      <h1 id="home-title"></h1>
+      <h1 id="home-title">5% de desconto nos pedidos online com hora marcada, para levantar no balcão.</h1>
       <div class="capa-camp" id="capaCamp" hidden></div>
+      <div class="mur" id="capaMural" aria-hidden="true">
+        <span class="mur-k" id="murK">Só no site!</span>
+        <div class="mur-l1">
+          <span class="mur-5"><span id="murNum">5%</span></span>
+          <div class="mur-t"><span class="mur-off" id="murOff">de desconto</span><span class="mur-l" id="murL">nos pedidos online para <b>levantar</b>*</span></div>
+        </div>
+        <span class="mur-n" id="murN">*Transferência · Hora marcada · Não válido no balcão</span>
+      </div>
       <p class="capa-sub" data-home-i18n="heroSub"></p>
       <div class="capa-acoes"><button class="capa-cta" id="capaCta" type="button" hidden></button></div>
       <div class="capa-pts" id="capaPts"></div>
@@ -1258,7 +1415,7 @@ const MENU=[
      p  = com granola e/ou leite em pó            sp = sem os dois, mesmo com fruta (leva mais açaí)
      xp = cada topping extra da lista xt
      rec = escolha com estrela e "recomendamos" */
-  {n:"Açaí",d:"copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings",ml:355,p:950,sp:1050,xp:50,
+  {n:"Açaí",d:"copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings",ml:355,p:790,sp:890,xp:50,
    base:["Granola","Leite em pó"],fr:["Banana","Morango","Frutos vermelhos","Kiwi"],tp:["Leite condensado"],rec:"Leite em pó",
    xt:["Caramelo","Chocolate","Morango"],
    top:["Granola","Leite em pó","Banana","Morango","Frutos vermelhos","Kiwi","Leite condensado"]},
@@ -1332,8 +1489,8 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiRx": "Toppings extra × {n}",
    "acaiAdd": "Adicionar · {p} ECV",
    "acaiDesc": "O açaí não entra no desconto online de 5% (o resto do pedido continua a ter).",
-   "dropSub": "Açaí cremoso em copo de <b>355 ml</b>: monte o seu com granola, leite em pó, fruta e toppings, desde {p}$. E água de coco natural — <b>coco grande inteiro</b>, servido no próprio coco.",
-   "dropP1s": "copo 355 ml · desde {p}$"
+   "dropSub": "Açaí cremoso em copo de <b>355 ml</b>: monte o seu com granola, leite em pó, fruta e toppings. <b>{o}$ aqui no site</b>, com transferência bancária e hora marcada para levantar. Não válido para pagamentos no balcão ({p}$). E água de coco natural — <b>coco grande inteiro</b>, servido no próprio coco.",
+   "dropP1s": "copo 355 ml · {o}$ no site"
   },
   "d": {
    "copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings": "copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings",
@@ -1366,8 +1523,8 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiRx": "Extra toppings × {n}",
    "acaiAdd": "Add · {p} ECV",
    "acaiDesc": "Açaí is not included in the 5% online discount (the rest of your order still is).",
-   "dropSub": "Creamy açaí in a <b>355 ml</b> cup: build your own with granola, milk powder, fruit and toppings, from {p}$. And natural coconut water — <b>a whole large coconut</b>, served in the shell.",
-   "dropP1s": "355 ml cup · from {p}$"
+   "dropSub": "Creamy açaí in a <b>355 ml</b> cup: build your own with granola, milk powder, fruit and toppings. <b>{o}$ here online</b>, paid by bank transfer with a scheduled pick-up time. Not valid for payment at the counter ({p}$). And natural coconut water — <b>a whole large coconut</b>, served in the shell.",
+   "dropP1s": "355 ml cup · {o}$ online"
   },
   "d": {
    "copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings": "355 ml cup · build your own with granola, milk powder, fruit and toppings",
@@ -1400,8 +1557,8 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiRx": "Toppings en supplément × {n}",
    "acaiAdd": "Ajouter · {p} ECV",
    "acaiDesc": "L'açaí n'entre pas dans la remise en ligne de 5 % (le reste de la commande, oui).",
-   "dropSub": "Açaí crémeux en gobelet de <b>355 ml</b> : à composer avec granola, lait en poudre, fruits et toppings, dès {p}$. Et eau de coco naturelle — <b>une grande noix entière</b>, servie dans sa coque.",
-   "dropP1s": "gobelet 355 ml · dès {p}$"
+   "dropSub": "Açaí crémeux en gobelet de <b>355 ml</b> : à composer avec granola, lait en poudre, fruits et toppings. <b>{o}$ ici en ligne</b>, payé par virement, retrait à heure choisie. Non valable pour un paiement au comptoir ({p}$). Et eau de coco naturelle — <b>une grande noix entière</b>, servie dans sa coque.",
+   "dropP1s": "gobelet 355 ml · {o}$ en ligne"
   },
   "d": {
    "copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings": "gobelet de 355 ml · à composer avec granola, lait en poudre, fruits et toppings",
@@ -1434,8 +1591,8 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiRx": "Extra-Toppings × {n}",
    "acaiAdd": "Hinzufügen · {p} ECV",
    "acaiDesc": "Açaí ist vom 5 %-Online-Rabatt ausgenommen (der Rest der Bestellung nicht).",
-   "dropSub": "Cremiges Açaí im <b>355-ml</b>-Becher: selbst zusammenstellen mit Granola, Milchpulver, Früchten und Toppings, ab {p}$. Und natürliches Kokoswasser — <b>eine ganze große Kokosnuss</b>, in der Schale serviert.",
-   "dropP1s": "355-ml-Becher · ab {p}$"
+   "dropSub": "Cremiges Açaí im <b>355-ml</b>-Becher: selbst zusammenstellen mit Granola, Milchpulver, Früchten und Toppings. <b>{o}$ hier online</b>, per Überweisung bezahlt, Abholung mit Wunschzeit. Nicht gültig bei Zahlung an der Theke ({p}$). Und natürliches Kokoswasser — <b>eine ganze große Kokosnuss</b>, in der Schale serviert.",
+   "dropP1s": "355-ml-Becher · {o}$ online"
   },
   "d": {
    "copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings": "355-ml-Becher · selbst zusammenstellen mit Granola, Milchpulver, Früchten und Toppings",
@@ -1468,8 +1625,8 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    "acaiRx": "Extra toppings × {n}",
    "acaiAdd": "Toevoegen · {p} ECV",
    "acaiDesc": "Açaí valt niet onder de online korting van 5% (de rest van je bestelling wel).",
-   "dropSub": "Romige açaí in een beker van <b>355 ml</b>: stel zelf samen met granola, melkpoeder, fruit en toppings, vanaf {p}$. En natuurlijk kokoswater — <b>een hele grote kokosnoot</b>, in de dop geserveerd.",
-   "dropP1s": "beker 355 ml · vanaf {p}$"
+   "dropSub": "Romige açaí in een beker van <b>355 ml</b>: stel zelf samen met granola, melkpoeder, fruit en toppings. <b>{o}$ hier online</b>, betaald per overschrijving, afhalen op gekozen tijd. Niet geldig bij betaling aan de balie ({p}$). En natuurlijk kokoswater — <b>een hele grote kokosnoot</b>, in de dop geserveerd.",
+   "dropP1s": "beker 355 ml · {o}$ online"
   },
   "d": {
    "copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings": "beker van 355 ml · stel zelf samen met granola, melkpoeder, fruit en toppings",
@@ -1499,7 +1656,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    chaves camp… = faixa, carrinho e folha do açaí · capaCamp… e cc… = foto da campanha na capa */
 (function(){
  const R={
-  pt:{soHoje:"só hoje",amanha:"amanhã",campPara:"Para pedidos levantados {d}.",campAinda:"A campanha é {d}: este pedido é para levantar antes, por isso ainda não tem o desconto.",campTag:"CAMPANHA AÇAÍ{h} · SÓ NO SITE",campLinha:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −{x}%",
+  pt:{murK:"Só no site!",murOff:"de desconto",murL:"nos pedidos online para <b>levantar</b>*",murN:"*Transferência · Hora marcada · Não válido no balcão",murL2:"ao levar <b>2 açaís</b>*",murL3:"ao levar <b>3 ou mais</b>*",murN2:"*Transferência · Hora marcada · Não válido no balcão",murAcaiO:"o açaí",murAcaiL:"no site, para <b>levantar</b>*",murAcaiN:"*Transferência · Hora marcada · Balcão: {pb}$",murCada:"cada",murAltA:"Açaí a {v1}$ no site, com transferência bancária e hora marcada para levantar ({pb}$ a pagar no balcão).",murCta:"Ver o menu",murAlt:"5% de desconto nos pedidos online pagos por transferência bancária, com hora marcada para levantar. Não válido para pagamentos no balcão.",murAlt2:"Campanha do açaí: {v2}$ cada ao levar 2, {v3}$ cada ao levar 3 ou mais.",escAte:"até {b}",escTag:"CAMPANHA AÇAÍ{h} · SÓ NO SITE",escLinha:"2 açaís: {v2}$ cada · 3 ou mais: {v3}$ cada",escNota:"Preço do açaí com granola ou leite em pó; toppings extra à parte. Só em pedidos feitos aqui, pagos por transferência bancária, com hora marcada para levantar. Não válido para pagamentos no balcão.",escTot:"Campanha açaí · −{off}$ em cada",escMais1:"Junte mais 1 açaí: cada um fica com −{off2}$.",escMais2:"Junte mais 1 açaí: com 3, cada um fica com −{off3}$.",escHora:"Escolha <b>hora marcada</b> para levantar e cada açaí fica com <b>−{off}$</b>.",escSoLev:"A campanha do açaí (−{off}$ em cada) é só com transferência bancária e hora marcada para levantar.",escOpt:"<b>Campanha:</b> 2 açaís, {v2}$ cada · 3 ou mais, {v3}$ cada (com granola ou leite em pó; extras à parte). Só no site, com transferência bancária e hora marcada para levantar. Não válido para pagamentos no balcão.",escAinda:"A campanha começa a {d}: este pedido é para levantar antes, por isso ainda não tem o desconto.",soHoje:"só hoje",amanha:"amanhã",campPara:"Para pedidos levantados {d}.",campAinda:"A campanha é {d}: este pedido é para levantar antes, por isso ainda não tem o desconto.",campTag:"CAMPANHA AÇAÍ{h} · SÓ NO SITE",campLinha:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −{x}%",
    campNota:"Só em encomendas feitas aqui, pagas por transferência. Ao balcão não há desconto. Uma oferta por pedido.",
    campTot2:"Campanha açaí · 2.º com −{x}%",campTot3:"Campanha açaí · 1 grátis em 3",
    campMais1:"Junte mais 1 açaí: o 2.º fica com −{x}%.",campMais2:"Junte mais 1 açaí: com 3, 1 é grátis.",
@@ -1508,7 +1665,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"açaís no carrinho",ccGratis:"1 é GRÁTIS",ccPct:"o 2.º com −{x}%",ccNota:"Ao balcão não há desconto. Uma oferta por pedido.",
    sohora:"Neste momento só aceitamos pedidos com hora marcada.",sohoraerro:"Escolha a hora do seu pedido para continuar.",
    cfgmudou:"As condições do pedido mudaram entretanto. Confira o total e envie de novo."},
-  en:{soHoje:"today only",amanha:"tomorrow",campPara:"For orders picked up {d}.",campAinda:"The deal is {d}: this order is picked up before that, so the discount does not apply yet.",campTag:"AÇAÍ DEAL{h} · ONLINE ONLY",campLinha:"3 açaís: 1 is free · 2 açaís: 2nd one {x}% off",
+  en:{murK:"Online only!",murOff:"off",murL:"online orders for <b>pick-up</b>*",murN:"*Bank transfer · Scheduled time · Not valid at the counter",murL2:"when you get <b>2 açaís</b>*",murL3:"when you get <b>3 or more</b>*",murN2:"*Bank transfer · Scheduled time · Not valid at the counter",murAcaiO:"açaí",murAcaiL:"online, for <b>pick-up</b>*",murAcaiN:"*Bank transfer · Scheduled time · Counter: {pb}$",murCada:"each",murAltA:"Açaí for {v1}$ online, paid by bank transfer with a scheduled pick-up time ({pb}$ when paying at the counter).",murCta:"See the menu",murAlt:"5% off online orders paid by bank transfer, with a scheduled pick-up time. Not valid for payment at the counter.",murAlt2:"Açaí deal: {v2}$ each when you get 2, {v3}$ each for 3 or more.",escAte:"until {b}",escTag:"AÇAÍ DEAL{h} · ONLINE ONLY",escLinha:"2 açaís: {v2}$ each · 3 or more: {v3}$ each",escNota:"Price of an açaí with granola or milk powder; extra toppings charged separately. Only for orders placed here, paid by bank transfer, with a scheduled pick-up time. Not valid for payment at the counter.",escTot:"Açaí deal · {off}$ off each",escMais1:"Add 1 more açaí: each one gets {off2}$ off.",escMais2:"Add 1 more açaí: with 3, each one gets {off3}$ off.",escHora:"Choose a <b>scheduled time</b> for pick-up and each açaí gets <b>{off}$ off</b>.",escSoLev:"The açaí deal ({off}$ off each) is only for orders paid by bank transfer with a scheduled pick-up time.",escOpt:"<b>Deal:</b> 2 açaís, {v2}$ each · 3 or more, {v3}$ each (with granola or milk powder; extras charged separately). Online only, paid by bank transfer, with a scheduled pick-up time. Not valid for payment at the counter.",escAinda:"The deal starts on {d}: this order is picked up before that, so the discount does not apply yet.",soHoje:"today only",amanha:"tomorrow",campPara:"For orders picked up {d}.",campAinda:"The deal is {d}: this order is picked up before that, so the discount does not apply yet.",campTag:"AÇAÍ DEAL{h} · ONLINE ONLY",campLinha:"3 açaís: 1 is free · 2 açaís: 2nd one {x}% off",
    campNota:"Only for orders placed here and paid by bank transfer. No discount at the counter. One offer per order.",
    campTot2:"Açaí deal · 2nd at {x}% off",campTot3:"Açaí deal · 1 free in 3",
    campMais1:"Add 1 more açaí: the 2nd is {x}% off.",campMais2:"Add 1 more açaí: with 3, 1 is free.",
@@ -1517,7 +1674,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"açaís in your cart",ccGratis:"1 is FREE",ccPct:"2nd one {x}% off",ccNota:"No discount at the counter. One offer per order.",
    sohora:"Right now we only take orders with a set time.",sohoraerro:"Pick a time for your order to continue.",
    cfgmudou:"The order conditions have just changed. Check the total and send again."},
-  fr:{soHoje:"aujourd'hui seulement",amanha:"demain",campPara:"Pour les commandes retirées {d}.",campAinda:"L'offre est valable {d} : cette commande est retirée avant, la remise ne s'applique donc pas encore.",campTag:"OFFRE AÇAÍ{h} · EN LIGNE UNIQUEMENT",campLinha:"3 açaís : 1 offert · 2 açaís : le 2e à −{x} %",
+  fr:{murK:"Sur le site !",murOff:"de remise",murL:"sur les commandes en ligne à <b>retirer</b>*",murN:"*Virement · Heure choisie · Non valable au comptoir",murL2:"pour <b>2 açaís</b> achetés*",murL3:"pour <b>3 ou plus</b>*",murN2:"*Virement · Heure choisie · Non valable au comptoir",murAcaiO:"l'açaí",murAcaiL:"en ligne, à <b>retirer</b>*",murAcaiN:"*Virement · Heure choisie · Comptoir : {pb}$",murCada:"chacun",murAltA:"Açaí à {v1}$ en ligne, payé par virement, retrait à heure choisie ({pb}$ en payant au comptoir).",murCta:"Voir le menu",murAlt:"5 % de remise sur les commandes en ligne payées par virement, à retirer à heure choisie. Non valable pour un paiement au comptoir.",murAlt2:"Offre açaí : {v2}$ chacun pour 2, {v3}$ chacun pour 3 ou plus.",escAte:"jusqu'au {b}",escTag:"OFFRE AÇAÍ{h} · EN LIGNE UNIQUEMENT",escLinha:"2 açaís : {v2}$ chacun · 3 ou plus : {v3}$ chacun",escNota:"Prix d'un açaí avec granola ou lait en poudre ; toppings en supplément à part. Uniquement pour les commandes passées ici, payées par virement, à retirer à heure choisie. Non valable pour un paiement au comptoir.",escTot:"Offre açaí · −{off}$ sur chacun",escMais1:"Ajoutez 1 açaí : chacun passe à −{off2}$.",escMais2:"Ajoutez 1 açaí : avec 3, chacun passe à −{off3}$.",escHora:"Choisissez une <b>heure précise</b> de retrait et chaque açaí est à <b>−{off}$</b>.",escSoLev:"L'offre açaí (−{off}$ sur chacun) vaut uniquement avec paiement par virement et retrait à heure choisie.",escOpt:"<b>Offre :</b> 2 açaís, {v2}$ chacun · 3 ou plus, {v3}$ chacun (avec granola ou lait en poudre ; suppléments à part). En ligne uniquement, payé par virement, retrait à heure choisie. Non valable pour un paiement au comptoir.",escAinda:"L'offre commence le {d} : cette commande est retirée avant, la remise ne s'applique donc pas encore.",soHoje:"aujourd'hui seulement",amanha:"demain",campPara:"Pour les commandes retirées {d}.",campAinda:"L'offre est valable {d} : cette commande est retirée avant, la remise ne s'applique donc pas encore.",campTag:"OFFRE AÇAÍ{h} · EN LIGNE UNIQUEMENT",campLinha:"3 açaís : 1 offert · 2 açaís : le 2e à −{x} %",
    campNota:"Uniquement pour les commandes passées ici et payées par virement. Pas de remise au comptoir. Une offre par commande.",
    campTot2:"Offre açaí · 2e à −{x} %",campTot3:"Offre açaí · 1 offert sur 3",
    campMais1:"Ajoutez 1 açaí : le 2e est à −{x} %.",campMais2:"Ajoutez 1 açaí : avec 3, 1 est offert.",
@@ -1526,7 +1683,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"açaís dans le panier",ccGratis:"1 est OFFERT",ccPct:"le 2e à −{x} %",ccNota:"Pas de remise au comptoir. Une offre par commande.",
    sohora:"En ce moment, nous n'acceptons que les commandes à heure fixée.",sohoraerro:"Choisissez l'heure de votre commande pour continuer.",
    cfgmudou:"Les conditions de la commande viennent de changer. Vérifiez le total et renvoyez."},
-  de:{soHoje:"nur heute",amanha:"morgen",campPara:"Für Bestellungen mit Abholung {d}.",campAinda:"Die Aktion gilt {d}: Diese Bestellung wird vorher abgeholt, daher noch ohne Rabatt.",campTag:"AÇAÍ-AKTION{h} · NUR ONLINE",campLinha:"3 Açaís: 1 gratis · 2 Açaís: der 2. mit −{x} %",
+  de:{murK:"Nur online!",murOff:"Rabatt",murL:"auf Online-Bestellungen zur <b>Abholung</b>*",murN:"*Überweisung · Wunschzeit · Nicht an der Theke",murL2:"bei <b>2 Açaís</b>*",murL3:"ab <b>3 Açaís</b>*",murN2:"*Überweisung · Wunschzeit · Nicht an der Theke",murAcaiO:"Açaí",murAcaiL:"online, zur <b>Abholung</b>*",murAcaiN:"*Überweisung · Wunschzeit · Theke: {pb}$",murCada:"je Stück",murAltA:"Açaí für {v1}$ online, per Überweisung bezahlt, Abholung mit Wunschzeit ({pb}$ bei Zahlung an der Theke).",murCta:"Zum Menü",murAlt:"5 % Rabatt auf Online-Bestellungen, per Überweisung bezahlt, mit Abholung zur Wunschzeit. Nicht gültig bei Zahlung an der Theke.",murAlt2:"Açaí-Aktion: je {v2}$ bei 2 Stück, je {v3}$ ab 3 Stück.",escAte:"bis {b}",escTag:"AÇAÍ-AKTION{h} · NUR ONLINE",escLinha:"2 Açaís: je {v2}$ · ab 3: je {v3}$",escNota:"Preis für ein Açaí mit Granola oder Milchpulver; Extra-Toppings kosten extra. Nur für Bestellungen hier, per Überweisung bezahlt, mit Abholung zur Wunschzeit. Nicht gültig bei Zahlung an der Theke.",escTot:"Açaí-Aktion · je −{off}$",escMais1:"Noch 1 Açaí dazu: je −{off2}$.",escMais2:"Noch 1 Açaí dazu: ab 3 je −{off3}$.",escHora:"Wähle eine <b>Wunschzeit</b> zur Abholung und jeder Açaí kostet <b>{off}$ weniger</b>.",escSoLev:"Die Açaí-Aktion (je −{off}$) gilt nur bei Zahlung per Überweisung und Abholung mit Wunschzeit.",escOpt:"<b>Aktion:</b> 2 Açaís, je {v2}$ · ab 3, je {v3}$ (mit Granola oder Milchpulver; Extras kosten extra). Nur online, per Überweisung, Abholung mit Wunschzeit. Nicht gültig bei Zahlung an der Theke.",escAinda:"Die Aktion beginnt am {d}: Diese Bestellung wird vorher abgeholt, daher noch ohne Rabatt.",soHoje:"nur heute",amanha:"morgen",campPara:"Für Bestellungen mit Abholung {d}.",campAinda:"Die Aktion gilt {d}: Diese Bestellung wird vorher abgeholt, daher noch ohne Rabatt.",campTag:"AÇAÍ-AKTION{h} · NUR ONLINE",campLinha:"3 Açaís: 1 gratis · 2 Açaís: der 2. mit −{x} %",
    campNota:"Nur für Bestellungen hier auf der Website, per Überweisung bezahlt. Kein Rabatt an der Theke. Ein Angebot pro Bestellung.",
    campTot2:"Açaí-Aktion · 2. mit −{x} %",campTot3:"Açaí-Aktion · 1 von 3 gratis",
    campMais1:"Noch 1 Açaí dazu: der 2. kostet {x} % weniger.",campMais2:"Noch 1 Açaí dazu: bei 3 ist 1 gratis.",
@@ -1535,7 +1692,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ccNoCarr:"Açaís im Warenkorb",ccGratis:"1 ist GRATIS",ccPct:"der 2. mit −{x} %",ccNota:"Kein Rabatt an der Theke. Ein Angebot pro Bestellung.",
    sohora:"Im Moment nehmen wir nur Bestellungen mit fester Uhrzeit an.",sohoraerro:"Bitte wähle eine Uhrzeit für deine Bestellung.",
    cfgmudou:"Die Bestellbedingungen haben sich gerade geändert. Prüfe die Summe und sende erneut."},
-  nl:{soHoje:"alleen vandaag",amanha:"morgen",campPara:"Voor bestellingen die {d} worden afgehaald.",campAinda:"De actie geldt {d}: deze bestelling wordt eerder afgehaald, dus nog zonder korting.",campTag:"AÇAÍ-ACTIE{h} · ALLEEN ONLINE",campLinha:"3 açaís: 1 gratis · 2 açaís: de 2e met −{x}%",
+  nl:{murK:"Alleen online!",murOff:"korting",murL:"op online bestellingen om <b>af te halen</b>*",murN:"*Overschrijving · Gekozen tijd · Niet aan de balie",murL2:"bij <b>2 açaís</b>*",murL3:"vanaf <b>3 açaís</b>*",murN2:"*Overschrijving · Gekozen tijd · Niet aan de balie",murAcaiO:"açaí",murAcaiL:"online, om <b>af te halen</b>*",murAcaiN:"*Overschrijving · Gekozen tijd · Balie: {pb}$",murCada:"per stuk",murAltA:"Açaí voor {v1}$ online, betaald per overschrijving, afhalen op gekozen tijd ({pb}$ bij betaling aan de balie).",murCta:"Bekijk het menu",murAlt:"5% korting op online bestellingen, betaald per overschrijving, afhalen op gekozen tijd. Niet geldig bij betaling aan de balie.",murAlt2:"Açaí-actie: {v2}$ per stuk bij 2, {v3}$ per stuk vanaf 3.",escAte:"t/m {b}",escTag:"AÇAÍ-ACTIE{h} · ALLEEN ONLINE",escLinha:"2 açaís: {v2}$ per stuk · 3 of meer: {v3}$ per stuk",escNota:"Prijs van een açaí met granola of melkpoeder; extra toppings apart. Alleen voor bestellingen hier, betaald per overschrijving, met een gekozen afhaaltijd. Niet geldig bij betaling aan de balie.",escTot:"Açaí-actie · −{off}$ per stuk",escMais1:"Voeg nog 1 açaí toe: elke krijgt −{off2}$.",escMais2:"Voeg nog 1 açaí toe: bij 3 krijgt elke −{off3}$.",escHora:"Kies een <b>afhaaltijd</b> en elke açaí krijgt <b>−{off}$</b>.",escSoLev:"De açaí-actie (−{off}$ per stuk) geldt alleen bij betaling per overschrijving en afhalen op gekozen tijd.",escOpt:"<b>Actie:</b> 2 açaís, {v2}$ per stuk · 3 of meer, {v3}$ per stuk (met granola of melkpoeder; extra's apart). Alleen online, betaald per overschrijving, afhalen op gekozen tijd. Niet geldig bij betaling aan de balie.",escAinda:"De actie begint op {d}: deze bestelling wordt eerder afgehaald, dus nog zonder korting.",soHoje:"alleen vandaag",amanha:"morgen",campPara:"Voor bestellingen die {d} worden afgehaald.",campAinda:"De actie geldt {d}: deze bestelling wordt eerder afgehaald, dus nog zonder korting.",campTag:"AÇAÍ-ACTIE{h} · ALLEEN ONLINE",campLinha:"3 açaís: 1 gratis · 2 açaís: de 2e met −{x}%",
    campNota:"Alleen voor bestellingen hier op de site, betaald per overschrijving. Geen korting aan de balie. Eén aanbieding per bestelling.",
    campTot2:"Açaí-actie · 2e met −{x}%",campTot3:"Açaí-actie · 1 van 3 gratis",
    campMais1:"Voeg nog 1 açaí toe: de 2e krijgt −{x}%.",campMais2:"Voeg nog 1 açaí toe: bij 3 is er 1 gratis.",
@@ -1843,11 +2000,12 @@ function desenharDestaque(){
   fig.classList.toggle("off",parado);
   if(parado) fig.dataset.blq=fim?"esgotado":"fechado"; else delete fig.dataset.blq;
   fig.querySelectorAll("button").forEach(b=>{ b.disabled=parado; });
-  fig.querySelector(".drop-price").textContent=f.item.top?"":f.item.p+"$";      // açaí: o "desde 750$" já está na legenda
+  fig.querySelector(".drop-price").textContent=f.item.top?"":f.item.p+"$";      // açaí: o preço já está na legenda
   fig.querySelector(".drop-st").textContent = lojaFechada ? t("fechadoCurto") : (fim ? t("acabou") : "");
  });
- const ac=findMenuItem(DESTAQUE[0]);            // "desde X$" do texto vem do preço do menu
- sec.querySelectorAll('[data-i18n="dropSub"],[data-i18n="dropP1s"]').forEach(e=>{ e.innerHTML=t(e.dataset.i18n).replace("{p}",ac?Math.min(ac.item.p,ac.item.sp||ac.item.p):""); });
+ const ac=findMenuItem(DESTAQUE[0]);            // {p} = preço ao balcão · {o} = no site com hora marcada (com os 5%)
+ const pm=ac?Math.min(ac.item.p,ac.item.sp||ac.item.p):0;
+ sec.querySelectorAll('[data-i18n="dropSub"],[data-i18n="dropP1s"]').forEach(e=>{ e.innerHTML=t(e.dataset.i18n).replace(/\{p\}/g,pm||"").replace(/\{o\}/g,pm?precoOnline(pm):""); });
  sec.style.display=visiveis?"":"none";
  sec.querySelector(".drop-media").classList.toggle("um",visiveis===1);
 }
@@ -2032,7 +2190,7 @@ function acaiHTML(i){
  const grupo=(n,k,tag,chips)=>`<div class="acai-h"><div class="lbl"><i>${n}</i>${t(k)}</div>${tag?`<em>${tag}</em>`:""}</div>
    <div class="opttop g2">${chips}</div>`;
  const inc=t("acaiInc");
- return (campMostra()?`<div class="campopt">${ct("campOpt")}${campDiaTxt()?" "+ct("campPara"):""}</div>`:"")+`<div class="acai-pr" id="acaiPr">`+
+ return (escMostra()?`<div class="campopt">${et("escOpt")}</div>`:(campMostra()?`<div class="campopt">${ct("campOpt")}${campDiaTxt()?" "+ct("campPara"):""}</div>`:""))+`<div class="acai-pr" id="acaiPr">`+
    ["p","sp"].map(n=>`<div data-n="${n}"><span>${t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
    grupo(1,"acaiG1",inc,i.base.map(s=>chip(s)).join(""))+
    grupo(2,"acaiG2",inc,i.fr.map(s=>chip(s)).join(""))+
@@ -2155,13 +2313,16 @@ function renderCart(){
    (dias contados desde 01-01-2026, pela hora de Cabo Verde): vale de g — ou desde já — até ao fim de m,
    e depois desliga-se sozinha. Assim pode marcar-se de véspera uma campanha de um dia só.
    Sem resposta do servidor ficam desligadas e o site funciona como sempre.
+   3) campanha dos escalões (10-10-2026) — 2 açaís: −15% em cada · 3 ou mais: −25% em cada; só no site,
+      para levantar com hora marcada. Chave CFG_ESC, com o seu interruptor no /admin.
+      SUBSTITUI a campanha 2): enquanto a 3) estiver ligada ou marcada, a 2) não se lê.
    ============================================================ */
-const CFG_ASAP="__cfg:asap_off", CFG_CAMP="__cfg:camp_acai";
+const CFG_ASAP="__cfg:asap_off", CFG_CAMP="__cfg:camp_acai", CFG_ESC="__cfg:camp_escalao";
 const CFG_DIA0=Date.UTC(2026,0,1)/864e5;
-let asapOff=false, campAcai=false;
-/* cfgAsap / cfgCamp = {de, ate} das opções que ainda não acabaram (ou null)
+let asapOff=false, campAcai=false, escAcai=false;
+/* cfgAsap / cfgCamp / cfgEsc = {de, ate} das opções que ainda não acabaram (ou null)
    campServ = dia do próximo levantamento, dito pelo servidor nos horários (0 = ainda não se sabe) */
-let cfgAsap=null, cfgCamp=null, campServ=0;
+let cfgAsap=null, cfgCamp=null, cfgEsc=null, campServ=0;
 function diaCV(){
  const agora=new Date(); let y=0,m=0,d=0;
  try{
@@ -2183,14 +2344,17 @@ function acertarOpcoes(){
  const hoje=diaCV(), dia=campServ;
  const aplica=c=>!!(c && dia>0 && dia>=c.de && dia<=c.ate);
  campAcai = aplica(cfgCamp);
+ escAcai = aplica(cfgEsc);
  asapOff = cfgAsap ? (dia>0 ? aplica(cfgAsap) : hoje>=cfgAsap.de) : false;
 }
 function campMostra(){ return !!(cfgCamp && campServ>0 && campServ<=cfgCamp.ate); }     // anunciada ou já a aplicar-se
-function cfgSinal(){ return asapOff+"|"+campAcai+"|"+campMostra()+"|"+campQuando(); }
+function escMostra(){ return !!(cfgEsc && campServ>0 && campServ<=cfgEsc.ate); }        // idem, campanha dos escalões
+function cfgSinal(){ return asapOff+"|"+campAcai+"|"+campMostra()+"|"+campQuando()+"|"+escAcai+"|"+escMostra()+"|"+escPeriodo(); }
 function lerConfig(ed){
  const hoje=diaCV(), p=(ed&&ed.p)||{};
  const viva=o=>(o && o.m>0 && hoje<=o.m) ? {de:(o.g>0?o.g:0), ate:o.m} : null;
- cfgAsap=viva(p[CFG_ASAP]); cfgCamp=viva(p[CFG_CAMP]);
+ cfgAsap=viva(p[CFG_ASAP]); cfgEsc=viva(p[CFG_ESC]);
+ cfgCamp = cfgEsc ? null : viva(p[CFG_CAMP]);          // a campanha nova substitui a antiga enquanto durar
  acertarOpcoes();
 }
 /* chegou do servidor o dia do próximo levantamento; devolve true se alguma opção mudou com isso */
@@ -2213,7 +2377,7 @@ async function carregarConfig(){
  }catch(e){}
 }
 function aplicarConfig(){
- if((cfgCamp||cfgAsap) && !campServ) fillSlots();   // há opções em vigor: falta saber para que dia fica o levantamento
+ if((cfgCamp||cfgAsap||cfgEsc) && !campServ) fillSlots();   // há opções em vigor: falta saber para que dia fica o levantamento
  acertarHora();
  desenharCamp();
  if(typeof _capaPronta!=="undefined" && _capaPronta) capaCampanha();
@@ -2267,15 +2431,64 @@ function campCalc(){
  if(z.n>=3){ z.v=barato; z.tipo=3; } else { z.v=Math.round(barato*CAMP_PCT2/100); z.tipo=2; }
  return z;
 }
-function descCampBruto(){ return campCalc().v; }
+/* ---------- CAMPANHA DOS ESCALÕES (10-10-2026) ----------
+   Com a campanha ligada no /admin e o pedido para LEVANTAR COM HORA MARCADA:
+     1 açaí  -> fica com os 5% de todo o pedido
+     2 açaís -> 675$ cada      ·      3 ou mais -> 600$ cada        (11-10-2026: antes era −15% / −25%)
+   O preço é o do açaí com granola e/ou leite em pó (o preço "p" do menu). O desconto de cada copo é a diferença
+   entre esse preço e o do escalão (com o açaí a 790: −115 com 2, −190 com 3 ou mais) e vale igual em todos os
+   açaís do pedido: o "só açaí" e os toppings extra continuam a pagar a diferença deles.
+   O resto do pedido leva os 5%. Não soma com os 5% no açaí.
+   Para mudar os preços bastam estes dois números (os textos e o mural lêem-nos daqui). */
+const ESC_PRECO2=675, ESC_PRECO3=600;
+function comHoraMarcada(){ return mode==="recolha" && timeMode==="marcada" && !!slotVal; }
+function nAcai(){ return cart.reduce((s,i)=>s+(i.name===CAMP_PROD?i.q:0),0); }
+/* preço do açaí no menu (com granola e/ou leite em pó) e o mesmo com os 5% de hora marcada */
+function acaiMenuP(){ const f=findMenuItem(CAMP_PROD); return f ? f.item.p : 0; }
+function precoOnline(x){ return x - Math.round(x*DESC_ONLINE/100); }
+function escPreco(n){ return n>=3 ? ESC_PRECO3 : (n===2 ? ESC_PRECO2 : 0); }
+function escOff(n){ const a=escPreco(n); return a ? Math.max(0, acaiMenuP()-a) : 0; }       // desconto em cada copo
+function escCalc(){
+ const z={v:0,off:0,n:nAcai()};
+ if(!escAcai || !comHoraMarcada()) return z;
+ z.off=escOff(z.n);
+ if(z.off) z.v=Math.min(z.off*z.n, cart.reduce((s,i)=>s+(i.name===CAMP_PROD?i.price*i.q:0),0));
+ return z;
+}
+/* QUANDO é a campanha dos escalões: "só hoje" · "amanhã, segunda-feira" · "12 – 18 de out." (ainda não começou) · "até 18 de out." */
+function escFmt(){ return new Intl.DateTimeFormat(LANG,{day:"numeric",month:"short",timeZone:"UTC"}); }
+function escData(n){ try{ return escFmt().format(new Date((CFG_DIA0+n-1)*864e5)); }catch(e){ return ""; } }
+function escDatas(a,b){
+ try{ const f=escFmt(); if(f.formatRange) return f.formatRange(new Date((CFG_DIA0+a-1)*864e5),new Date((CFG_DIA0+b-1)*864e5)).replace(/ /g," "); }catch(e){}
+ return escData(a)+" – "+escData(b);
+}
+function escPeriodo(){
+ if(!cfgEsc) return "";
+ const h=diaCV(), de=cfgEsc.de, ate=cfgEsc.ate;
+ if(de>h && de===ate) return de===h+1 ? t("amanha")+", "+diaSemana(de) : diaSemana(de);
+ if(de>h) return escDatas(de,ate);
+ return ate===h ? t("soHoje") : t("escAte").replace("{b}",escData(ate));
+}
+/* textos da campanha nova e do mural:
+   {v2} {v3} = preço por copo com 2 / com 3 ou mais · {v} = o deste pedido · {off2} {off3} {off} = desconto em cada copo
+   {v1} = 1 açaí no site com hora marcada (com os 5%) · {pb} = preço ao balcão · {h} = " · quando" · {d} = primeiro dia */
+function et(k){
+ const q=escPeriodo(), n=nAcai(), pb=acaiMenuP(), e=(n>=3?3:2);
+ return String(t(k)||"").replace(/\{v2\}/g,ESC_PRECO2).replace(/\{v3\}/g,ESC_PRECO3).replace(/\{v\}/g,escPreco(e))
+  .replace(/\{off2\}/g,escOff(2)).replace(/\{off3\}/g,escOff(3)).replace(/\{off\}/g,escOff(e))
+  .replace(/\{v1\}/g,precoOnline(pb)).replace(/\{pb\}/g,pb)
+  .replace(/\{h\}/g, q ? " · "+q : "").replace(/\{d\}/g, cfgEsc&&cfgEsc.de ? escData(cfgEsc.de).replace(/\.$/,"") : "");
+}
+function descCampBruto(){ return campCalc().v + escCalc().v; }      // nunca as duas: com a nova ligada a antiga não se lê
 /* botão do aviso "junte mais 1 açaí": mais um igual ao que já está no pedido */
 function campJuntar(){ const it=cart.find(i=>i.name===CAMP_PROD); if(it) chg(it.key,1); }
 /* faixa no topo do menu: aparece com a campanha anunciada ou a aplicar-se, e enquanto houver açaí */
 function desenharCamp(){
  const b=$("campBanner"); if(!b) return;
- const ver=campMostra() && !lojaFechada && !!findMenuItem(CAMP_PROD) && !esgotados.includes(CAMP_PROD);
+ const ver=(campMostra()||escMostra()) && !lojaFechada && !!findMenuItem(CAMP_PROD) && !esgotados.includes(CAMP_PROD);
  b.style.display = ver ? "flex" : "none";
- if(ver) b.innerHTML='<span><em>'+ct("campTag").split(" · ").map(x=>x.replace(/ /g,"\u00a0")).join("\u00a0· ")+'</em><b>'+ct("campLinha")+'</b><small>'+campNotaDia()+ct("campNota")+'</small></span><i aria-hidden="true">+</i>';
+ if(ver && escMostra()) b.innerHTML='<span><em>'+et("escTag").split(" · ").map(x=>x.replace(/ /g,"\u00a0")).join("\u00a0· ")+'</em><b>'+et("escLinha")+'</b><small>'+et("escNota")+'</small></span><i aria-hidden="true">+</i>';
+ else if(ver) b.innerHTML='<span><em>'+ct("campTag").split(" · ").map(x=>x.replace(/ /g,"\u00a0")).join("\u00a0· ")+'</em><b>'+ct("campLinha")+'</b><small>'+campNotaDia()+ct("campNota")+'</small></span><i aria-hidden="true">+</i>';
 }
 
 /* Valor bruto do desconto do código promocional */
@@ -2294,18 +2507,19 @@ function temCategoria(catNome){ return cart.some(i=>i.icat===catNome); }
 
 /* 5% para encomendas no site com levantamento em hora marcada */
 const DESC_ONLINE=5, TAXA_SERVICO=5;
-/* Única excepção à regra dos 5%: o açaí (com toppings ou SÓ AÇAÍ) não tem desconto online.
+/* 10-10-2026: o açaí deixou de ser excepção — entra nos 5% como tudo o resto.
+   Só fica de fora dos 5% quando já leva uma oferta de campanha (escalões ou a antiga): nunca soma as duas.
    Os códigos promocionais continuam a aplicar-se como antes. */
-const SEM_DESC_ONLINE=["Açaí"];
-const subComDesc=()=>cart.reduce((s,i)=>s+(SEM_DESC_ONLINE.includes(i.name)?0:i.price*i.q),0);
-const temAcai=()=>cart.some(i=>SEM_DESC_ONLINE.includes(i.name));
+const acaiComOferta=()=>(campCalc().v>0 || escCalc().v>0);
+const subComDesc=()=>{ const fora=acaiComOferta(); return cart.reduce((s,i)=>s+((fora && i.name===CAMP_PROD)?0:i.price*i.q),0); };
+const temAcai=()=>cart.some(i=>i.name===CAMP_PROD);
 function descOnlineBruto(){
- return (mode==="recolha" && timeMode==="marcada" && slotVal) ? Math.round(subComDesc()*DESC_ONLINE/100) : 0;
+ return comHoraMarcada() ? Math.round(subComDesc()*DESC_ONLINE/100) : 0;
 }
 
 /* NÃO ACUMULAM: aplica-se só o maior dos dois; o menor é anulado.
    Em caso de empate, fica o código (é o que o cliente trouxe na mão). */
-/* Descontos do site = 5% da hora marcada (tudo menos açaí) + campanha do açaí (só açaí):
+/* Descontos do site = 5% da hora marcada + campanha do açaí (só açaí; nesse caso o açaí sai dos 5%):
    nunca caem no mesmo produto, por isso somam-se. Contra um código promocional, fica o maior. */
 function descSiteBruto(){ return descOnlineBruto()+descCampBruto(); }
 function ganhaOnline(){ return descSiteBruto() > descPromoBruto(); }
@@ -2455,7 +2669,8 @@ function totalsHTML(){
  const falta=Math.max(5, Math.ceil((FREE+1-subLiq())/5)*5);
  let h=`<div class="tot"><span>${t("subtotal")}</span><b>${s} ECV</b></div>`;
  if(d5) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descon")} (−${DESC_ONLINE}%)</span><b>−${d5} ECV</b></div>`;
- if(dc) h+=`<div class="tot" style="color:#2E6B32"><span>${ct(cp.tipo===3?"campTot3":"campTot2")}</span><b>−${dc} ECV</b></div>`;
+ const ec=escCalc();
+ if(dc) h+=`<div class="tot" style="color:#2E6B32"><span>${ec.v?et("escTot"):ct(cp.tipo===3?"campTot3":"campTot2")}</span><b>−${dc} ECV</b></div>`;
  if(dsc) h+=`<div class="tot" style="color:#2E6B32"><span>${t("desconto")} (${promo.c})</span><b>−${dsc} ECV</b></div>`;
  if(!slotHoje && slotQuando)
   h+=`<div class="warn" style="border-color:#8C2F2F;background:#F6E9E6;color:#8C2F2F;">
@@ -2466,15 +2681,22 @@ function totalsHTML(){
  if(anul) h+=`<div class="warn">${t("naoacum")} ${anul}</div>`;
  else if(!d5 && mode==="recolha" && !descPromoBruto() && subComDesc()>0)
   h+=`<div class="warn">${t("incent")}</div>`;
- if(mode==="recolha" && temAcai() && !campAcai)        // em dia de campanha o carrinho fala só da campanha
-  h+=`<div class="warn">${t("acaiDesc")}</div>`;
  /* campanha do açaí: o que falta para a oferta seguinte, e a regra quando já se aplica */
- const maisUm=k=>`<div class="warn campw campmais"><span>${ct(k)}</span><button type="button" onclick="campJuntar()"><i aria-hidden="true">+</i>1 ${esc(td(CAMP_PROD))}</button></div>`;
- if(campAcai && cp.n===1) h+=maisUm("campMais1");
- else if(dc && cp.n===2) h+=maisUm("campMais2");
- if(dc) h+=`<div class="note" style="border:none;padding-top:0;margin-top:2px">${campNotaDia()+ct("campNota")}</div>`;
+ const maisUm=(k,f)=>`<div class="warn campw campmais"><span>${(f||ct)(k)}</span><button type="button" onclick="campJuntar()"><i aria-hidden="true">+</i>1 ${esc(td(CAMP_PROD))}</button></div>`;
+ if(escAcai){
+  /* escalões: só com hora marcada para levantar — se o pedido ainda não é assim, diz-se como se chega ao desconto */
+  if(ec.n>=2 && !ec.v && !anul) h+=`<div class="warn campw">${et(mode==="recolha"?"escHora":"escSoLev")}</div>`;
+  if(comHoraMarcada() && !anul && ec.n===1) h+=maisUm("escMais1",et);          // "junte mais 1" só a quem já está no caminho do desconto
+  else if(ec.v && ec.n===2) h+=maisUm("escMais2",et);
+  if(dc) h+=`<div class="note" style="border:none;padding-top:0;margin-top:2px">${et("escNota")}</div>`;
+ }else{
+  if(campAcai && cp.n===1) h+=maisUm("campMais1");
+  else if(dc && cp.n===2) h+=maisUm("campMais2");
+  if(dc) h+=`<div class="note" style="border:none;padding-top:0;margin-top:2px">${campNotaDia()+ct("campNota")}</div>`;
+ }
  /* campanha anunciada mas este pedido é para levantar antes do dia dela: dizê-lo, para ninguém contar com o desconto */
  if(!campAcai && campMostra() && temAcai()) h+=`<div class="warn campw">${ct("campAinda")}</div>`;
+ if(!escAcai && escMostra() && temAcai()) h+=`<div class="warn campw">${et("escAinda")}</div>`;
  if(mode==="entrega"){
   const txZona=taxa();
   h+= (txZona===0)
@@ -2679,7 +2901,8 @@ async function sendWA(){
  L.push(`Subtotal: ${s} ECV`);
  if(desconto()) L.push(`Desconto (${promo.c} — ${promo.d}): -${desconto()} ECV`);
  if(descOnline()) L.push(`Desconto encomenda online (-${DESC_ONLINE}%): -${descOnline()} ECV`);
- if(descCamp()) L.push(`Campanha açaí (${campCalc().tipo===3?"3 açaís, 1 grátis":"2 açaís, 2.º com -"+CAMP_PCT2+"%"}): -${descCamp()} ECV`);
+ if(descCamp()) L.push(escCalc().v ? `Campanha açaí (${escCalc().n} açaís, -${escCalc().off} ECV em cada): -${descCamp()} ECV`
+   : `Campanha açaí (${campCalc().tipo===3?"3 açaís, 1 grátis":"2 açaís, 2.º com -"+CAMP_PCT2+"%"}): -${descCamp()} ECV`);
  if(servico()) L.push(`Taxa de serviço (${TAXA_SERVICO}%): ${servico()} ECV`);
  if(mode==="entrega") L.push(txe?`Entrega: ${txe} ECV`:"Entrega: GRÁTIS");
  L.push(`*TOTAL A PAGAR: ${total()} ECV*`);
@@ -2754,6 +2977,7 @@ async function sendWA(){
  if(precisa&&banco) mtrTag("pedido_banco",banco.id);
  mtrTag("pedido_hora",(timeMode==="marcada"&&slotVal)?"marcada":"assim que possivel");
  mtrTag("pedido_promo",promo?"sim":"nao"); mtrTag("pedido_valor",mtrValor(total()));
+ mtrTag("pedido_campanha", descCamp() ? (escCalc().v ? (escCalc().n>=3 ? "acai3" : "acai2") : "acai_antiga") : "nao");
  mtr("pedido_submetido");
  const info={code:codigo, nome:nome, tel:tel, total:total(), banco:banco, resumo:L.join("\n")};
  cart=[]; promo=null; codigo="";
@@ -3258,26 +3482,80 @@ const CAPA=[
  /* CAMPANHA DO AÇAÍ — só entra na rotação com a campanha ligada no /admin. Nessa altura ocupa o lugar da
     frase do açaí (usa a mesma foto — foto:3), é a primeira a aparecer e fica "mais" milésimos além das outras.
     Os textos estão nos 5 idiomas, nas chaves capaCamp* e cc*. */
- {prod:"Açaí", camp:true, foto:3, mais:3000}
+ {prod:"Açaí", camp:true, foto:3, mais:3000},
+ /* MURAL DOS DESCONTOS — não é foto de produto: é o painel de cor, animado, com as regras de desconto do site.
+    É SEMPRE o primeiro banner. Para o tirar, pôr CAPA_MURAL=false.
+    Os números vêm do carrinho (DESC_ONLINE, preço do açaí no menu, ESC_PRECO2, ESC_PRECO3); as frases estão nas chaves mur… (5 idiomas). */
+ {mural:true, mais:2500}
 ];
-const CAPA_SEG=6500;
-let _capaK=0, _capaT=0, _capaPts="", _capaCamp=false;
-function capaDur(i){ return CAPA_SEG+((CAPA[i]&&CAPA[i].mais)||0); }
+const CAPA_MURAL=true;
+const CAPA_SEG=6500, MUR_BATIDA=3300;                 // MUR_BATIDA = tempo de cada número do mural (5% · 750$ · 675$ · 600$)
+let _capaK=0, _capaT=0, _capaPts="", _capaCamp="", _murB=0, _murT=0;
+/* as "batidas" do mural: a regra dos 5%; o preço do açaí no site (com os 5%) enquanto houver açaí;
+   e, com a campanha dos escalões anunciada, o preço por copo de cada escalão.
+   n = o que aparece em grande · o = a etiqueta ao lado · c = tamanho ("d3" para preços com 4 algarismos) */
+function murBatidas(){
+ const b=[{n:DESC_ONLINE+"%", o:t("murOff"), c:(DESC_ONLINE>=10?"d2":""), k:t("murK"), l:t("murL"), nota:t("murN")}];
+ if(!findMenuItem(CAMP_PROD) || esgotados.includes(CAMP_PROD)) return b;
+ const pb=acaiMenuP(), v1=precoOnline(pb);
+ if(pb && v1<pb) b.push({acai:1, n:v1+"$", o:t("murAcaiO"), c:"d3", k:t("murK"), l:t("murAcaiL"), nota:t("murAcaiN").replace("{pb}",pb)});
+ if(escMostra()){
+  const q=escPeriodo(), k=td(CAMP_PROD)+(q ? " · "+q : "!");                  // "Açaí · 12 – 18 de out."
+  if(escOff(2)>0) b.push({acai:1, n:ESC_PRECO2+"$", o:t("murCada"), c:"d3", k:k, l:t("murL2"), nota:t("murN2")});
+  if(escOff(3)>0) b.push({acai:1, n:ESC_PRECO3+"$", o:t("murCada"), c:"d3", k:k, l:t("murL3"), nota:t("murN2")});
+ }
+ return b;
+}
+/* mostra a batida k (com "bate" o número carimba e a frase sobe) */
+function murPor(k,bate){
+ const m=$("capaMural"); if(!m) return;
+ const b=murBatidas(); _murB=((k%b.length)+b.length)%b.length;
+ const x=b[_murB];
+ $("murK").textContent=x.k; $("murOff").textContent=x.o;
+ $("murNum").textContent=x.n; $("murL").innerHTML=x.l; $("murN").textContent=x.nota;
+ m.classList.toggle("d2",x.c==="d2"); m.classList.toggle("d3",x.c==="d3");
+ const sec=m.closest(".home-hero"); if(sec){ sec.classList.toggle("mur2",_murB>0); sec.classList.toggle("mur-acai",!!x.acai); }
+ if(bate){ m.classList.remove("bate"); void m.offsetWidth; m.classList.add("bate"); }
+}
+/* enquanto o mural está à vista, o número vai mudando sozinho (se houver mais do que uma batida) */
+function murRelogio(){
+ clearInterval(_murT); _murT=0;
+ if(!(CAPA[_capaK]&&CAPA[_capaK].mural) || murBatidas().length<2) return;
+ let parado=false; try{ parado=window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+ if(parado) return;
+ _murT=setInterval(()=>{ if(!document.hidden) murPor(_murB+1,true); },MUR_BATIDA);
+}
+function capaDur(i){
+ if(CAPA[i]&&CAPA[i].mural){ const n=murBatidas().length; if(n>1) return n*MUR_BATIDA-60; }     // dá a volta completa aos números e segue
+ return CAPA_SEG+((CAPA[i]&&CAPA[i].mais)||0);
+}
 function capaLista(){
- const l=[];
+ const l=[]; let mur=-1;
  CAPA.forEach((c,i)=>{
+  if(c.mural){ if(CAPA_MURAL) mur=i; return; }
   const f=findMenuItem(c.prod); if(!f || esgotados.includes(f.item.n)) return;
   if(c.camp){ if(campMostra()) l.unshift(i); return; }
   if(campMostra() && c.prod===CAMP_PROD) return;
   l.push(i);
  });
+ if(mur>=0) l.unshift(mur);                                    // o mural abre sempre a capa
  return l.length?l:[0];
 }
 /* texto de uma foto: frase + resposta, ou o quadro da campanha (3 açaís -> 1 grátis · 2 açaís -> 2.º com −50%) */
 function capaTexto(i){
- const sec=document.querySelector(".home-hero.capa"), c=CAPA[i], pt=(LANG==="pt"), q=$("capaCamp");
+ const sec=document.querySelector(".home-hero.capa"), c=CAPA[i], pt=(LANG==="pt"), q=$("capaCamp"), m=$("capaMural");
  sec.classList.toggle("camp",!!c.camp);
- if(c.camp){
+ sec.classList.toggle("mural",!!c.mural);
+ if(!c.mural) sec.classList.remove("mur2","mur-acai");
+ if(m) m.hidden=!c.mural;
+ if(c.mural){
+  /* o que se vê é o painel #capaMural; a frase e o título ficam só para leitores de ecrã (dizem tudo de uma vez) */
+  $("capaA").textContent=String(t("murK")).replace(/\s*!$/,"");
+  const nb=murBatidas().length;                  // 1 = só os 5% · 2 = mais o açaí no site · 3 ou 4 = mais a campanha
+  $("home-title").textContent=t("murAlt")+(nb>1 ? " "+et("murAltA") : "")+(nb>2 ? " "+et("murAlt2") : "");
+  murPor(_murB,false);
+  if(q){ q.hidden=true; q.innerHTML=""; }
+ }else if(c.camp){
   $("capaA").textContent=ct("capaCampA");
   const qd=campQuando();
   $("home-title").innerHTML=esc(ct("capaCampB"))+(qd?' <em class="cc-hoje">'+esc(qd)+'</em>':"");
@@ -3294,19 +3572,27 @@ function capaTexto(i){
 function desenharCapa(animar){
  const sec=document.querySelector(".home-hero.capa"); if(!sec) return;
  const lista=capaLista(); if(!lista.includes(_capaK)) _capaK=lista[0];
- const c=CAPA[_capaK], f=findMenuItem(c.prod), foto=(c.foto!=null?c.foto:_capaK);
+ const c=CAPA[_capaK], f=c.mural?null:findMenuItem(c.prod), foto=c.mural?-1:(c.foto!=null?c.foto:_capaK);
  sec.querySelectorAll(".hero-slide").forEach((s,i)=>s.classList.toggle("on",i===foto));
+ const fundo=$("capaMuralFundo"); if(fundo) fundo.classList.toggle("on",!!c.mural);
  sec.classList.toggle("roxo",c.camp?true:_capaK%2===1);
  sec.style.setProperty("--capa-seg",(capaDur(_capaK)/1000)+"s");      // a barrinha enche no tempo desta foto
+ if(c.mural && animar) _murB=0;                                       // ao chegar ao mural começa-se pelo primeiro número
  capaTexto(_capaK);
+ if(c.mural && animar) murPor(0,true);
+ murRelogio();
  const cta=$("capaCta"), fim=!f||esgotados.includes(f.item.n);
- if(f && !fim && !lojaFechada){
+ if(c.mural){                                   // no mural o botão leva ao menu (só aparece em ecrã largo)
+  cta.hidden=false;
+  cta.innerHTML='<span>'+esc(t("murCta"))+'</span>';
+  cta.onclick=()=>scrollHome("menu");
+ } else if(f && !fim && !lojaFechada){
   const p=f.item.top ? Math.min(f.item.p,f.item.sp||f.item.p) : f.item.p;
   cta.hidden=false;
   cta.innerHTML='<i aria-hidden="true">+</i><span>'+esc(td(f.item.n))+'</span><b>'+p+'$</b>';
   cta.onclick=()=>pick(f.ci,f.ii);
  } else { cta.hidden=true; cta.onclick=null; }
- const pts = lista.length>1 ? lista.map(i=>`<button type="button" class="${i===_capaK?"on":""}" onclick="capaIr(${i})" aria-label="${esc(CAPA[i].camp?ct("capaCampB"):td(CAPA[i].prod))}"></button>`).join("") : "";
+ const pts = lista.length>1 ? lista.map(i=>`<button type="button" class="${i===_capaK?"on":""}" onclick="capaIr(${i})" aria-label="${esc(CAPA[i].mural?(DESC_ONLINE+"% · "+t("murOff")):CAPA[i].camp?ct("capaCampB"):td(CAPA[i].prod))}"></button>`).join("") : "";
  if(pts!==_capaPts || animar){ $("capaPts").innerHTML=pts; _capaPts=pts; }
  if(animar){ const tx=sec.querySelector(".capa-txt"); tx.classList.remove("entra"); void tx.offsetWidth; tx.classList.add("entra"); }
 }
@@ -3318,7 +3604,13 @@ function capaMedir(){
  const tx=sec.querySelector(".capa-txt"); if(!tx||!$("capaA")||!$("home-title")) return;
  sec.style.setProperty("--capa-h","0px");
  let max=0;
- capaLista().forEach(i=>{ capaTexto(i); max=Math.max(max,Math.ceil(tx.scrollHeight)); });
+ const bAgora=_murB;
+ capaLista().forEach(i=>{
+  capaTexto(i);
+  if(CAPA[i].mural) murBatidas().forEach((x,k)=>{ murPor(k,false); max=Math.max(max,Math.ceil(tx.scrollHeight)); });
+  else max=Math.max(max,Math.ceil(tx.scrollHeight));
+ });
+ _murB=bAgora;
  capaTexto(_capaK);
  sec.style.setProperty("--capa-h",max+"px");
 }
@@ -3341,11 +3633,14 @@ function capaRelogio(){
 }
 /* a campanha ligou-se ou desligou-se: a capa abre na foto da campanha (ou volta à primeira) e mede-se de novo */
 function capaCampanha(){
- if(campMostra()===_capaCamp) return;
- _capaCamp=campMostra();
- _capaK=capaLista()[0];
+ const sinal=campMostra()+"|"+escMostra()+"|"+escPeriodo();
+ if(sinal===_capaCamp) return;
+ _capaCamp=sinal;
+ _capaK=capaLista()[0]; _murB=0;
  desenharCapa(true); capaMedir(); capaRelogio();
 }
+_capaK=capaLista()[0];          // abre no primeiro banner da rotação (o mural, quando está ligado)
+_capaCamp=campMostra()+"|"+escMostra()+"|"+escPeriodo();
 var _capaPronta=true;          // antes desta linha a lista CAPA ainda não existe: build() e traduzir() não a podem usar
 desenharCapa(false); capaMedir(); capaRelogio();
 (function(){ let t=0, w=window.innerWidth;
