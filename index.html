@@ -757,6 +757,18 @@ textarea.fld{min-height:74px;resize:vertical;}
  .capa .capa-txt.entra .capa-a,.capa .capa-txt.entra h1,.capa .capa-txt.entra .capa-cta,.capa .capa-pts button.on::after,.topcart.salta{animation:none;}
 }
 
+/* ===== BARRA DE TOPO (13-10-2026): nunca se sobrepõe =====
+   Deixa de ter colunas fixas (que deixavam o menu transbordar por cima da marca e do horário quando o texto
+   era maior do que o previsto: browser com letra maior, zoom, francês/alemão). Passa a ser uma fila:
+   marca e carrinho ficam sempre, o menu ocupa o meio. Se não couber tudo, o script arrumarBarra()
+   esconde primeiro o horário e, se ainda não couber, o menu (no telemóvel já estavam escondidos). */
+.sitebar{display:flex;flex-wrap:nowrap;}
+.sitebar>.brand-lockup{flex:0 0 auto;}
+.sitebar>.desktop-nav{flex:1 1 auto;min-width:0;}
+.sitebar>.site-meta{flex:0 0 auto;}
+.sitebar>.topcart{flex:0 0 auto;margin-left:auto;}
+.sitebar.sem-meta>.site-meta,.sitebar.sem-nav>.desktop-nav{display:none;}
+
 /* ===== "Os mais pedidos" logo a seguir ao destaque: uma fila compacta que desliza de lado ===== */
 .menu-zone .best-section{margin:0 0 20px;scroll-margin-top:var(--salto);}
 .menu-zone .best-section .section-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;max-width:none;margin:0 2px 10px;text-align:left;}
@@ -3707,6 +3719,33 @@ desenharCapa(false); capaMedir(); capaRelogio();
 (function(){ let t=0, w=window.innerWidth;
  window.addEventListener("resize",()=>{ if(window.innerWidth===w) return; w=window.innerWidth; clearTimeout(t); t=setTimeout(capaMedir,120); });
  try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(capaMedir); }catch(e){}
+})();
+
+/* Barra de topo: se não cabe tudo numa linha, sai o horário; se ainda não couber, sai o menu.
+   Volta a medir ao mudar a largura da janela, as letras ou a língua. */
+(function(){
+ const bar=document.querySelector(".sitebar"); if(!bar) return;
+ const nav=bar.querySelector(".desktop-nav");
+ function cabe(){
+  if(bar.scrollWidth>bar.clientWidth+1) return false;
+  if(nav && getComputedStyle(nav).display!=="none"){
+   const a=[...nav.children], g=parseFloat(getComputedStyle(nav).columnGap)||0;
+   const precisa=a.reduce((s,x)=>s+x.getBoundingClientRect().width,0)+g*Math.max(0,a.length-1);
+   if(precisa>nav.clientWidth+1) return false;
+  }
+  return true;
+ }
+ function arrumar(){
+  bar.classList.remove("sem-meta","sem-nav");
+  if(!cabe()) bar.classList.add("sem-meta");
+  if(!cabe()) bar.classList.add("sem-nav");
+ }
+ let t=0; const depois=()=>{ cancelAnimationFrame(t); t=requestAnimationFrame(arrumar); };
+ arrumar();
+ window.addEventListener("resize",depois);
+ try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(arrumar); }catch(e){}
+ try{ new MutationObserver(depois).observe(bar,{childList:true,characterData:true,subtree:true}); }catch(e){}
+ window.arrumarBarra=arrumar;
 })();
 
 /* O carrinho do topo dá um pequeno salto quando entra um produto */
