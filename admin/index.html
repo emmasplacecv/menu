@@ -225,6 +225,23 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:999px;}
 .bar .lim{flex:1.4 1 0;}
 body{padding-bottom:76px;}
+.hclip{color:var(--verde,#4E5937);font-weight:700;text-decoration:none;padding:2px 4px;}
+
+/* ===== v7: campanhas numa linha — Ligar · Desligar · Apagar ===== */
+.estado.cfg.camp{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:9px 10px 9px 12px;}
+.estado.cfg.camp>div:first-child{flex:1 1 0;min-width:0;padding-right:0;cursor:default;}
+.estado.cfg.camp>div:first-child::after{display:none;}
+.estado.cfg.camp .et{font-size:13.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.estado.cfg.camp .es{display:block;-webkit-line-clamp:unset;font-size:12px;margin-top:2px;color:var(--ink2);}
+.estado.cfg.camp.on .es{color:#2E6B32;font-weight:600;}
+.estado.cfg.camp .ebts{display:flex;flex:none;margin-top:0;gap:4px;flex-wrap:nowrap;align-items:center;}
+.estado.cfg.camp .ebts .mini{padding:7px 9px;font-size:12px;border-width:1.5px;}
+.estado.cfg.camp .ebts .mini.cur{cursor:default;color:#fff;}
+.estado.cfg.camp .ebts .mini.lig.cur{background:#2E6B32;border-color:#2E6B32;}
+.estado.cfg.camp .ebts .mini.des.cur{background:#8F8172;border-color:#8F8172;}
+.estado.cfg.camp .ebts .mini.des:not(.cur){border-color:var(--ink2);color:var(--ink);}
+.estado.cfg.camp .ebts .mini.lig:not(.cur){border-color:#2E6B32;color:#2E6B32;}
+.estado.cfg.camp .ebts .mini.apa{padding-left:5px;padding-right:5px;}
 </style>
 </head>
 <body>
@@ -680,14 +697,14 @@ const CFG_UI=[
   f3:"Vale para os pedidos levantados amanhã ({d}), incluindo os feitos hoje depois de a loja fechar. Depois volta sozinho.",
   lig:"Desactivar", bOff:"Voltar a permitir já",
   perg:"Desactivar «assim que possível»?\n\nO site passa a aceitar só pedidos com hora marcada."},
- {k:CFG_CAMP, id:"Camp",
+ {k:CFG_CAMP, id:"Camp", curto:"Açaí · 3 = 1 grátis",
   off:"CAMPANHA AÇAÍ DESLIGADA", offSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −50%. Só no site, com transferência.",
   on:"CAMPANHA AÇAÍ LIGADA", onSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −50%. Só no site.", fim:"depois desliga-se sozinha",
   marc:"CAMPANHA AÇAÍ MARCADA", marcSub:"3 açaís: 1 é grátis · 2 açaís: o 2.º com −50%. Só no site. O site já a anuncia; o desconto vale para pedidos levantados {d}, incluindo os feitos na véspera depois de a loja fechar",
   f3:"Vale só para pedidos levantados amanhã ({d}), incluindo os feitos hoje depois de a loja fechar.\nO site começa já a anunciá-la e desliga-a sozinho no fim desse dia.",
   lig:"Ligar", bOff:"Desligar já",
   perg:"Ligar a campanha do açaí?\n\n3 açaís no carrinho: 1 é grátis.\n2 açaís no carrinho: o 2.º com −50%.\n\nSó nas encomendas do site (transferência), para levantar nos dias da campanha. Ao balcão o preço continua o normal."},
- {k:CFG_ESC, id:"Esc", semana:true,
+ {k:CFG_ESC, id:"Esc", semana:true, curto:"Açaí · 675$ / 600$",
   off:"CAMPANHA AÇAÍ 675$ / 600$ DESLIGADA", offSub:"2 açaís: 675$ cada · 3 ou mais: 600$ cada (açaí com granola ou leite em pó). Só no site, para levantar com hora marcada.",
   on:"CAMPANHA AÇAÍ 675$ / 600$ LIGADA", onSub:"2 açaís: 675$ cada · 3 ou mais: 600$ cada (açaí com granola ou leite em pó). Só no site, com hora marcada.", fim:"depois desliga-se sozinha",
   marc:"CAMPANHA AÇAÍ 675$ / 600$ MARCADA", marcSub:"2 açaís: 675$ cada · 3 ou mais: 600$ cada (açaí com granola ou leite em pó). Só no site, com hora marcada. O site já a anuncia; o desconto vale para pedidos levantados {d}, incluindo os feitos na véspera depois de a loja fechar",
@@ -717,9 +734,12 @@ function desenharCfg(){
   if(u.k===CFG_CAMP || u.k===CFG_ESC){
    const apagada=cfgApagadas().includes(u.k) && est===0;
    box.classList.toggle("apagada",apagada);
+   $("cfgTxt"+u.id).textContent=u.curto;
+   $("cfgSub"+u.id).textContent = est===1 ? "Ligada · até "+cfgCurto(v.ate)
+     : est===2 ? "Marcada · "+cfgCurto(v.de)+(v.ate>v.de?" a "+cfgCurto(v.ate):"") : "Desligada";
    $("cfgBts"+u.id).innerHTML =
-     (est===0 ? `<button class="mini lig" onclick="mudarCfg(${i},6)">Ligar</button>`
-              : `<button class="mini des" onclick="mudarCfg(${i},0)">Desligar</button>`)+
+     `<button class="mini lig${est!==0?" cur":""}" ${est!==0?'aria-pressed="true" disabled':`onclick="mudarCfg(${i},6)"`}>Ligar</button>`+
+     `<button class="mini des${est===0?" cur":""}" ${est===0?'aria-pressed="true" disabled':`onclick="mudarCfg(${i},0)"`}>Desligar</button>`+
      `<button class="mini apa" onclick="apagarCampanha(${i})">Apagar</button>`;
    return;
   }
@@ -1251,12 +1271,12 @@ function hisDesenhar(){
   return `<div class="hdia"><span>${hEsc(hDiaTxt(dia))}</span><span>${ps.length} · ${tv.toLocaleString("pt-PT")} ECV</span></div>`+
    ps.map(p=>{
     const e=hEstado(p), cls=e==="feito"?"hst-ok":"hst-"+e, ent=p.modo==="entrega";
-    const comp = p.balcao ? `<b>Balcão · ${p.balcaoPago?"pago":"por pagar"}</b>`
+    const comp = p.balcao ? `<b>Balcão · ${p.balcaoPago?"pago"+(p.balcaoMetodo?" ("+hEsc({dinheiro:"dinheiro",vinti4:"Vinti4",transf:"transferência"}[p.balcaoMetodo]||p.balcaoMetodo)+")":""):"por pagar"}</b>`
       : (p.code ? `<a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener">Ver comprovativo</a>`+
                   ` · <a href="#" onclick="hisUmComp('${hEsc(p.code)}','${p._dia}');return false">Descarregar</a>` : "");
     return `<details class="hrow ${p.status||""}"><summary>
       <span class="hh">${hEsc(p.slot||"—")}</span>
-      <span class="hn">${hEsc(p.nome||"(sem nome)")}<small>${hEsc(p.code||"")}${ent?" · entrega":""}</small></span>
+      <span class="hn">${hEsc(p.nome||"(sem nome)")}<small>${hEsc(p.code||"")}${ent?" · entrega":""}${(!p.balcao&&p.code)?` · <a class="hclip" href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📎 PDF</a>`:""}</small></span>
       <span class="ht">${(+p.total||0).toLocaleString("pt-PT")}<small class="${cls}">${ESTX[p.status]||hEsc(p.status||"")}</small></span></summary>
       <div class="hb">
        ${p.tel?`<a href="tel:${hEsc(String(p.tel).replace(/\s/g,""))}">${hEsc(p.tel)}</a> · `:""}feito às ${hEsc(p.criado||"—")}${p.quando&&p.quando!=="hoje"?" · para "+hEsc(p.quando):""}
@@ -1342,7 +1362,7 @@ function hisCopiaAviso(){
    : "Última cópia completa neste aparelho: "+(d===0?"hoje":(d===1?"ontem":"há "+d+" dias"))+(d>=7?" — está na altura de guardar outra.":".");
 }
 /* abrir/fechar as opções do dia (só o título; os botões lá dentro funcionam como sempre) */
-document.querySelectorAll(".estado.cfg").forEach(box=>{
+document.querySelectorAll(".estado.cfg:not(.camp)").forEach(box=>{
  const cab=box.firstElementChild; if(!cab) return;
  cab.setAttribute("role","button"); cab.tabIndex=0;
  const alt=()=>{ box.classList.toggle("abre"); cab.setAttribute("aria-expanded",box.classList.contains("abre")); };
