@@ -321,6 +321,102 @@ h1{font-size:19px;letter-spacing:.5px;}
 .pe .fech{font-size:12px;color:var(--ink2);margin-top:2px;}
 details.canc>summary{cursor:pointer;list-style:none;}
 details.canc>summary::-webkit-details-marker{display:none;}
+
+/* ===== 14-10-2026: histórico em Vendas ===== */
+.hvdias{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.hvdias .pill.sel{background:var(--verde);color:#fff;border-color:var(--verde);}
+.hvdias input{flex:1 1 140px;min-width:0;}
+.hvfil{display:flex;gap:6px;margin-bottom:10px;}
+.hvfil button{flex:1;padding:8px 6px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink2);font:600 12.5px/1 inherit;cursor:pointer;}
+.hvfil button.sel{background:var(--ink);color:#fff;border-color:var(--ink);}
+.hvres{display:flex;gap:14px;font-size:13px;color:var(--ink2);margin:0 2px 8px;}
+.hvres b{color:var(--ink);font-size:15px;}
+details.hv{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:6px;}
+details.hv>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:10px 11px;cursor:pointer;}
+details.hv>summary::-webkit-details-marker{display:none;}
+details.hv .hh{font-weight:700;font-size:13px;min-width:42px;}
+details.hv .hn{flex:1;min-width:0;}
+details.hv .hn b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+details.hv .hn small{display:block;font-size:11.5px;color:var(--ink2);font-family:monospace;}
+details.hv .hvv{font-weight:700;font-size:14.5px;white-space:nowrap;}
+details.hv .selo{padding:5px 7px;font-size:10.5px;}
+.selo.site{background:#E9E1D1;color:var(--ink);}
+details.hv .hb{padding:0 12px 12px;font-size:13.5px;line-height:1.45;}
+details.hv .hb ul{margin:4px 0 8px 18px;}
+.hvcomp{display:inline-block;margin-top:4px;padding:9px 14px;border-radius:10px;background:var(--verde);color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;}
+.hvclip{color:var(--verde);font-weight:700;}
+.hvcanc{opacity:.6;}
+
+/* ===== v7 (14-10-2026): COBRAR + PEDIDOS FECHADOS ===== */
+.tab .pg.sem{background:#B9AC9A;}
+.pagar{margin:14px 0 4px;}
+.pg-tit{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px;font-size:11.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink2);font-weight:600;}
+.pg-tit b{letter-spacing:0;text-transform:none;font-size:13.5px;}
+.pg-met{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.pg-met button{display:flex;align-items:center;gap:9px;min-height:52px;padding:10px 12px;border:2px solid var(--line);border-radius:13px;background:#fff;
+ color:var(--ink);font-family:inherit;font-weight:600;font-size:15px;line-height:1.1;text-align:left;cursor:pointer;}
+.pg-met button i{font-style:normal;font-size:20px;flex:none;}
+.pg-met button.on{border-color:#2E6B32;background:#2E6B32;color:#fff;}
+.pg-met button.dep.on{border-color:var(--vermelho);background:var(--vermelho);}
+.pagar.falta .pg-met button:not(.on){border-color:#D7B98A;}
+.troco{margin-top:10px;padding:10px 12px;border-radius:12px;background:#F2EEE4;}
+.troco .chips{display:flex;gap:6px;flex-wrap:wrap;}
+.troco .chips button{padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-family:inherit;font-weight:600;font-size:14px;line-height:1;cursor:pointer;}
+.troco .chips button.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+.troco .res{margin-top:9px;font-size:14px;color:var(--ink2);}
+.troco .res b{font-size:22px;color:var(--ink);}
+.envia.pago{background:#2E6B32;}
+.envia.depois{background:var(--vermelho);}
+/* enviados */
+.sx-grp{display:flex;justify-content:space-between;align-items:center;margin:12px 0 7px;padding:9px 12px;border-radius:10px;font-size:12.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;}
+.sx-grp.nao{background:var(--vermelho);color:#fff;}
+.sx-grp.sim{background:#E3EEDF;color:#2E6B32;}
+.sx{position:relative;border:1.5px solid var(--line);border-left:7px solid #2E6B32;border-radius:12px;background:#fff;margin-bottom:7px;
+ -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .12s,box-shadow .12s;}
+.sx.nao{border-left-color:var(--vermelho);background:#FFF6F4;}
+.sx.canc{border-left-color:#B9AC9A;opacity:.6;}
+.sx.prem{transform:scale(.985);box-shadow:0 0 0 3px #C88A1E;}
+.sx.novo-pronto{box-shadow:0 0 0 3px #2F4029;}
+.sx .cab{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;}
+.sx .lk{font-size:13px;opacity:.5;flex:none;}
+.sx .q{flex:1;min-width:0;}
+.sx .q b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sx .q small{display:block;margin-top:2px;font-size:12px;color:var(--ink2);}
+.sx .kst{display:inline-block;margin-left:3px;padding:2px 7px;border-radius:6px;background:#EFE7DA;color:var(--ink);font-size:11px;font-weight:700;}
+.sx .kst.pronto{background:#2F4029;color:#fff;} .sx .kst.entregue{background:#DDE6D8;}
+.sx .v{flex:none;text-align:right;}
+.sx .v b{display:block;font-size:17px;}
+.sx .v small{display:block;margin-top:2px;font-size:11.5px;font-weight:800;letter-spacing:.4px;}
+.sx.sim .v small{color:#2E6B32;} .sx.nao .v small{color:var(--vermelho);}
+.sx .cobrar2{display:block;width:calc(100% - 24px);margin:0 12px 12px;padding:13px;border:0;border-radius:11px;background:var(--vermelho);color:#fff;
+ font-family:inherit;font-weight:700;font-size:15.5px;line-height:1;cursor:pointer;}
+.sx .det{margin:0 12px;padding:8px 0 11px;border-top:1px dashed var(--line);font-size:13.5px;line-height:1.45;}
+.sx .det ul{margin:2px 0 6px 18px;}
+.sx .dica{font-size:12px;color:var(--ink2);}
+.sx-dica{margin-top:8px;font-size:12px;color:var(--ink2);text-align:center;}
+/* folhas (cobrar / opções) */
+.sh-bg{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;justify-content:center;background:rgba(30,20,14,.5);}
+.sh-bg.on{display:flex;}
+.sheet{width:100%;max-width:520px;max-height:90vh;overflow:auto;background:var(--card);border-radius:20px 20px 0 0;
+ padding:18px 16px calc(16px + env(safe-area-inset-bottom));}
+.sheet h3{margin:0;font-size:18px;}
+.sheet .sub{margin:3px 0 10px;font-size:12.5px;color:var(--ink2);}
+.sheet .big{margin:2px 0 12px;font-size:32px;font-weight:800;}
+.sheet .pg-met{grid-template-columns:1fr;}
+.sheet .acc{display:grid;gap:8px;}
+.sheet .acc button{padding:14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-family:inherit;font-weight:700;font-size:15.5px;line-height:1.15;text-align:left;cursor:pointer;}
+.sheet .acc button small{display:block;margin-top:3px;font-weight:400;font-size:12.5px;color:var(--ink2);}
+.sheet .acc .ed{border-color:#8A5A12;color:#8A5A12;}
+.sheet .acc .cb{border-color:#2E6B32;color:#2E6B32;}
+.sheet .acc .dz{border-color:var(--vermelho);color:var(--vermelho);}
+.sheet .ok{width:100%;margin-top:14px;padding:16px;border:0;border-radius:13px;background:#2E6B32;color:#fff;font-family:inherit;font-weight:700;font-size:16.5px;line-height:1;cursor:pointer;}
+.sheet .ok:disabled{opacity:.4;}
+.sheet .fx{display:block;width:100%;margin-top:6px;padding:12px;border:0;background:none;color:var(--ink2);font-family:inherit;font-size:14.5px;cursor:pointer;}
+/* fecho: caixa do balcão */
+.caixa{margin:10px 0 12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;}
+.caixa .cx-t{padding:8px 12px;background:#F2EEE4;font-size:11.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:700;color:var(--ink2);}
+.caixa .cx{display:flex;justify-content:space-between;padding:9px 12px;border-top:1px solid var(--line);font-size:14px;}
+.caixa .cx.nao{color:var(--vermelho);font-weight:700;}
 </style>
 </head>
 <body>
@@ -342,6 +438,7 @@ details.canc>summary::-webkit-details-marker{display:none;}
     <div><small id="hoje"></small><h1>Vendas ao balcão</h1></div>
     <div style="display:flex;gap:8px">
       <button class="pill ghost" id="notifBtn" onclick="activarNotificacoes()">🔔 Notificações</button>
+      <button class="pill ghost" onclick="irHistorico()">Histórico</button>
       <button class="pill ghost" onclick="carregarPedidos()">Actualizar</button>
       <button class="pill ghost" onclick="sair()">Sair</button>
     </div>
@@ -363,17 +460,21 @@ details.canc>summary::-webkit-details-marker{display:none;}
     <div class="sec">Pedido do balcão <span id="tabNome"></span></div>
     <div id="linhas"></div>
     <div id="editBan"></div>
-    <div class="pagseg" role="group" aria-label="Pagamento">
-      <button type="button" class="nao" id="pgNao" onclick="setPago(false)">Por pagar</button>
-      <button type="button" class="sim" id="pgSim" onclick="setPago(true)">✓ Pago</button>
+    <div class="pagar" id="pagar">
+      <div class="pg-tit"><span>Como paga?</span><b id="pgResumo"></b></div>
+      <div class="pg-met" id="pgMet" role="group" aria-label="Forma de pagamento"></div>
+      <div id="pgTroco"></div>
     </div>
-    <div class="pagest" id="pgEst"></div>
-    <button class="pagbtn" id="pgBtn" type="button" aria-pressed="false" onclick="alternarPagoBalcao()" hidden>Por pagar</button>
     <textarea class="fld notas" id="fNotas" placeholder="Notas para a cozinha (sem açúcar, para viagem, alergias…)" onchange="guardarNotas(this.value)"></textarea>
     <div class="tot"><span>Total</span><b id="total">0 ECV</b></div>
     <button class="envia" id="btnEnviar" onclick="enviar()">Enviar para a cozinha</button>
     <button class="limpar" id="btnLimpar" onclick="limpar()">Eliminar este pedido</button>
     <div class="msg" id="envMsg"></div>
+  </div>
+
+  <div class="box">
+    <div class="sec">Pedidos enviados — hoje</div>
+    <div id="hist"><div class="vazio">Ainda não enviaste nenhum pedido.</div></div>
   </div>
 
   <div class="box">
@@ -391,9 +492,20 @@ details.canc>summary::-webkit-details-marker{display:none;}
     <div id="fecho"><div class="vazio">A carregar…</div></div>
   </div>
 
-  <div class="box">
-    <div class="sec">Balcão — hoje · enviados</div>
-    <div id="hist"><div class="vazio">Ainda não enviaste nenhum pedido.</div></div>
+  <div class="box" id="boxHisV">
+    <div class="sec">Histórico de pedidos e comprovativos</div>
+    <div class="hvdias">
+      <button type="button" class="pill ghost" id="hvHoje" onclick="hvDia(0)">Hoje</button>
+      <button type="button" class="pill ghost" id="hvOntem" onclick="hvDia(1)">Ontem</button>
+      <input class="fld" type="date" id="hvData" onchange="hvCarregar()">
+    </div>
+    <div class="hvfil" role="group" aria-label="Filtro">
+      <button type="button" class="sel" data-f="" onclick="hvFiltro(this)">Todos</button>
+      <button type="button" data-f="balcao" onclick="hvFiltro(this)">Balcão</button>
+      <button type="button" data-f="site" onclick="hvFiltro(this)">Site</button>
+    </div>
+    <div id="hvLista"><div class="vazio">Escolha um dia.</div></div>
+    <div class="msg">Toque num pedido para ver os produtos e o comprovativo. Lista completa de vários dias, Excel e ZIP com todos os comprovativos: <b>Admin → Histórico</b>.</div>
   </div>
 </div>
 
@@ -419,7 +531,18 @@ const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Dup
 let KEY="", cat=0, activo=0, pedidos=[];
 let balcoes=[novoBalcao(),novoBalcao(),novoBalcao(),novoBalcao()];
 let pagoEnviado={};   // estado de pagamento dos pedidos já enviados (só neste aparelho)
-function novoBalcao(){ return {nome:"",itens:[],pago:false,notas:"",edita:null}; }
+let metEnviado={};    // forma de pagamento dos enviados: code -> {m, h} (cópia neste aparelho; o servidor novo também guarda)
+const MET={dinheiro:{t:"Dinheiro",i:"💵"}, vinti4:{t:"Vinti4 / cartão",c:"Vinti4",i:"💳"},
+ transf:{t:"Transferência",i:"📲"}, depois:{t:"Paga depois",i:"⏳"}};
+function metTxt(m){ return (m&&MET[m]) ? (MET[m].c||MET[m].t) : ""; }
+function metDe(p){
+ if(!p) return "";
+ if(p.balcaoMetodo && MET[p.balcaoMetodo]) return p.balcaoMetodo;
+ const l=metEnviado[p.code]; if(l&&l.m) return l.m;
+ const r=/PAGO \(([^)]+)\)/.exec(p.notas||""); if(r){ const k=Object.keys(MET).find(k=>metTxt(k)===r[1]); if(k) return k; }
+ return "";
+}
+function novoBalcao(){ return {nome:"",itens:[],pago:false,met:null,recebido:null,notas:"",edita:null}; }
 let esgotados=[], stock={};
 const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO"];
 const $=id=>document.getElementById(id);
@@ -446,7 +569,7 @@ async function entrar(){
  await Promise.all([aplicarEdicao(), carregarEsgotados(), carregarStock()]);
  ordenarCategorias();
  restaurar(); desenharTabs(); desenharCats(); desenharProdutos(); desenharPedido(); desenharHist(); desenharStock();
- $("fDia").value=hojeISO(); carregarFecho();
+ $("fDia").value=hojeISO(); carregarFecho(); try{ hvDia(0); }catch(e){}
  setInterval(()=>{ if(document.visibilityState==="visible") carregarPedidos(); }, 7000);
  setInterval(()=>{ if(document.visibilityState==="visible")
    carregarStock().then(()=>{desenharStock(); desenharProdutos();}); }, 30000);
@@ -515,15 +638,18 @@ function guardar(){
  try{
   localStorage.setItem("ep_vendas", JSON.stringify(balcoes));
   localStorage.setItem("ep_vendas_pago", JSON.stringify(pagoEnviado));
+  localStorage.setItem("ep_vendas_met", JSON.stringify(metEnviado));
  }catch(e){}
 }
 function restaurar(){
  try{
   const b=JSON.parse(localStorage.getItem("ep_vendas")||"null");
   if(Array.isArray(b)&&b.length) balcoes=b.map(x=>({nome:x.nome||"",itens:x.itens||[],
-   pago:!!x.pago,notas:x.notas||"",edita:x.edita||null}));
+   pago:!!x.pago,met:x.met||(x.pago?"dinheiro":null),recebido:x.recebido||null,notas:x.notas||"",edita:x.edita||null}));
   const p=JSON.parse(localStorage.getItem("ep_vendas_pago")||"null");
   if(p&&typeof p==="object") pagoEnviado=p;
+  const mt=JSON.parse(localStorage.getItem("ep_vendas_met")||"null");
+  if(mt&&typeof mt==="object") metEnviado=mt;
  }catch(e){}
  if(!balcoes.length) balcoes=[novoBalcao()];
  if(activo>=balcoes.length) activo=0;
@@ -543,8 +669,29 @@ function fecharCliente(i,ev){
  if(activo>=balcoes.length) activo=balcoes.length-1;
  guardar(); desenharTudo();
 }
-function setPago(v){ balcoes[activo].pago=v; guardar(); desenharTabs(); desenharPedido(); }
-function alternarPagoBalcao(){ setPago(!balcoes[activo].pago); }   // um só botão: Por pagar <-> Pago
+/* forma de pagamento do pedido que se está a montar (tocar outra vez tira a escolha) */
+function setMetodo(m){
+ const b=balcoes[activo];
+ b.met = (b.met===m && !b.edita) ? null : m;
+ b.pago = !!b.met && b.met!=="depois";
+ if(b.met!=="dinheiro") b.recebido=null;
+ guardar(); desenharTabs(); desenharPedido();
+}
+function setRecebido(v){ balcoes[activo].recebido=v; guardar(); desenharPedido(); }
+function setPago(v){ setMetodo(v?"dinheiro":"depois"); }          // compatibilidade
+function alternarPagoBalcao(){ setPago(!balcoes[activo].pago); }
+/* troco: valores que o cliente costuma entregar */
+function chipsTroco(t){
+ const s=new Set();
+ [100,500,1000].forEach(m=>{ const r=Math.ceil(t/m)*m; if(r>t) s.add(r); });
+ [1000,2000,5000].forEach(n=>{ if(n>t) s.add(n); });
+ return [...s].sort((a,b)=>a-b).slice(0,5);
+}
+function htmlTroco(t,rec,fn){
+ return `<div class="troco"><div class="chips"><button type="button" class="${rec===t?"on":""}" onclick="${fn}(${t})">Certo</button>`+
+  chipsTroco(t).map(v=>`<button type="button" class="${rec===v?"on":""}" onclick="${fn}(${v})">${v}</button>`).join("")+
+  `</div><div class="res">${rec&&rec>=t ? `Recebeu ${rec} · troco <b>${rec-t} ECV</b>` : "Quanto entregou? Toque para ver o troco."}</div></div>`;
+}
 
 /* ---------- ANULAR ----------
    Guarda os balcões tal como estavam antes de eliminar; "Anular" repõe-nos. Fica 7 segundos. */
@@ -567,7 +714,7 @@ function desenharTabs(){
  $("tabs").innerHTML=balcoes.map((b,i)=>{
   const n=b.itens.reduce((s,x)=>s+x.q,0);
   return `<button class="tab${i===activo?" sel":""}" onclick="irBalcao(${i})">
-   ${n?`<span class="pg ${b.pago?"sim":"nao"}"></span>`:""}
+   ${n?`<span class="pg ${b.met?(b.pago?"sim":"nao"):"sem"}"></span>`:""}
    <b>${i+1}${b.edita?" ✎":""}</b>${b.nome?esc(b.nome.slice(0,12)):"Cliente"}
    ${n?`<span class="n">${n}</span>`:""}
    ${balcoes.length>1?`<span class="fecha" onclick="fecharCliente(${i},event)">${IC_X}</span>`:""}</button>`;
@@ -739,16 +886,15 @@ function desenharPedido(){
    <button type="button" class="rm" onclick="tirarLinha(${k})" aria-label="Eliminar ${esc(x.nome)}">${IC_X}</button>
   </div>`).join("") : '<div class="vazio">Toca nos produtos acima para montar o pedido.</div>';
  $("total").textContent=totalBalcao()+" ECV";
- $("btnEnviar").disabled = !b.itens.length;
- const pg=$("pgBtn"), pago=b.pago===true;
- pg.classList.toggle("sim", pago);
- pg.textContent = pago ? "✓ Pago" : "Por pagar";
- pg.setAttribute("aria-pressed", pago?"true":"false");
- $("pgNao").classList.toggle("on",!pago); $("pgSim").classList.toggle("on",pago);
- $("pgNao").setAttribute("aria-pressed",!pago); $("pgSim").setAttribute("aria-pressed",pago);
- const pe=$("pgEst");
- pe.className="pagest "+(pago?"sim":"nao");
- pe.textContent = !b.itens.length ? "" : (pago ? "Pagamento recebido." : "Ainda não pagou — cobre antes de entregar.");
+ const pago=b.pago===true;
+ $("pgMet").innerHTML=Object.keys(MET).map(k=>
+  `<button type="button" class="${k==="depois"?"dep":""}${b.met===k?" on":""}" aria-pressed="${b.met===k}" onclick="setMetodo('${k}')"><i>${MET[k].i}</i>${MET[k].t}</button>`).join("");
+ const rs=$("pgResumo");
+ rs.textContent = !b.itens.length ? "" : (!b.met ? "escolha antes de enviar" : (pago ? "✓ Pago · "+metTxt(b.met) : "Fica por cobrar"));
+ rs.style.color = !b.met ? "var(--ink2)" : (pago ? "#2E6B32" : "var(--vermelho)");
+ $("pagar").classList.toggle("falta", !!b.itens.length && !b.met);
+ $("pagar").style.display = b.itens.length ? "" : "none";
+ $("pgTroco").innerHTML = (b.met==="dinheiro" && b.itens.length && !b.edita) ? htmlTroco(totalBalcao(), b.recebido, "setRecebido") : "";
  const ed=b.edita;
  if(ed){
   const t=totalBalcao(), dif=t-(ed.total||0);
@@ -758,8 +904,13 @@ function desenharPedido(){
   $("editBan").innerHTML=`<div class="editban"><b>A modificar o pedido ${esc(ed.code)}</b>
    Até carregar em «Fechar e reenviar», a cozinha continua com o pedido antigo.${dtx}</div>`;
  } else $("editBan").innerHTML="";
- $("btnEnviar").textContent = ed ? "Fechar e reenviar à cozinha" : "Enviar para a cozinha";
- $("btnEnviar").classList.toggle("edita",!!ed);
+ const bt=$("btnEnviar");
+ bt.disabled = !b.itens.length || !b.met;
+ bt.textContent = ed ? "Fechar e reenviar à cozinha"
+   : (!b.itens.length ? "Enviar para a cozinha" : (!b.met ? "Escolha como paga ↑" : (pago ? "✓ Pago · Enviar à cozinha" : "Enviar à cozinha · cobrar depois")));
+ bt.classList.toggle("edita",!!ed);
+ bt.classList.toggle("pago", !ed && pago);
+ bt.classList.toggle("depois", !ed && b.met==="depois");
  $("btnLimpar").textContent = ed ? "Cancelar modificação (fica o pedido antigo)" : "Eliminar este pedido";
  $("fNotas").value=b.notas||"";
 }
@@ -841,9 +992,9 @@ async function enviar(){
   stock: b.itens.reduce((o,x)=>{ const n=x.base||x.nome; o[n]=(o[n]||0)+x.q; return o; },{}),
   linhas: b.itens.map(x=>({n:x.nome, q:x.q, p:x.preco})),
   total: totalBalcao(),
-  notas: (b.edita ? "MODIFICADO (substitui "+b.edita.code+") · " : "") + "Cliente à espera · " + (b.pago?"PAGO":"POR PAGAR")
+  notas: (b.edita ? "MODIFICADO (substitui "+b.edita.code+") · " : "") + "Cliente à espera · " + (b.pago?"PAGO ("+metTxt(b.met)+")":"POR PAGAR")
          + (b.notas ? " · " + b.notas : ""),
-  morada:"", pago:false, balcao:true, balcaoPago:b.pago
+  morada:"", pago:false, balcao:true, balcaoPago:b.pago, balcaoMetodo:(b.pago?b.met:"")
  };
  let id=null;
  try{
@@ -856,14 +1007,15 @@ async function enviar(){
   btn.disabled=false; return;
  }
  msg.className="msg ok";
- msg.textContent="Enviado para a cozinha · "+code+" · levantamento "+slot+(b.pago?" · PAGO":" · POR PAGAR — cobre e marque na lista «Por cobrar».");
+ msg.textContent="Enviado para a cozinha · "+code+" · levantamento "+slot+(b.pago?" · PAGO ("+metTxt(b.met)+")":" · POR COBRAR — fica na lista vermelha «Por cobrar».");
  pagoEnviado[code]=b.pago;
+ if(b.pago) metEnviado[code]={m:b.met,h:horaMais(0)};
  if(b.edita){
   const velho=await retirarAntigo(b.edita);
-  msg.textContent="Reenviado · "+code+" substitui "+b.edita.code+" · levantamento "+slot+(b.pago?" · PAGO":" · POR PAGAR");
+  msg.textContent="Reenviado · "+code+" substitui "+b.edita.code+" · levantamento "+slot+(b.pago?" · PAGO ("+metTxt(b.met)+")":" · POR COBRAR");
   if(!velho){ msg.className="msg bad"; msg.textContent+=" — ATENÇÃO: não consegui retirar o pedido antigo "+b.edita.code+". Apague-o na cozinha ou no /admin."; }
   else if(velho==="cancelado") msg.textContent+=" · o antigo ficou cancelado (confirme o stock).";
-  delete pagoEnviado[b.edita.code];
+  delete pagoEnviado[b.edita.code]; delete metEnviado[b.edita.code];
  }
  { const ix=balcoes.indexOf(b); if(ix>=0) balcoes[ix]=novoBalcao(); }      // o cliente deste envio, mesmo que se tenha mudado de separador
  guardar(); desenharTabs(); desenharPedido();
@@ -918,6 +1070,7 @@ async function carregarFecho(){
     <div class="kpi"><small>Balcão</small><b>${nBalcao} · ${vBalcao} ECV</b></div>
     <div class="kpi"><small>Site</small><b>${nOnline} · ${total-vBalcao} ECV</b></div>
    </div>`
+  + caixaHtml(vendidos)
   + (linhas.length ? `<table class="fecho">
     <tr><th>Produto</th><th class="n">Qtd</th><th class="n">Valor</th></tr>
     ${linhas.map(([n,x],i)=>`<tr class="${i===0?"top":""}"><td>${esc(n)}</td>
@@ -926,6 +1079,80 @@ async function carregarFecho(){
    </table>` : "")
   + (semDetalhe?`<div class="msg">${semDetalhe} pedido(s) sem detalhe por produto (feitos antes desta actualização) — contam no total, não na tabela.</div>`:"")
   + `<div class="msg">Valores de venda, não de lucro: não há custo por produto no sistema.</div>`;
+}
+
+/* ---------- HISTÓRICO (14-10-2026) ----------
+   Qualquer dia guardado no servidor: balcão e site, estado do pagamento, produtos e comprovativo.
+   Só leitura — para mudar um pedido de hoje use "Pedidos enviados — hoje". */
+let _hv=[], _hvF="";
+const HV_EST={aguarda:"aguarda",confirmado:"confirmado",preparar:"a preparar",pronto:"pronto",entregue:"entregue",cancelado:"cancelado"};
+function irHistorico(){
+ const b=$("boxHisV"); if(!b) return;
+ if(!$("hvData").value) hvDia(0);
+ b.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function hvISO(desvio){ const d=new Date(); d.setDate(d.getDate()-desvio); const p=n=>("0"+n).slice(-2);
+ return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+function hvDia(desvio){ $("hvData").value=hvISO(desvio); hvCarregar(); }
+function hvFiltro(b){ _hvF=b.dataset.f; document.querySelectorAll(".hvfil button").forEach(x=>x.classList.toggle("sel",x===b)); hvDesenhar(); }
+async function hvCarregar(){
+ const dia=$("hvData").value || hvISO(0);
+ $("hvHoje").classList.toggle("sel",dia===hvISO(0)); $("hvOntem").classList.toggle("sel",dia===hvISO(1));
+ $("hvLista").innerHTML='<div class="vazio">A carregar…</div>';
+ try{
+  const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY)+"&dia="+encodeURIComponent(dia));
+  const d=await r.json(); if(d.erro) throw new Error(d.erro);
+  _hv=(d.pedidos||[]).slice();
+ }catch(e){ _hv=null; $("hvLista").innerHTML='<div class="vazio">Não foi possível carregar. Verifique a internet e tente outra vez.</div>'; return; }
+ hvDesenhar();
+}
+function hvDesenhar(){
+ if(!_hv) return;
+ const l=_hv.filter(p=>!_hvF || (_hvF==="balcao"?p.balcao:!p.balcao))
+            .sort((a,b)=>String(b.criado||b.slot||"").localeCompare(String(a.criado||a.slot||"")));
+ if(!l.length){
+  const velho=(Date.now()-new Date(($("hvData").value||hvISO(0))+"T12:00:00").getTime())>7*86400000;
+  $("hvLista").innerHTML='<div class="vazio">Sem pedidos neste dia'+(_hvF?" com este filtro":"")+'.'+
+   (velho?'<br><small>Atenção: até o servidor ser actualizado, os pedidos só ficam guardados 7 dias.</small>':'')+'</div>';
+  return;
+ }
+ const ok=l.filter(p=>p.status!=="cancelado"), soma=ok.reduce((s,p)=>s+(+p.total||0),0);
+ const site=ok.filter(p=>!p.balcao).length;
+ $("hvLista").innerHTML=`<div class="hvres"><span><b>${ok.length}</b> pedidos</span><span><b>${soma}</b> ECV</span><span><b>${site}</b> do site</span></div>`+
+  l.map(p=>{
+   const canc=p.status==="cancelado";
+   const linhas=(Array.isArray(p.linhas)&&p.linhas.length)?p.linhas.map(x=>x.q+"x "+x.n):(p.itens||[]);
+   const selo=p.balcao?(p.balcaoPago?'<span class="selo sim">✓ Pago'+(metDe(p)?' · '+esc(metTxt(metDe(p))):'')+'</span>':'<span class="selo nao">Por pagar</span>')
+                      :'<span class="selo site">Site</span>';
+   const compUrl=PROMO_API+"/comprovativo?code="+encodeURIComponent(p.code||"")+"&key="+encodeURIComponent(KEY);
+   const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
+   return `<details class="hv${canc?" hvcanc":""}"><summary>
+     <span class="hh">${esc(p.slot||p.criado||"—")}</span>
+     <span class="hn"><b>${esc(p.nome||"(sem nome)")}</b><small>${esc(p.code||"")}${p.balcao?"":' · <span class="hvclip">📎 comprovativo</span>'} · ${esc(HV_EST[p.status]||p.status||"")}</small></span>
+     <span class="hvv">${(+p.total||0)}</span>${selo}</summary>
+     <div class="hb">
+      <ul>${linhas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+      ${nt?`<div>Notas: ${esc(nt)}</div>`:""}
+      ${!p.balcao&&p.modo==="entrega"?`<div>📍 Entrega${p.zona?" · "+esc(p.zona):""}</div>`:""}
+      ${p.criado?`<div style="color:var(--ink2);font-size:12.5px">Feito às ${esc(p.criado)}</div>`:""}
+      ${p.balcao?"":`<a class="hvcomp" href="${compUrl}" target="_blank" rel="noopener">Abrir comprovativo</a>`}
+     </div></details>`;
+  }).join("");
+}
+
+/* caixa do balcão: quanto entrou por cada forma de pagamento e quanto falta cobrar */
+function caixaHtml(vendidos){
+ const bal=vendidos.filter(p=>p.balcao); if(!bal.length) return "";
+ const por={}; let falta=0, nf=0;
+ bal.forEach(p=>{
+  const pg=(p.balcaoPago===true)||(pagoEnviado[p.code]===true);
+  if(!pg){ falta+=(+p.total||0); nf++; return; }
+  const m=metDe(p)||"sem"; por[m]=(por[m]||0)+(+p.total||0);
+ });
+ return `<div class="caixa"><div class="cx-t">Caixa do balcão</div>`+
+  ["dinheiro","vinti4","transf"].map(k=>`<div class="cx"><span>${MET[k].i} ${MET[k].t}</span><b>${por[k]||0} ECV</b></div>`).join("")+
+  (por.sem?`<div class="cx"><span>Pago (forma não registada)</span><b>${por.sem} ECV</b></div>`:"")+
+  `<div class="cx${falta?" nao":""}"><span>${falta?"⚠ ":""}Por cobrar${nf?" ("+nf+")":""}</span><b>${falta} ECV</b></div></div>`;
 }
 
 /* ---------- AVISO DE PEDIDO PRONTO ----------
@@ -991,49 +1218,114 @@ const EST_TXT={aguarda:"recebido",confirmado:"na fila",preparar:"a preparar",pro
 function desenharHist(){
  const l=(pedidos||[]).filter(p=>String(p.code||"").startsWith("BAL-"));
  if(!l.length){ $("hist").innerHTML='<div class="vazio">Ainda não enviaste nenhum pedido.</div>'; return; }
- const ordem={pronto:0,preparar:1,confirmado:2,aguarda:3,entregue:4,cancelado:5};
- l.sort((a,b)=>((ordem[a.status]??9)-(ordem[b.status]??9))||String(b.criado||"").localeCompare(String(a.criado||"")));
- l.forEach(p=>{ if(p.balcaoPago!==undefined) pagoEnviado[p.code]=!!p.balcaoPago; });
+ l.forEach(p=>{ if(p.balcaoPago!==undefined) pagoEnviado[p.code]=!!p.balcaoPago;
+                if(p.balcaoMetodo && MET[p.balcaoMetodo]) metEnviado[p.code]=Object.assign({},metEnviado[p.code],{m:p.balcaoMetodo}); });
  const emEdicao=new Set(balcoes.filter(b=>b.edita).map(b=>b.edita.code));
+ const hora=p=>String(p.criado||"");
  const cartao=p=>{
-  const pg=pagoEnviado[p.code]===true, ab=_abertos.has(p.code), canc=p.status==="cancelado";
+  const pg=pagoEnviado[p.code]===true, ab=_abertos.has(p.code), canc=p.status==="cancelado", m=metDe(p);
   const linhas=(Array.isArray(p.linhas)&&p.linhas.length)?p.linhas.map(x=>x.q+"x "+x.n):(p.itens||[]);
-  const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO|POR PAGAR)( · )?/,"");
-  return `<div class="pe ${canc?"fechado":(pg?"sim":"nao")}${_prontosNovos.has(p.id)?" novo-pronto":""}">
-   <button type="button" class="cab" onclick="abrirEnviado('${esc(p.code)}','${p.id}')" aria-expanded="${ab}">
-    <span class="q"><b>${esc(p.nome||"")}</b><small>${esc(p.code)}${p.criado?" · "+esc(p.criado):""}${emEdicao.has(p.code)?" · ✎ em modificação":""}</small></span>
-    <span class="v">${p.total||0}</span>
-    ${canc?"":`<span class="selo ${pg?"sim":"nao"}">${pg?"✓ Pago":"Por pagar"}</span>`}
-    <span class="est ${p.status}">${esc(EST_TXT[p.status]||p.status||"")}</span>
-   </button>
+  const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
+  const ph=(metEnviado[p.code]&&metEnviado[p.code].h)||p.balcaoPagoHora||"";
+  return `<div class="sx ${canc?"canc":(pg?"sim":"nao")}${_prontosNovos.has(p.id)?" novo-pronto":""}" data-code="${esc(p.code)}" data-id="${esc(p.id)}">
+   <div class="cab" role="button" tabindex="0" aria-expanded="${ab}">
+    <span class="lk" aria-hidden="true">🔒</span>
+    <span class="q"><b>${esc(p.nome||"")}</b><small>${esc(p.code)}${p.criado?" · "+esc(p.criado):""}${canc?"":` <span class="kst ${esc(p.status||"")}">${esc(EST_TXT[p.status]||p.status||"")}</span>`}${emEdicao.has(p.code)?" · ✎ em edição":""}</small></span>
+    <span class="v"><b>${p.total||0}</b><small>${canc?"CANCELADO":(pg?"✓ PAGO"+(m?" · "+esc(metTxt(m)).toUpperCase():""):"POR COBRAR")}</small></span>
+   </div>
+   ${(!pg&&!canc)?`<button type="button" class="cobrar2" onclick="abrirCobrar('${esc(p.code)}')">Cobrar ${p.total||0} ECV</button>`:""}
    ${ab?`<div class="det"><ul>${linhas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
-    ${nt?`<div class="nt">Notas: ${esc(nt)}</div>`:""}
-    ${canc?"":`<div class="acts">
-     ${pg?"":`<button type="button" class="cobrar" onclick="alternarPago('${esc(p.code)}')">Recebi o pagamento · ${p.total||0} ECV</button>`}
-     <button type="button" class="mod" onclick="modificar('${esc(p.code)}')">✎ Modificar pedido</button>
-     ${pg?`<button type="button" class="corr" onclick="corrigirPago('${esc(p.code)}')">Enganei-me: ainda não pagou</button>`:""}
-    </div>`}
-    <div class="fech">Pedido enviado e fechado: para mudar alguma coisa, use «Modificar pedido».</div></div>`:""}
+     ${nt?`<div class="dica">Notas: ${esc(nt)}</div>`:""}
+     ${pg?`<div class="dica">Pago${m?" em "+esc(metTxt(m).toLowerCase()):""}${ph?" às "+esc(ph):""}.</div>`:""}
+     <div class="dica">🔒 Pedido fechado. Para editar, mantenha o dedo em cima dele.</div></div>`:""}
   </div>`;
  };
- const porCobrar=l.filter(p=>p.status!=="cancelado" && pagoEnviado[p.code]!==true);
- const pagos=l.filter(p=>p.status!=="cancelado" && pagoEnviado[p.code]===true);
+ const porCobrar=l.filter(p=>p.status!=="cancelado" && pagoEnviado[p.code]!==true).sort((a,b)=>hora(a).localeCompare(hora(b)));
+ const pagos=l.filter(p=>p.status!=="cancelado" && pagoEnviado[p.code]===true).sort((a,b)=>hora(b).localeCompare(hora(a)));
  const canc=l.filter(p=>p.status==="cancelado");
  const somaN=a=>a.reduce((s,p)=>s+(+p.total||0),0);
  $("hist").innerHTML=
-  (porCobrar.length?`<div class="grp nao"><span>Por cobrar</span><span>${porCobrar.length} · ${somaN(porCobrar)} ECV</span></div>`+porCobrar.map(cartao).join(""):"")+
-  (pagos.length?`<div class="grp"><span>Enviados e pagos</span><span>${pagos.length} · ${somaN(pagos)} ECV</span></div>`+pagos.map(cartao).join(""):"")+
-  (canc.length?`<details class="canc"><summary class="grp"><span>Cancelados (${canc.length}) ▾</span></summary>${canc.map(cartao).join("")}</details>`:"");
+  (porCobrar.length?`<div class="sx-grp nao"><span>Por cobrar · ${porCobrar.length}</span><span>falta ${somaN(porCobrar)} ECV</span></div>`+porCobrar.map(cartao).join(""):"")+
+  (pagos.length?`<div class="sx-grp sim"><span>✓ Pagos · ${pagos.length}</span><span>${somaN(pagos)} ECV</span></div>`+pagos.map(cartao).join(""):"")+
+  (canc.length?`<details class="canc"><summary class="grp"><span>Cancelados (${canc.length}) ▾</span></summary>${canc.map(cartao).join("")}</details>`:"")+
+  `<div class="sx-dica">🔒 Enviado = fechado. Manter o dedo num pedido abre «Editar» e corrigir o pagamento.</div>`;
 }
+/* tocar = ver produtos · manter o dedo (0,55 s) ou clique direito = opções */
+(function(){
+ const box=document.getElementById("hist"); if(!box) return;
+ let t=null, alvo=null, longo=false, x0=0, y0=0;
+ const parar=()=>{ clearTimeout(t); t=null; if(alvo) alvo.classList.remove("prem"); };
+ box.addEventListener("pointerdown",e=>{
+  const c=e.target.closest(".sx"); if(!c || e.target.closest("button")) return;
+  parar(); alvo=c; longo=false; x0=e.clientX; y0=e.clientY; c.classList.add("prem");
+  t=setTimeout(()=>{ t=null; longo=true; c.classList.remove("prem");
+   try{ if(navigator.vibrate) navigator.vibrate(35); }catch(_){}
+   abrirOpcoes(c.dataset.code); }, 550);
+ });
+ box.addEventListener("pointermove",e=>{ if(t && (Math.abs(e.clientX-x0)>10 || Math.abs(e.clientY-y0)>10)) parar(); });
+ ["pointerup","pointercancel"].forEach(ev=>box.addEventListener(ev,parar));
+ box.addEventListener("click",e=>{
+  const c=e.target.closest(".sx"); if(!c || e.target.closest("button")) return;
+  if(longo){ longo=false; e.preventDefault(); e.stopPropagation(); return; }
+  abrirEnviado(c.dataset.code,c.dataset.id);
+ },true);
+ box.addEventListener("contextmenu",e=>{
+  const c=e.target.closest(".sx"); if(!c) return;
+  e.preventDefault(); if(longo && !t) return;
+  parar(); longo=true; abrirOpcoes(c.dataset.code);
+ });
+ box.addEventListener("keydown",e=>{
+  const c=e.target.closest(".sx"); if(!c) return;
+  if(e.key==="Enter"){ e.preventDefault(); abrirEnviado(c.dataset.code,c.dataset.id); }
+  if(e.key===" "||e.key==="ContextMenu"){ e.preventDefault(); abrirOpcoes(c.dataset.code); }
+ });
+})();
+/* ---------- OPÇÕES de um pedido enviado (só com o dedo pressionado) ---------- */
+function abrirOpcoes(code){
+ const p=(pedidos||[]).find(x=>x.code===code); if(!p) return;
+ const pg=pagoEnviado[code]===true, canc=p.status==="cancelado", m=metDe(p), c=esc(code);
+ $("opSheet").innerHTML=`<h3>${esc(p.nome||"")} · ${p.total||0} ECV</h3>
+  <div class="sub">${c} · ${canc?"cancelado":(pg?"pago"+(m?" ("+esc(metTxt(m))+")":""):"por cobrar")} · cozinha: ${esc(EST_TXT[p.status]||p.status||"")}</div>
+  <div class="acc">
+   ${canc?"":`<button type="button" class="ed" onclick="fecharOpcoes();modificar('${c}')">✎ Editar pedido<small>Abre no carrinho. A cozinha só recebe a mudança quando carregar em «Fechar e reenviar».</small></button>`}
+   ${canc?"":(pg?`<button type="button" class="dz" onclick="fecharOpcoes();desfazerPago('${c}')">↩ Afinal não pagou<small>Volta para «Por cobrar».</small></button>`
+                 :`<button type="button" class="cb" onclick="fecharOpcoes();abrirCobrar('${c}')">💵 Cobrar ${p.total||0} ECV</button>`)}
+  </div>
+  <button type="button" class="fx" onclick="fecharOpcoes()">Fechar</button>`;
+ $("opBg").classList.add("on");
+}
+function fecharOpcoes(){ $("opBg").classList.remove("on"); }
+function desfazerPago(code){
+ if(!confirm("O pedido "+code+" volta para POR COBRAR?")) return;
+ marcarPago(code,false,"");
+}
+/* ---------- COBRAR um pedido enviado ---------- */
+let _cob=null;
+function abrirCobrar(code){
+ const p=(pedidos||[]).find(x=>x.code===code); if(!p) return;
+ _cob={code, nome:p.nome||"", total:+p.total||0, met:null, rec:null};
+ desenharCobrar(); $("cobBg").classList.add("on");
+}
+function cobMet(m){ if(!_cob) return; _cob.met=m; if(m!=="dinheiro") _cob.rec=null; desenharCobrar(); }
+function cobRec(v){ if(!_cob) return; _cob.rec=v; desenharCobrar(); }
+function desenharCobrar(){
+ const c=_cob; if(!c) return;
+ $("cobSheet").innerHTML=`<h3>Cobrar · ${esc(c.nome)}</h3><div class="sub">${esc(c.code)}</div>
+  <div class="big">${c.total} ECV</div>
+  <div class="pg-met">${["dinheiro","vinti4","transf"].map(k=>
+   `<button type="button" class="${c.met===k?"on":""}" onclick="cobMet('${k}')"><i>${MET[k].i}</i>${MET[k].t}</button>`).join("")}</div>
+  ${c.met==="dinheiro"?htmlTroco(c.total,c.rec,"cobRec"):""}
+  <button type="button" class="ok" ${c.met?"":"disabled"} onclick="confirmarCobrar()">${c.met?"✓ Recebi "+c.total+" ECV · "+esc(metTxt(c.met)):"Escolha como pagou"}</button>
+  <button type="button" class="fx" onclick="fecharCobrar()">Cancelar</button>`;
+}
+function fecharCobrar(){ $("cobBg").classList.remove("on"); _cob=null; }
+function confirmarCobrar(){ const c=_cob; if(!c||!c.met) return; fecharCobrar(); marcarPago(c.code,true,c.met); }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ fecharCobrar(); fecharOpcoes(); } });
 function vistoPronto(id){ if(_prontosNovos.delete(id)) desenharHist(); }
 function abrirEnviado(code,id){
  _prontosNovos.delete(id);
  if(_abertos.has(code)) _abertos.delete(code); else _abertos.add(code);
  desenharHist();
-}
-function corrigirPago(code){
- if(!confirm("Marcar o pedido "+code+" como AINDA POR PAGAR?")) return;
- alternarPago(code);
 }
 /* MODIFICAR: o pedido enviado abre-se num cliente novo, com tudo o que tinha (e o estado do pagamento).
    A cozinha só recebe a mudança quando se carrega em "Fechar e reenviar". */
@@ -1054,10 +1346,10 @@ function modificar(code){
  if(itens.some(x=>!x.preco)) alert("Este pedido é antigo e não tem os preços guardados: confira os preços antes de reenviar.");
  if(balcoes.length>=10){ alert("Feche um cliente antes de modificar (máximo 10)."); return; }
  const pago=pagoEnviado[code]===true;
- const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO|POR PAGAR)( · )?/,"");
+ const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
  const nome=/^Cliente \d+$/.test(p.nome||"")?"":(p.nome||"");
  const vazio=balcoes.findIndex(b=>!b.itens.length&&!b.edita);
- const novo={nome, itens, pago, notas:nt, edita:{code:p.code, id:p.id, total:+p.total||0, pago}};
+ const novo={nome, itens, pago, met:(pago?(metDe(p)||"dinheiro"):"depois"), recebido:null, notas:nt, edita:{code:p.code, id:p.id, total:+p.total||0, pago}};
  if(vazio>=0){ balcoes[vazio]=novo; activo=vazio; } else { balcoes.push(novo); activo=balcoes.length-1; }
  guardar(); desenharTudo(); desenharHist();
  setTimeout(()=>{ try{ $("linhas").scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){} },50);
@@ -1070,22 +1362,24 @@ async function retirarAntigo(ed){
  if(ed.id && await tenta("/order-status"+k+"&st=cancelado")) return "cancelado";
  return null;
 }
-async function alternarPago(code){
+async function marcarPago(code,on,met){
  const p=(pedidos||[]).find(x=>x.code===code);
- const novo = !(pagoEnviado[code]===true), antes = p ? p.balcaoPago : undefined;
- pagoEnviado[code]=novo; if(p) p.balcaoPago=novo;      // a lista mostra já o estado novo (antes voltava atrás até à leitura seguinte)
- guardar(); desenharHist();
+ pagoEnviado[code]=on;
+ if(on) metEnviado[code]={m:met,h:horaMais(0)}; else delete metEnviado[code];
+ if(p){ p.balcaoPago=on; p.balcaoMetodo=on?met:""; }
+ guardar(); desenharHist(); try{ carregarFecho(); }catch(e){}
  if(!p) return;
  try{
   const r=await fetch(PROMO_API+"/order-pago?key="+encodeURIComponent(KEY)+
-   "&id="+encodeURIComponent(p.id)+"&on="+(novo?"1":"0"),{method:"POST"});
+   "&id="+encodeURIComponent(p.id)+"&on="+(on?"1":"0")+"&met="+encodeURIComponent(on?met:""),{method:"POST"});
   const d=await r.json();
   if(d.erro) throw new Error(d.erro);
-  p.balcaoPago=novo;
  }catch(e){
   alert("Marcado só neste aparelho — não consegui guardar no servidor.");
  }
 }
+function alternarPago(code){ return marcarPago(code, !(pagoEnviado[code]===true), "dinheiro"); }   // compatibilidade
+function corrigirPago(code){ desfazerPago(code); }
 
 /* ---------- APP INSTALÁVEL E NOTIFICAÇÕES ---------- */
 if("serviceWorker" in navigator){
@@ -1156,6 +1450,8 @@ async function manterEcraAceso(){
   <div class="vacts"><button type="button" onclick="fecharAcai()">Cancelar</button><button type="button" class="ok" id="vOk" onclick="confirmarAcai()">Adicionar</button></div>
  </div>
 </div>
+<div class="sh-bg" id="cobBg" onclick="if(event.target===this)fecharCobrar()"><div class="sheet" id="cobSheet" role="dialog" aria-label="Cobrar"></div></div>
+<div class="sh-bg" id="opBg" onclick="if(event.target===this)fecharOpcoes()"><div class="sheet" id="opSheet" role="dialog" aria-label="Opções do pedido"></div></div>
 <div class="acai-bg" id="tamBg" onclick="if(event.target===this)fecharTamanho()">
  <div class="tam-box" role="dialog" aria-modal="true" aria-labelledby="tNome">
   <h3 id="tNome"></h3>
