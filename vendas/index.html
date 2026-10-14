@@ -278,6 +278,49 @@ h1{font-size:19px;letter-spacing:.5px;}
 /* histórico no telemóvel: código + pagamento + estado numa linha, artigos por baixo a toda a largura */
 @media(max-width:520px){ .ped{flex-wrap:wrap;row-gap:6px;} .ped>div:first-child{flex:1;min-width:0;}
  .ped>.it{order:5;flex:1 1 100%;} }
+/* ===== 14-10-2026: PAGAMENTO E PEDIDOS ENVIADOS =====
+   Ao montar: dois botões lado a lado, POR PAGAR | PAGO — o escolhido fica cheio, de cor.
+   Depois de enviado, o pedido fica fechado (só de leitura). Lista por grupos:
+     1) Por cobrar — enviados e ainda por pagar (vermelho, com o botão "Recebi o pagamento")
+     2) Enviados e pagos — linha arrumada, sem botões
+     3) Cancelados — fechados num grupo.
+   Tocar num pedido enviado mostra o detalhe e "Modificar pedido": abre-o num cliente novo; só depois de
+   "Fechar e reenviar" é que a cozinha recebe a versão nova (e a antiga sai). */
+.pagseg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px;}
+.pagseg button{padding:16px 8px;border-radius:13px;border:2px solid #CDBFAE;background:#fff;color:#9C8B78;
+ font-family:inherit;font-weight:700;font-size:17px;line-height:1;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;}
+.pagseg button.nao.on{background:var(--vermelho);border-color:var(--vermelho);color:#fff;}
+.pagseg button.sim.on{background:#2E6B32;border-color:#2E6B32;color:#fff;}
+.pagseg button:not(.on){opacity:.85;}
+.pagest{margin-top:4px;font-size:13.5px;font-weight:600;text-align:center;}
+.pagest.nao{color:var(--vermelho);} .pagest.sim{color:#2E6B32;}
+.editban{margin:0 0 10px;padding:11px 13px;border-radius:12px;background:#FFF4DE;border:2px solid #C88A1E;color:#5C3D06;font-size:14px;line-height:1.4;}
+.editban b{display:block;font-size:15px;}
+.editban .dif{display:block;margin-top:5px;font-weight:700;}
+.envia.edita{background:#8A5A12;}
+.grp{margin:14px 0 6px;font-size:11.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink2);display:flex;justify-content:space-between;}
+.grp.nao{color:var(--vermelho);}
+.pe{border:2px solid var(--line);border-radius:13px;background:#fff;margin-bottom:8px;overflow:hidden;}
+.pe.nao{border-color:var(--vermelho);background:#FCF1EF;}
+.pe.novo-pronto{box-shadow:0 0 0 3px #2F4029;}
+.pe .cab{display:flex;align-items:center;gap:8px;width:100%;padding:11px 12px;border:0;background:transparent;font-family:inherit;text-align:left;cursor:pointer;color:var(--tinta,#34251D);}
+.pe .cab .q{flex:1;min-width:0;}
+.pe .cab .q b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pe .cab .q small{display:block;font-size:12px;color:var(--ink2);font-family:monospace;}
+.pe .cab .v{font-weight:700;font-size:15px;white-space:nowrap;}
+.selo{flex:none;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;white-space:nowrap;}
+.selo.sim{background:#2E6B32;color:#fff;} .selo.nao{background:var(--vermelho);color:#fff;}
+.pe .det{padding:0 12px 12px;font-size:14px;line-height:1.45;}
+.pe .det ul{margin:2px 0 8px 18px;}
+.pe .det .nt{color:var(--ink2);font-size:13px;margin-bottom:8px;}
+.pe .acts{display:grid;gap:8px;}
+.pe .acts .cobrar{padding:15px;border:0;border-radius:12px;background:#2E6B32;color:#fff;font-family:inherit;font-weight:700;font-size:16px;line-height:1.1;cursor:pointer;}
+.pe .acts .mod{padding:12px;border:2px solid #8A5A12;border-radius:12px;background:#fff;color:#8A5A12;font-family:inherit;font-weight:700;font-size:15px;line-height:1;cursor:pointer;}
+.pe .acts .corr{padding:6px;border:0;background:none;color:var(--ink2);font-family:inherit;font-weight:500;font-size:13px;line-height:1.2;text-decoration:underline;cursor:pointer;}
+.pe.fechado .cab{opacity:.75;}
+.pe .fech{font-size:12px;color:var(--ink2);margin-top:2px;}
+details.canc>summary{cursor:pointer;list-style:none;}
+details.canc>summary::-webkit-details-marker{display:none;}
 </style>
 </head>
 <body>
@@ -319,11 +362,17 @@ h1{font-size:19px;letter-spacing:.5px;}
   <div class="box">
     <div class="sec">Pedido do balcão <span id="tabNome"></span></div>
     <div id="linhas"></div>
-    <button class="pagbtn" id="pgBtn" type="button" aria-pressed="false" onclick="alternarPagoBalcao()">Por pagar</button>
+    <div id="editBan"></div>
+    <div class="pagseg" role="group" aria-label="Pagamento">
+      <button type="button" class="nao" id="pgNao" onclick="setPago(false)">Por pagar</button>
+      <button type="button" class="sim" id="pgSim" onclick="setPago(true)">✓ Pago</button>
+    </div>
+    <div class="pagest" id="pgEst"></div>
+    <button class="pagbtn" id="pgBtn" type="button" aria-pressed="false" onclick="alternarPagoBalcao()" hidden>Por pagar</button>
     <textarea class="fld notas" id="fNotas" placeholder="Notas para a cozinha (sem açúcar, para viagem, alergias…)" onchange="guardarNotas(this.value)"></textarea>
     <div class="tot"><span>Total</span><b id="total">0 ECV</b></div>
     <button class="envia" id="btnEnviar" onclick="enviar()">Enviar para a cozinha</button>
-    <button class="limpar" onclick="limpar()">Eliminar este pedido</button>
+    <button class="limpar" id="btnLimpar" onclick="limpar()">Eliminar este pedido</button>
     <div class="msg" id="envMsg"></div>
   </div>
 
@@ -343,7 +392,7 @@ h1{font-size:19px;letter-spacing:.5px;}
   </div>
 
   <div class="box">
-    <div class="sec">Balcão — hoje</div>
+    <div class="sec">Balcão — hoje · enviados</div>
     <div id="hist"><div class="vazio">Ainda não enviaste nenhum pedido.</div></div>
   </div>
 </div>
@@ -370,7 +419,7 @@ const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Dup
 let KEY="", cat=0, activo=0, pedidos=[];
 let balcoes=[novoBalcao(),novoBalcao(),novoBalcao(),novoBalcao()];
 let pagoEnviado={};   // estado de pagamento dos pedidos já enviados (só neste aparelho)
-function novoBalcao(){ return {nome:"",itens:[],pago:false,notas:""}; }
+function novoBalcao(){ return {nome:"",itens:[],pago:false,notas:"",edita:null}; }
 let esgotados=[], stock={};
 const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO"];
 const $=id=>document.getElementById(id);
@@ -472,7 +521,7 @@ function restaurar(){
  try{
   const b=JSON.parse(localStorage.getItem("ep_vendas")||"null");
   if(Array.isArray(b)&&b.length) balcoes=b.map(x=>({nome:x.nome||"",itens:x.itens||[],
-   pago:!!x.pago,notas:x.notas||""}));
+   pago:!!x.pago,notas:x.notas||"",edita:x.edita||null}));
   const p=JSON.parse(localStorage.getItem("ep_vendas_pago")||"null");
   if(p&&typeof p==="object") pagoEnviado=p;
  }catch(e){}
@@ -519,7 +568,7 @@ function desenharTabs(){
   const n=b.itens.reduce((s,x)=>s+x.q,0);
   return `<button class="tab${i===activo?" sel":""}" onclick="irBalcao(${i})">
    ${n?`<span class="pg ${b.pago?"sim":"nao"}"></span>`:""}
-   <b>${i+1}</b>${b.nome?esc(b.nome.slice(0,12)):"Cliente"}
+   <b>${i+1}${b.edita?" ✎":""}</b>${b.nome?esc(b.nome.slice(0,12)):"Cliente"}
    ${n?`<span class="n">${n}</span>`:""}
    ${balcoes.length>1?`<span class="fecha" onclick="fecharCliente(${i},event)">${IC_X}</span>`:""}</button>`;
  }).join("") + `<button class="addtab" onclick="juntarCliente()">+ Cliente</button>`;
@@ -695,6 +744,23 @@ function desenharPedido(){
  pg.classList.toggle("sim", pago);
  pg.textContent = pago ? "✓ Pago" : "Por pagar";
  pg.setAttribute("aria-pressed", pago?"true":"false");
+ $("pgNao").classList.toggle("on",!pago); $("pgSim").classList.toggle("on",pago);
+ $("pgNao").setAttribute("aria-pressed",!pago); $("pgSim").setAttribute("aria-pressed",pago);
+ const pe=$("pgEst");
+ pe.className="pagest "+(pago?"sim":"nao");
+ pe.textContent = !b.itens.length ? "" : (pago ? "Pagamento recebido." : "Ainda não pagou — cobre antes de entregar.");
+ const ed=b.edita;
+ if(ed){
+  const t=totalBalcao(), dif=t-(ed.total||0);
+  let dtx="";
+  if(ed.pago && dif>0) dtx=`<span class="dif">Já tinha pago ${ed.total} ECV: cobre mais ${dif} ECV.</span>`;
+  else if(ed.pago && dif<0) dtx=`<span class="dif">Já tinha pago ${ed.total} ECV: devolva ${-dif} ECV.</span>`;
+  $("editBan").innerHTML=`<div class="editban"><b>A modificar o pedido ${esc(ed.code)}</b>
+   Até carregar em «Fechar e reenviar», a cozinha continua com o pedido antigo.${dtx}</div>`;
+ } else $("editBan").innerHTML="";
+ $("btnEnviar").textContent = ed ? "Fechar e reenviar à cozinha" : "Enviar para a cozinha";
+ $("btnEnviar").classList.toggle("edita",!!ed);
+ $("btnLimpar").textContent = ed ? "Cancelar modificação (fica o pedido antigo)" : "Eliminar este pedido";
  $("fNotas").value=b.notas||"";
 }
 function tirarLinha(k){
@@ -704,6 +770,10 @@ function tirarLinha(k){
  guardar(); desenharTudo();
 }
 function limpar(){
+ if(balcoes[activo].edita){
+  if(!confirm("Cancelar a modificação?\n\nO pedido "+balcoes[activo].edita.code+" fica como foi enviado.")) return;
+  balcoes[activo]=novoBalcao(); guardar(); desenharTudo(); desenharHist(); return;
+ }
  if(!balcoes[activo].itens.length) return;
  lembrarParaAnular("Pedido do cliente "+(activo+1)+" eliminado");
  balcoes[activo]=novoBalcao();
@@ -771,7 +841,7 @@ async function enviar(){
   stock: b.itens.reduce((o,x)=>{ const n=x.base||x.nome; o[n]=(o[n]||0)+x.q; return o; },{}),
   linhas: b.itens.map(x=>({n:x.nome, q:x.q, p:x.preco})),
   total: totalBalcao(),
-  notas: "Cliente à espera · " + (b.pago?"PAGO":"POR PAGAR")
+  notas: (b.edita ? "MODIFICADO (substitui "+b.edita.code+") · " : "") + "Cliente à espera · " + (b.pago?"PAGO":"POR PAGAR")
          + (b.notas ? " · " + b.notas : ""),
   morada:"", pago:false, balcao:true, balcaoPago:b.pago
  };
@@ -786,9 +856,16 @@ async function enviar(){
   btn.disabled=false; return;
  }
  msg.className="msg ok";
- msg.textContent="Enviado para a cozinha · "+code+" · levantamento "+slot;
+ msg.textContent="Enviado para a cozinha · "+code+" · levantamento "+slot+(b.pago?" · PAGO":" · POR PAGAR — cobre e marque na lista «Por cobrar».");
  pagoEnviado[code]=b.pago;
- balcoes[activo]=novoBalcao();
+ if(b.edita){
+  const velho=await retirarAntigo(b.edita);
+  msg.textContent="Reenviado · "+code+" substitui "+b.edita.code+" · levantamento "+slot+(b.pago?" · PAGO":" · POR PAGAR");
+  if(!velho){ msg.className="msg bad"; msg.textContent+=" — ATENÇÃO: não consegui retirar o pedido antigo "+b.edita.code+". Apague-o na cozinha ou no /admin."; }
+  else if(velho==="cancelado") msg.textContent+=" · o antigo ficou cancelado (confirme o stock).";
+  delete pagoEnviado[b.edita.code];
+ }
+ { const ix=balcoes.indexOf(b); if(ix>=0) balcoes[ix]=novoBalcao(); }      // o cliente deste envio, mesmo que se tenha mudado de separador
  guardar(); desenharTabs(); desenharPedido();
  await carregarStock(); desenharStock(); desenharProdutos();
  carregarPedidos(); carregarFecho();
@@ -909,27 +986,95 @@ async function carregarPedidos(){
  verificarProntos((pedidos||[]).filter(p=>String(p.code||"").startsWith("BAL-")));
  desenharHist();
 }
+const _abertos=new Set();
+const EST_TXT={aguarda:"recebido",confirmado:"na fila",preparar:"a preparar",pronto:"pronto",entregue:"entregue",cancelado:"cancelado"};
 function desenharHist(){
  const l=(pedidos||[]).filter(p=>String(p.code||"").startsWith("BAL-"));
  if(!l.length){ $("hist").innerHTML='<div class="vazio">Ainda não enviaste nenhum pedido.</div>'; return; }
- const ordem={pronto:0,preparar:1,confirmado:2,entregue:3,cancelado:4};
- l.sort((a,b)=>(ordem[a.status]??9)-(ordem[b.status]??9));
+ const ordem={pronto:0,preparar:1,confirmado:2,aguarda:3,entregue:4,cancelado:5};
+ l.sort((a,b)=>((ordem[a.status]??9)-(ordem[b.status]??9))||String(b.criado||"").localeCompare(String(a.criado||"")));
  l.forEach(p=>{ if(p.balcaoPago!==undefined) pagoEnviado[p.code]=!!p.balcaoPago; });
- $("hist").innerHTML=l.map(p=>{
-  const pg = pagoEnviado[p.code]===true;
-  return `<div class="ped${_prontosNovos.has(p.id)?" novo-pronto":""}" onclick="vistoPronto('${p.id}')">
-   <div><div class="cod">${esc(p.code)}</div><div class="it">${esc(p.nome||"")} · ${p.total||0} ECV</div></div>
-   <div class="it">${(p.itens||[]).map(esc).join(" · ")}</div>
-   <button class="tagpag ${pg?"sim":"nao"}" onclick="alternarPago('${esc(p.code)}')">${pg?"Pago":"Por pagar"}</button>
-   <span class="est ${p.status}">${esc(p.status||"")}</span>
+ const emEdicao=new Set(balcoes.filter(b=>b.edita).map(b=>b.edita.code));
+ const cartao=p=>{
+  const pg=pagoEnviado[p.code]===true, ab=_abertos.has(p.code), canc=p.status==="cancelado";
+  const linhas=(Array.isArray(p.linhas)&&p.linhas.length)?p.linhas.map(x=>x.q+"x "+x.n):(p.itens||[]);
+  const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO|POR PAGAR)( · )?/,"");
+  return `<div class="pe ${canc?"fechado":(pg?"sim":"nao")}${_prontosNovos.has(p.id)?" novo-pronto":""}">
+   <button type="button" class="cab" onclick="abrirEnviado('${esc(p.code)}','${p.id}')" aria-expanded="${ab}">
+    <span class="q"><b>${esc(p.nome||"")}</b><small>${esc(p.code)}${p.criado?" · "+esc(p.criado):""}${emEdicao.has(p.code)?" · ✎ em modificação":""}</small></span>
+    <span class="v">${p.total||0}</span>
+    ${canc?"":`<span class="selo ${pg?"sim":"nao"}">${pg?"✓ Pago":"Por pagar"}</span>`}
+    <span class="est ${p.status}">${esc(EST_TXT[p.status]||p.status||"")}</span>
+   </button>
+   ${ab?`<div class="det"><ul>${linhas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+    ${nt?`<div class="nt">Notas: ${esc(nt)}</div>`:""}
+    ${canc?"":`<div class="acts">
+     ${pg?"":`<button type="button" class="cobrar" onclick="alternarPago('${esc(p.code)}')">Recebi o pagamento · ${p.total||0} ECV</button>`}
+     <button type="button" class="mod" onclick="modificar('${esc(p.code)}')">✎ Modificar pedido</button>
+     ${pg?`<button type="button" class="corr" onclick="corrigirPago('${esc(p.code)}')">Enganei-me: ainda não pagou</button>`:""}
+    </div>`}
+    <div class="fech">Pedido enviado e fechado: para mudar alguma coisa, use «Modificar pedido».</div></div>`:""}
   </div>`;
- }).join("");
+ };
+ const porCobrar=l.filter(p=>p.status!=="cancelado" && pagoEnviado[p.code]!==true);
+ const pagos=l.filter(p=>p.status!=="cancelado" && pagoEnviado[p.code]===true);
+ const canc=l.filter(p=>p.status==="cancelado");
+ const somaN=a=>a.reduce((s,p)=>s+(+p.total||0),0);
+ $("hist").innerHTML=
+  (porCobrar.length?`<div class="grp nao"><span>Por cobrar</span><span>${porCobrar.length} · ${somaN(porCobrar)} ECV</span></div>`+porCobrar.map(cartao).join(""):"")+
+  (pagos.length?`<div class="grp"><span>Enviados e pagos</span><span>${pagos.length} · ${somaN(pagos)} ECV</span></div>`+pagos.map(cartao).join(""):"")+
+  (canc.length?`<details class="canc"><summary class="grp"><span>Cancelados (${canc.length}) ▾</span></summary>${canc.map(cartao).join("")}</details>`:"");
 }
 function vistoPronto(id){ if(_prontosNovos.delete(id)) desenharHist(); }
+function abrirEnviado(code,id){
+ _prontosNovos.delete(id);
+ if(_abertos.has(code)) _abertos.delete(code); else _abertos.add(code);
+ desenharHist();
+}
+function corrigirPago(code){
+ if(!confirm("Marcar o pedido "+code+" como AINDA POR PAGAR?")) return;
+ alternarPago(code);
+}
+/* MODIFICAR: o pedido enviado abre-se num cliente novo, com tudo o que tinha (e o estado do pagamento).
+   A cozinha só recebe a mudança quando se carrega em "Fechar e reenviar". */
+function linhasDoPedido(p){
+ if(Array.isArray(p.linhas)&&p.linhas.length)
+  return p.linhas.map(x=>({nome:x.n, base:String(x.n).replace(/\s*\(.*\)$/,""), preco:+x.p||0, q:+x.q||1}));
+ return (p.itens||[]).map(s=>{ const m=/^(\d+)x\s+(.*)$/.exec(s)||[0,1,s]; const n=m[2];
+  return {nome:n, base:String(n).replace(/\s*\(.*\)$/,""), preco:0, q:+m[1]||1}; });
+}
+function modificar(code){
+ const p=(pedidos||[]).find(x=>x.code===code); if(!p) return;
+ const j=balcoes.findIndex(b=>b.edita&&b.edita.code===code);
+ if(j>=0){ irBalcao(j); $("linhas").scrollIntoView({behavior:"smooth",block:"center"}); return; }
+ if(p.status==="pronto"||p.status==="entregue"){
+  if(!confirm("O pedido "+code+" já está "+(p.status==="pronto"?"pronto":"entregue")+".\n\nModificar mesmo assim?")) return;
+ }
+ const itens=linhasDoPedido(p);
+ if(itens.some(x=>!x.preco)) alert("Este pedido é antigo e não tem os preços guardados: confira os preços antes de reenviar.");
+ if(balcoes.length>=10){ alert("Feche um cliente antes de modificar (máximo 10)."); return; }
+ const pago=pagoEnviado[code]===true;
+ const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO|POR PAGAR)( · )?/,"");
+ const nome=/^Cliente \d+$/.test(p.nome||"")?"":(p.nome||"");
+ const vazio=balcoes.findIndex(b=>!b.itens.length&&!b.edita);
+ const novo={nome, itens, pago, notas:nt, edita:{code:p.code, id:p.id, total:+p.total||0, pago}};
+ if(vazio>=0){ balcoes[vazio]=novo; activo=vazio; } else { balcoes.push(novo); activo=balcoes.length-1; }
+ guardar(); desenharTudo(); desenharHist();
+ setTimeout(()=>{ try{ $("linhas").scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){} },50);
+}
+/* tira o pedido antigo depois de o novo estar na cozinha: apaga (o stock volta) ou, se não der, cancela */
+async function retirarAntigo(ed){
+ const tenta=async u=>{ try{ const r=await fetch(PROMO_API+u,{method:"POST"}); const d=await r.json(); return !!(r.ok && d && !d.erro); }catch(e){ return false; } };
+ const k="?key="+encodeURIComponent(KEY)+"&id="+encodeURIComponent(ed.id);
+ if(ed.id && await tenta("/order-del"+k)) return "apagado";
+ if(ed.id && await tenta("/order-status"+k+"&st=cancelado")) return "cancelado";
+ return null;
+}
 async function alternarPago(code){
  const p=(pedidos||[]).find(x=>x.code===code);
- const novo = !(pagoEnviado[code]===true);
- pagoEnviado[code]=novo; guardar(); desenharHist();
+ const novo = !(pagoEnviado[code]===true), antes = p ? p.balcaoPago : undefined;
+ pagoEnviado[code]=novo; if(p) p.balcaoPago=novo;      // a lista mostra já o estado novo (antes voltava atrás até à leitura seguinte)
+ guardar(); desenharHist();
  if(!p) return;
  try{
   const r=await fetch(PROMO_API+"/order-pago?key="+encodeURIComponent(KEY)+
