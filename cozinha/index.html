@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="manifest-cozinha.json">
+<script src="/painel-offline.js?v=1"></script>
 <meta name="theme-color" content="#1F4A38">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -158,6 +159,16 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 /* morada e andar: também são detalhes de quem prepara e entrega */
 .ped .mor{font-size:17px;font-weight:600;color:var(--ink);}
 .ped .andar{font-size:17px;font-weight:700;color:var(--vermelho);margin-top:8px;line-height:1.35;}
+
+/* ===== 15-10-2026: TABLET =====
+   Deitado: três colunas de pedidos e o stock em duas colunas. Ao alto: como no telemóvel (duas). */
+@media (min-width:1000px){
+ .wrap{max-width:1500px;padding:14px 20px;}
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+ #stockLista{columns:2;column-gap:14px;}
+ #stockLista .srow,#stockLista .scat{break-inside:avoid;}
+ #stockLista .scat:first-child{margin-top:0;}
+}
 </style>
 </head>
 <body>
@@ -293,7 +304,8 @@ async function carregar(){
   const d=await r.json();
   if(!d.erro){
    pedidos=d.pedidos||[];
-   _ultimaOk=Date.now(); falhas=0;
+   if(d._offline) falhas=Math.max(falhas,2);          // veio da cópia deste aparelho (sem internet)
+   else { _ultimaOk=Date.now(); falhas=0; }
    verificarNovos(pedidos);
    /* só redesenha quando alguma coisa mudou — assim o ecrã não salta
       nem perde um toque a meio de cada 3 segundos */
@@ -310,7 +322,7 @@ function mostrarLigacao(){
  if(!el || el.style.display==="none") return;
  const off = falhas>1 || !navigator.onLine;
  el.classList.toggle("off", off);
- if(off){ txt.textContent="sem ligação"; return; }
+ if(off){ txt.textContent="sem internet · a trabalhar neste aparelho"; return; }
  const s=Math.round((Date.now()-_ultimaOk)/1000);
  txt.textContent = s<5 ? "ligado" : ("há "+s+"s");
 }
@@ -363,9 +375,10 @@ function optAcai(opts){
    e só o texto escrito por quem atendeu fica na caixa da nota. */
 function blocoNotas(p){
   let txt=String(p.notas||"").trim(), etqs="";
-  const m=p.balcao ? txt.match(/^Cliente à espera\s*·\s*(PAGO|POR PAGAR)\s*(?:·\s*([\s\S]*))?$/) : null;
+  /* 15-10-2026: aceita também "PAGO (Dinheiro)" e "MODIFICADO (substitui …) · " — antes caía tudo na caixa da nota */
+  const m=p.balcao ? txt.match(/^(?:MODIFICADO \(substitui [^)]*\)\s*·\s*)?Cliente à espera\s*·\s*(PAGO(?:\s*\([^)]*\))?|POR PAGAR)\s*(?:·\s*([\s\S]*))?$/) : null;
   if(m){
-    const pago=(p.balcaoPago!==undefined && p.balcaoPago!==null) ? !!p.balcaoPago : (m[1]==="PAGO");
+    const pago=(p.balcaoPago!==undefined && p.balcaoPago!==null) ? !!p.balcaoPago : (m[1].indexOf("PAGO")===0);
     etqs=`<div class="etqs"><span class="etq">CLIENTE À ESPERA</span><span class="etq ${pago?"pg":"npg"}">${pago?"PAGO":"POR PAGAR"}</span></div>`;
     txt=(m[2]||"").trim();
   }
@@ -398,7 +411,7 @@ function desenhar(){
    <div class="origem${p.balcao?"":" online"}">${p.balcao?"Balcão":"Online"}</div>
    <div class="top"><span class="hora">levantar <b>${p.slot||"—"}</b></span>
     <span class="tipo ${ent?"ent":""}">${ent?"ENTREGA":"LEVANTAR"}</span></div>
-   <div class="meta">${p.code||""}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}${p.criado?" · pedido às "+p.criado:""}</div>
+   <div class="meta">${p.code||""}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}${p.criado?" · pedido às "+p.criado:""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
    ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
    <div class="acts">${acts}</div>
@@ -453,7 +466,7 @@ function tocarAlerta(){
 
 /* Toca só quando aparece um pedido que ainda não tinha sido visto */
 function verificarNovos(lista){
-  const ids = (lista||[]).map(p => p.id);
+  const ids = (lista||[]).map(p => p.code || p.id);   // pelo código: o id muda quando um pedido feito sem internet chega ao servidor
   if(_idsVistos === null){ _idsVistos = new Set(ids); return 0; }  // 1.ª carga: não alerta
   let novos = 0;
   ids.forEach(id => { if(!_idsVistos.has(id)){ novos++; _idsVistos.add(id); } });
