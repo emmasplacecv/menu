@@ -2567,15 +2567,29 @@ function desenharCamp(){
  else if(ver) b.innerHTML='<span><em>'+ct("campTag").split(" · ").map(x=>x.replace(/ /g,"\u00a0")).join("\u00a0· ")+'</em><b>'+ct("campLinha")+'</b><small>'+campNotaDia()+ct("campNota")+'</small></span><i aria-hidden="true">+</i>';
 }
 
+/* 15-10-2026: os códigos de bebidas frias valem para UMA bebida por código — a mais cara do pedido.
+   (antes: todas as bebidas frias do pedido, sem limite de quantidade) */
+const PROMO_UMA_UNIDADE=["BEBIDAS FRIAS"];
+function maisCaraDaCat(cat){ return cart.reduce((m,i)=> (i.icat===cat && i.price>m) ? i.price : m, 0); }
+function totalDaCat(cat){ return cart.reduce((s,i)=> s + ((i.icat===cat) ? i.price*i.q : 0), 0); }
+/* texto do código no ecrã e no resumo do pedido (o servidor ainda manda o texto antigo) */
+function textoPromo(p){
+ if(p && p.cat==="BEBIDAS FRIAS"){
+  if(p.tipo==="catfree") return "1 bebida fria grátis";
+  if(p.tipo==="pctcat")  return p.v+"% numa bebida fria";
+ }
+ return p ? p.d : "";
+}
 /* Valor bruto do desconto do código promocional */
 function descPromoBruto(){
  if(!promo) return 0;
+ const uma=PROMO_UMA_UNIDADE.includes(promo.cat);
  if(promo.tipo==="pct")  return Math.round(sub()*promo.v/100);
  if(promo.tipo==="fixo") return Math.min(promo.v, sub());
  if(promo.tipo==="catfree")
-  return cart.reduce((s,i)=> s + ((i.icat===promo.cat) ? i.price*i.q : 0), 0);
+  return uma ? maisCaraDaCat(promo.cat) : totalDaCat(promo.cat);
  if(promo.tipo==="pctcat")
-  return Math.round(cart.reduce((s,i)=> s + ((i.icat===promo.cat) ? i.price*i.q : 0), 0)*promo.v/100);
+  return Math.round((uma ? maisCaraDaCat(promo.cat) : totalDaCat(promo.cat))*promo.v/100);
  return 0;
 }
 /* Há no carrinho pelo menos um item da categoria do código? */
@@ -2705,7 +2719,7 @@ async function aplicarPromo(){
  if(p.modo && p.modo!==mode){ $("promoMsg").innerHTML='<span class="pbad">Só válido para '+(p.modo==="entrega"?"entregas":"levantamento no local")+'.</span>'; return; }
  if(p.min && sub()<p.min){ $("promoMsg").innerHTML='<span class="pbad">Precisa de '+p.min+' ECV em produtos para usar este código.</span>'; return; }
  if((p.tipo==="catfree"||p.tipo==="pctcat") && !temCategoria(p.cat)){ $("promoMsg").innerHTML='<span class="pbad">Este código é para '+p.cat.toLowerCase()+' — adicione ao pedido primeiro.</span>'; return; }
- promo=p;
+ promo=p; promo.d=textoPromo(p);
  mtr("promo_aplicada");
  $("fPromo").value=promo.c;
  refreshChk();
