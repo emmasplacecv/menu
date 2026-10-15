@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="manifest-vendas.json">
+<script src="/painel-offline.js?v=1"></script>
 <meta name="theme-color" content="#2F4029">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Vendas">
@@ -417,6 +418,29 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
 .caixa .cx-t{padding:8px 12px;background:#F2EEE4;font-size:11.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:700;color:var(--ink2);}
 .caixa .cx{display:flex;justify-content:space-between;padding:9px 12px;border-top:1px solid var(--line);font-size:14px;}
 .caixa .cx.nao{color:var(--vermelho);font-weight:700;}
+
+/* ===== 15-10-2026: TABLET (Samsung Galaxy Tab A 10.1, deitado) =====
+   Produtos e contas à esquerda; clientes, pedido e enviados à direita, sempre à vista.
+   No telemóvel (e no tablet ao alto) fica tudo como antes, uma coluna pela mesma ordem. */
+.pos{display:flex;flex-direction:column;}
+.colL,.colR{display:contents;}
+#tabs{order:1;} #boxProd{order:2;} #boxPed{order:3;} #boxEnv{order:4;} #boxStk{order:5;} #boxFecho{order:6;} #boxHisV{order:7;}
+@media (min-width:900px){
+ body{padding:10px 16px 16px;}
+ .top{margin-bottom:8px;}
+ .pos{display:grid;grid-template-columns:minmax(0,1fr) clamp(370px,35vw,460px);column-gap:16px;align-items:start;}
+ .colL,.colR{display:block;min-width:0;}
+ .colL{grid-column:1;grid-row:1;}
+ .colR{grid-column:2;grid-row:1;position:sticky;top:6px;max-height:calc(100vh - 12px);max-height:calc(100dvh - 12px);
+  overflow-y:auto;overscroll-behavior:contain;padding:10px 10px 80px 4px;margin-top:-10px;scrollbar-width:thin;}
+ .colR .tabs{grid-template-columns:repeat(auto-fill,minmax(86px,1fr));}
+ .grid{grid-template-columns:repeat(auto-fill,minmax(168px,1fr));}
+ .prod{min-height:112px;}
+ .catrow{flex-wrap:wrap;overflow-x:visible;}
+ #boxPed .tot b{font-size:26px;}
+ .anular{left:auto;right:16px;width:440px;}
+ .somBtn{bottom:calc(12px + env(safe-area-inset-bottom));}
+}
 </style>
 </head>
 <body>
@@ -444,9 +468,9 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
     </div>
   </div>
 
-  <div class="tabs" id="tabs"></div>
-
-  <div class="box">
+  <div class="pos">
+  <div class="colL">
+  <div class="box" id="boxProd">
     <input class="fld" id="fNome" placeholder="Nome do cliente (opcional)" onchange="guardarNome(this.value)">
     <div class="buscabox" id="buscabox" style="margin-top:12px">
       <input class="fld" id="fBusca" placeholder="Pesquisar produto…" oninput="pesquisar(this.value)">
@@ -456,34 +480,13 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
     <div class="grid" id="prods"></div>
   </div>
 
-  <div class="box">
-    <div class="sec">Pedido do balcão <span id="tabNome"></span></div>
-    <div id="linhas"></div>
-    <div id="editBan"></div>
-    <div class="pagar" id="pagar">
-      <div class="pg-tit"><span>Como paga?</span><b id="pgResumo"></b></div>
-      <div class="pg-met" id="pgMet" role="group" aria-label="Forma de pagamento"></div>
-      <div id="pgTroco"></div>
-    </div>
-    <textarea class="fld notas" id="fNotas" placeholder="Notas para a cozinha (sem açúcar, para viagem, alergias…)" onchange="guardarNotas(this.value)"></textarea>
-    <div class="tot"><span>Total</span><b id="total">0 ECV</b></div>
-    <button class="envia" id="btnEnviar" onclick="enviar()">Enviar para a cozinha</button>
-    <button class="limpar" id="btnLimpar" onclick="limpar()">Eliminar este pedido</button>
-    <div class="msg" id="envMsg"></div>
-  </div>
-
-  <div class="box">
-    <div class="sec">Pedidos enviados — hoje</div>
-    <div id="hist"><div class="vazio">Ainda não enviaste nenhum pedido.</div></div>
-  </div>
-
-  <div class="box">
+  <div class="box" id="boxStk">
     <div class="sec">Stock de hoje — o que resta</div>
     <div id="stkLista"><div class="vazio">Sem stock definido para hoje.</div></div>
     <div class="msg">Desconta sozinho em cada venda, aqui e no site. Os botões são só para correcções (partiu-se, ofereceste, contaste mal).</div>
   </div>
 
-  <div class="box">
+  <div class="box" id="boxFecho">
     <div class="sec">Fecho — vendas do dia</div>
     <div class="diarow">
       <input class="fld" type="date" id="fDia" onchange="carregarFecho()">
@@ -507,6 +510,34 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
     <div id="hvLista"><div class="vazio">Escolha um dia.</div></div>
     <div class="msg">Toque num pedido para ver os produtos e o comprovativo. Lista completa de vários dias, Excel e ZIP com todos os comprovativos: <b>Admin → Histórico</b>.</div>
   </div>
+  </div><!-- /colL -->
+
+  <div class="colR">
+  <div class="tabs" id="tabs"></div>
+
+  <div class="box" id="boxPed">
+    <div class="sec">Pedido do balcão <span id="tabNome"></span></div>
+    <div id="linhas"></div>
+    <div id="editBan"></div>
+    <div class="pagar" id="pagar">
+      <div class="pg-tit"><span>Como paga?</span><b id="pgResumo"></b></div>
+      <div class="pg-met" id="pgMet" role="group" aria-label="Forma de pagamento"></div>
+      <div id="pgTroco"></div>
+    </div>
+    <textarea class="fld notas" id="fNotas" placeholder="Notas para a cozinha (sem açúcar, para viagem, alergias…)" onchange="guardarNotas(this.value)"></textarea>
+    <div class="tot"><span>Total</span><b id="total">0 ECV</b></div>
+    <button class="envia" id="btnEnviar" onclick="enviar()">Enviar para a cozinha</button>
+    <button class="limpar" id="btnLimpar" onclick="limpar()">Eliminar este pedido</button>
+    <div class="msg" id="envMsg"></div>
+  </div>
+
+  <div class="box" id="boxEnv">
+    <div class="sec">Pedidos enviados — hoje</div>
+    <div id="hist"><div class="vazio">Ainda não enviaste nenhum pedido.</div></div>
+  </div>
+  </div><!-- /colR -->
+
+  </div><!-- /pos -->
 </div>
 
 <script>
@@ -996,18 +1027,18 @@ async function enviar(){
          + (b.notas ? " · " + b.notas : ""),
   morada:"", pago:false, balcao:true, balcaoPago:b.pago, balcaoMetodo:(b.pago?b.met:"")
  };
- let id=null;
+ let id=null, semNet=false;
  try{
   const r=await fetch(PROMO_API+"/order?key="+encodeURIComponent(KEY),{method:"POST",
    headers:{"Content-Type":"text/plain;charset=UTF-8"}, body:JSON.stringify(dados)});
   if(!r.ok) throw new Error("http "+r.status);
-  try{ const d=await r.json(); id=d.id||null; }catch(e){}
+  try{ const d=await r.json(); id=d.id||null; semNet=!!d.offline; }catch(e){}
  }catch(e){
   msg.className="msg bad"; msg.textContent="Não foi possível enviar. Verifica a ligação e tenta outra vez.";
   btn.disabled=false; return;
  }
  msg.className="msg ok";
- msg.textContent="Enviado para a cozinha · "+code+" · levantamento "+slot+(b.pago?" · PAGO ("+metTxt(b.met)+")":" · POR COBRAR — fica na lista vermelha «Por cobrar».");
+ msg.textContent=(semNet?"📴 Sem internet — guardado neste aparelho (segue sozinho quando a internet voltar) · ":"Enviado para a cozinha · ")+code+" · levantamento "+slot+(b.pago?" · PAGO ("+metTxt(b.met)+")":" · POR COBRAR — fica na lista vermelha «Por cobrar».");
  pagoEnviado[code]=b.pago;
  if(b.pago) metEnviado[code]={m:b.met,h:horaMais(0)};
  if(b.edita){
@@ -1230,7 +1261,7 @@ function desenharHist(){
   return `<div class="sx ${canc?"canc":(pg?"sim":"nao")}${_prontosNovos.has(p.id)?" novo-pronto":""}" data-code="${esc(p.code)}" data-id="${esc(p.id)}">
    <div class="cab" role="button" tabindex="0" aria-expanded="${ab}">
     <span class="lk" aria-hidden="true">🔒</span>
-    <span class="q"><b>${esc(p.nome||"")}</b><small>${esc(p.code)}${p.criado?" · "+esc(p.criado):""}${canc?"":` <span class="kst ${esc(p.status||"")}">${esc(EST_TXT[p.status]||p.status||"")}</span>`}${emEdicao.has(p.code)?" · ✎ em edição":""}</small></span>
+    <span class="q"><b>${esc(p.nome||"")}</b><small>${esc(p.code)}${p.criado?" · "+esc(p.criado):""}${canc?"":` <span class="kst ${esc(p.status||"")}">${esc(EST_TXT[p.status]||p.status||"")}</span>`}${emEdicao.has(p.code)?" · ✎ em edição":""}${p._offline?' · <b style="color:var(--vermelho)">📴 por enviar</b>':""}</small></span>
     <span class="v"><b>${p.total||0}</b><small>${canc?"CANCELADO":(pg?"✓ PAGO"+(m?" · "+esc(metTxt(m)).toUpperCase():""):"POR COBRAR")}</small></span>
    </div>
    ${(!pg&&!canc)?`<button type="button" class="cobrar2" onclick="abrirCobrar('${esc(p.code)}')">Cobrar ${p.total||0} ECV</button>`:""}
