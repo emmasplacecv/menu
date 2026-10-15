@@ -573,7 +573,7 @@ async function alternarEstado(){
 
 /* ---------- STOCK DO DIA (só comidas) ---------- */
 const CAT_COMIDA = ["DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
-let stock = {}, stockSujo = false;
+let stock = {}, stockSujo = false, stockMudados = new Set();
 
 function ehComida(cat){
   const n = String(cat||"").replace(/&amp;/g,"&").trim().toUpperCase();
@@ -586,7 +586,7 @@ async function carregarStock(){
     const d = await r.json();
     stock = chavesAtuais(d.itens || {});
   }catch(e){ stock = {}; }
-  stockSujo = false;
+  stockSujo = false; stockMudados.clear();
   $("btnStock").textContent = "Guardar stock";
   desenharStock();
 }
@@ -616,22 +616,37 @@ function setStock(nome, v){
     const n = parseInt(s, 10);
     if(isFinite(n) && n >= 0) stock[nome] = n;
   }
-  stockSujo = true;
+  stockSujo = true; stockMudados.add(nome);
   $("btnStock").textContent = "Guardar stock •";
 }
 
+/* 15-10-2026: grava SÓ os produtos que mudou. Antes gravava a lista inteira tal como estava
+   quando abriu o separador — e apagava as baixas que as vendas tinham feito entretanto. */
 async function gravarStock(){
+  const nomes = [...stockMudados];
+  if(!nomes.length){ alert("Não mudou nenhuma quantidade."); return; }
   try{
-    const r = await fetch(PROMO_API+"/stock-set?key="+encodeURIComponent(KEY),
-      {method:"POST", headers:{"Content-Type":"application/json"},
-       body: JSON.stringify({itens: stock})});
-    const d = await r.json();
-    if(d.erro){ alert(d.erro); return; }
-    stock = chavesAtuais(d.itens || {});
-    stockSujo = false;
-    $("btnStock").textContent = "Guardar stock";
+    let erro = null, antigo = false;
+    for(const n of nomes){
+      const q = (stock[n] === undefined) ? "" : stock[n];
+      const r = await fetch(PROMO_API+"/stock-item?key="+encodeURIComponent(KEY)+"&item="+encodeURIComponent(n)+"&q="+q, {method:"POST"});
+      const d = await r.json();
+      if(d.erro === "Escreva um código."){ antigo = true; break; }      // servidor ainda sem a função nova
+      if(d.erro){ erro = d.erro; break; }
+    }
+    if(antigo){
+      /* lê o stock de agora (com as baixas das vendas) e só troca o que foi mudado aqui */
+      const ra = await fetch(PROMO_API+"/stock-dia", {cache:"no-store"});
+      const atual = chavesAtuais((await ra.json()).itens || {});
+      nomes.forEach(n => { if(stock[n] === undefined) delete atual[n]; else atual[n] = stock[n]; });
+      const r = await fetch(PROMO_API+"/stock-set?key="+encodeURIComponent(KEY),
+        {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({itens: atual})});
+      const d = await r.json();
+      if(d.erro) erro = d.erro;
+    }
+    if(erro){ alert(erro); return; }
+    await carregarStock();
     alert("Stock do dia guardado.");
-    desenharStock();
   }catch(e){ alert("Não foi possível guardar."); }
 }
 
