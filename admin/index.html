@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="manifest-admin.json">
+<script src="/painel-offline.js?v=1"></script>
 <meta name="theme-color" content="#2E2018">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -242,6 +243,18 @@ body{padding-bottom:76px;}
 .estado.cfg.camp .ebts .mini.des:not(.cur){border-color:var(--ink2);color:var(--ink);}
 .estado.cfg.camp .ebts .mini.lig:not(.cur){border-color:#2E6B32;color:#2E6B32;}
 .estado.cfg.camp .ebts .mini.apa{padding-left:5px;padding-right:5px;}
+
+/* ===== 15-10-2026: TABLET =====
+   Deitado: página mais larga, pedidos e esgotados em duas colunas. Ao alto: como no telemóvel. */
+@media (min-width:1000px){
+ .wrap{max-width:1180px;}
+ #pedidos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start;}
+ #pedidos>.ped{margin-bottom:0;}
+ #pedidos>.aviso{grid-column:1/-1;}
+ #lista{columns:2;column-gap:14px;}
+ #lista .row,#lista .cat{break-inside:avoid;}
+ #lista .cat:first-child{margin-top:0;}
+}
 </style>
 </head>
 <body>
@@ -1155,7 +1168,7 @@ async function carregarPedidos(){
    <div class="top"><span class="hora">${p.slot||"—"}</span>
     <span class="tipo ${ent?"ent":""}">${ent?"ENTREGA":"LEVANTAR"}</span></div>
    <div class="cli"><b>${p.nome||"(sem nome)"}</b>${p.tel?` · <a href="tel:${p.tel.replace(/\s/g,"")}" style="color:var(--verde);font-weight:600;text-decoration:none">${p.tel}</a>`:""}
-    · <span class="cod">${p.code||""}</span>
+    · <span class="cod">${p.code||""}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
     ${p._futuro?' · <b style="color:#8A5A12">'+(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
    ${linhaFeito(p)}
    <ul>${p.itens.map(i=>`<li>${i}</li>`).join("")}</ul>
@@ -1435,7 +1448,7 @@ function tocarAlerta(){
 
 /* Toca só quando aparece um pedido que ainda não tinha sido visto */
 function verificarNovos(lista){
-  const ids = (lista||[]).map(p => p.id);
+  const ids = (lista||[]).map(p => p.code || p.id);   // pelo código: o id muda quando um pedido feito sem internet chega ao servidor
   if(_idsVistos === null){ _idsVistos = new Set(ids); return 0; }  // 1.ª carga: não alerta
   let novos = 0;
   ids.forEach(id => { if(!_idsVistos.has(id)){ novos++; _idsVistos.add(id); } });
