@@ -162,6 +162,8 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped li .opt .dt{padding:3px 10px;border-radius:8px;border:2px solid var(--ink);background:#fff;}
 .ped li .opt .dt.gr{background:var(--dark);border-color:var(--dark);color:#F7F1E4;letter-spacing:.6px;}
 .ped li .opt .dt.sem{border-color:var(--vermelho);color:var(--vermelho);text-transform:uppercase;}
+/* 16-10-2026: leite diferente do normal (aveia, coco, soja, amêndoa, sem lactose) muda a bebida: em destaque */
+.ped li .opt .dt.lt{background:#FFE7A8;border-color:#8A5A12;color:#4A3204;font-weight:800;text-transform:uppercase;letter-spacing:.4px;}
 .ped li .opt .soacai{padding:3px 10px;border-radius:8px;}
 .ped li .opt .xtop{padding:2px 9px;border-radius:8px;}
 /* morada e andar: também são detalhes de quem prepara e entrega */
@@ -332,6 +334,7 @@ function mostrarLigacao(){
  const off = falhas>1 || !navigator.onLine;
  el.classList.toggle("off", off);
  if(off){ txt.textContent="sem internet · a trabalhar neste aparelho"; return; }
+ if(!_ultimaOk){ txt.textContent="a ligar…"; return; }   // ainda não houve resposta (antes mostrava "há 1792169425s")
  const s=Math.round((Date.now()-_ultimaOk)/1000);
  txt.textContent = s<5 ? "ligado" : ("há "+s+"s");
 }
@@ -364,6 +367,7 @@ function artigo(txt){
 function detalhes(opts){
   return String(opts).split(/\s*,\s*/).filter(Boolean).map(o=>{
     if(/^grande$/i.test(o)) return '<span class="dt gr">GRANDE</span>';
+    if(/^leite\s(?!em p|condensado)/i.test(o)) return `<span class="dt lt">${esc(o)}</span>`;
     return `<span class="dt${/^sem\s/i.test(o)?" sem":""}">${esc(o)}</span>`;
   }).join("");
 }
@@ -781,8 +785,9 @@ async function testarNotificacao(){
       alert("Nenhum aparelho registado.\n\nToque em «Activar notificações» primeiro.");
       return;
     }
+    const APP = {gestao:"Gestão", cozinha:"Cozinha", vendas:"Vendas"};
     const linhas = (d.resultado||[]).map(x =>
-      "• " + (x.estado===201||x.estado===200 ? "ENVIADO (" + x.estado + ")" : "FALHOU: " + x.estado)
+      "• " + (x.papel ? (APP[x.papel]||x.papel) + ": " : "") + (x.estado===201||x.estado===200 ? "ENVIADO (" + x.estado + ")" : "FALHOU: " + x.estado)
       + (x.resposta ? "\n  " + x.resposta : "")
     ).join("\n");
     alert("Aparelhos registados: " + d.aparelhos + "\n\n" + linhas +
