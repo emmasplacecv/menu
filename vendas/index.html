@@ -425,6 +425,36 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
 .pos{display:flex;flex-direction:column;}
 .colL,.colR{display:contents;}
 #tabs{order:1;} #boxProd{order:2;} #boxPed{order:3;} #boxEnv{order:4;} #boxStk{order:5;} #boxFecho{order:6;} #boxHisV{order:7;}
+/* ===== 16-10-2026: FOLHA DE OPÇÕES — leite, extras dos sumos, tamanho e combos =====
+   O leite normal já vem marcado: um café normal continua a ser um toque no produto e outro no tamanho. */
+.tam-box{max-height:94vh;max-height:94dvh;overflow-y:auto;}
+.tam-box .sub:empty{display:none;}
+.op-grp{margin:0 0 14px;}
+.op-grp .vgrp{margin:0 0 8px;}
+.op-grp .vtops .tp{min-height:48px;}
+.vtops .tp:disabled{opacity:.4;text-decoration:line-through;cursor:default;}
+.vtops .tp.on small{color:#E3EED9;}
+.vtops .tp.fixo{cursor:default;}
+.tam-ops button.um{grid-column:1/-1;min-height:76px;background:var(--verde2);border-color:var(--verde2);color:#F7F1E4;}
+.tam-ops button.um span{color:#F7F1E4;}
+.tam-ops button.um:disabled{opacity:.45;}
+.prod .cbd{font-size:12.5px;line-height:1.3;color:var(--ink2);font-weight:500;}
+/* ===== 16-10-2026: CATEGORIAS COM SWIPE =====
+   Uma "página" por categoria, lado a lado. Deslizar o dedo para o lado passa para a categoria
+   seguinte/anterior (scroll nativo com íman: pára sempre na categoria ao lado). Os botões das
+   categorias continuam a funcionar e acompanham o deslizar. A altura segue a categoria à vista. */
+.trilho{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+ overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;transition:height .2s ease;}
+.trilho::-webkit-scrollbar{display:none;}
+.trilho .pag{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always;}
+.pagtit{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 2px 8px;min-height:34px;}
+.pagtit b{flex:none;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--tinta);}
+.pagtit .viz{display:flex;gap:6px;min-width:0;justify-content:flex-end;}
+.pagtit .viz button{min-width:0;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+ padding:7px 10px;border:1.5px solid var(--line);border-radius:999px;background:transparent;color:var(--ink2);
+ font-family:inherit;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;}
+@media(max-width:520px){ .pagtit .viz button{width:42px;height:34px;padding:0;font-size:18px;line-height:1;}
+ .pagtit .viz button span{display:none;} }   /* telemóvel: só as setas */
 @media (min-width:900px){
  body{padding:10px 16px 16px;}
  .top{margin-bottom:8px;}
@@ -477,7 +507,8 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
       <button onclick="limparBusca()" aria-label="Limpar pesquisa">×</button>
     </div>
     <div class="catrow" id="cats"></div>
-    <div class="grid" id="prods"></div>
+    <div class="grid" id="prods" style="display:none"></div>
+    <div class="trilho" id="trilho"></div>
   </div>
 
   <div class="box" id="boxStk">
@@ -559,6 +590,24 @@ function migrarNomes(ed){
 }
 const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 790, "sp": 890, "xp": 50, "ml": 355, "d": "copo 355 ml", "base": ["Granola", "Leite em pó"], "fr": ["Banana", "Morango", "Frutos vermelhos", "Kiwi"], "tp": ["Leite condensado"], "xt": ["Caramelo", "Chocolate", "Morango"], "top": ["Granola", "Leite em pó", "Banana", "Morango", "Frutos vermelhos", "Kiwi", "Leite condensado"]}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 375}, {"n": "Sumo de Maçã", "m": 375}, {"n": "Sumo de Manga", "m": 400}, {"n": "Sumo de Papaia", "m": 450}, {"n": "Sumo de Ananás", "m": 500}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
 
+/* ---- 16-10-2026: opções iguais às do site (index.html: LEITES, milk/nm, extras, COMBOS) ----
+   Os preços dos leites e dos extras estão aqui e no site; os dos combos vêm do /admin. */
+const LEITES=[["Normal",0],["Aveia",100],["Coco",100],["Soja",100],["Amêndoa",100],["Sem lactose",100]];
+const CAT_LEITE=["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS"];   // categorias com escolha de leite
+const SEM_LEITE=["Espresso","Espresso Duplo","Americano"];             // nestas não se escolhe leite
+const CAT_EXTRAS={"SUMOS NATURAIS":[["Gengibre",50],["Hortelã",50]]};
+/* partes = o que o cliente escolhe em cada combo; serve para a cozinha saber e para descontar o stock */
+const COMBOS_BASE=[
+ {n:"PEQUENO-ALMOÇO",d:"espresso + donut ou muffin de chocolate",p:225,partes:[["Espresso"],["Donut de Chocolate","Donut de Doce de Leite","Muffin de Chocolate"]]},
+ {n:"LANCHE",d:"café gelado ou frappé clássico + donut",p:405,partes:[["Café Instantâneo Gelado","Frappé Clássico"],["Donut de Chocolate","Donut de Doce de Leite"]]},
+ {n:"SOPA E PÃO",d:"sopa do dia + pão recheado de frango ou caprese",p:500,partes:[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"]]},
+ {n:"ALMOÇO LEVE",d:"pão recheado de frango ou caprese + sumo de laranja ou maçã",p:570,partes:[["Pão Recheado de Frango","Pão Recheado Caprese"],["Sumo de Laranja","Sumo de Maçã"]]},
+ {n:"SALADA E PÃO",d:"salada fria de frango + pão recheado de frango ou caprese",p:640,partes:[["Salada Fria de Frango"],["Pão Recheado de Frango","Pão Recheado Caprese"]]},
+ {n:"SALADA E SUMO",d:"salada fria de frango + sumo de laranja ou maçã",p:785,partes:[["Salada Fria de Frango"],["Sumo de Laranja","Sumo de Maçã"]]},
+ {n:"SUPER COMBO",d:"sopa + pão recheado de frango ou caprese + café gelado ou frappé clássico",p:760,partes:[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"],["Café Instantâneo Gelado","Frappé Clássico"]]}
+];
+let comboEd={};       // preços (cp), retirados (coff), novos (cadd) e ordem (cord) dos combos, do /admin
+
 let KEY="", cat=0, activo=0, pedidos=[];
 let balcoes=[novoBalcao(),novoBalcao(),novoBalcao(),novoBalcao()];
 let pagoEnviado={};   // estado de pagamento dos pedidos já enviados (só neste aparelho)
@@ -575,7 +624,7 @@ function metDe(p){
 }
 function novoBalcao(){ return {nome:"",itens:[],pago:false,met:null,recebido:null,notas:"",edita:null}; }
 let esgotados=[], stock={};
-const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO"];
+const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO","COMBOS"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const IC_X='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
@@ -598,7 +647,9 @@ async function entrar(){
  $("loginBox").style.display="none";
  $("painel").style.display="block";
  await Promise.all([aplicarEdicao(), carregarEsgotados(), carregarStock()]);
+ montarCombos();
  ordenarCategorias();
+ ordenarProdutos();
  restaurar(); desenharTabs(); desenharCats(); desenharProdutos(); desenharPedido(); desenharHist(); desenharStock();
  $("fDia").value=hojeISO(); carregarFecho(); try{ hvDia(0); }catch(e){}
  setInterval(()=>{ if(document.visibilityState==="visible") carregarPedidos(); }, 7000);
@@ -624,6 +675,7 @@ async function aplicarEdicao(){
  try{ const r=await fetch(PROMO_API+"/menu-edit"); const d=await r.json(); if(!d.erro) ed=d.edit||null; }catch(e){}
  if(!ed) return;
  ed=migrarNomes(ed);
+ comboEd={cp:ed.cp||{}, coff:ed.coff||[], cadd:ed.cadd||[], cord:ed.cord||[]};
  const norm=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
  MENU.forEach(c=>c[1].forEach(i=>{
   if(i.top){   // açaí: três preços próprios no /admin (mesmas chaves que o site)
@@ -650,14 +702,50 @@ async function carregarEsgotados(){
 async function carregarStock(){
  try{ const r=await fetch(PROMO_API+"/stock-dia"); const d=await r.json(); stock=chavesAtuais(d.itens||{}); }catch(e){}
 }
+/* COMBOS: os do site, com os preços, retirados, novos e ordem definidos no /admin (como no site) */
+function montarCombos(){
+ const e=comboEd||{};
+ let l=COMBOS_BASE.map(c=>Object.assign({},c));
+ Object.keys(e.cp||{}).forEach(n=>{ const c=l.find(x=>x.n===n); if(c && +e.cp[n]>0) c.p=+e.cp[n]; });
+ const off=e.coff||[]; l=l.filter(c=>!off.includes(c.n));
+ (e.cadd||[]).forEach(a=>{ if(a && a.n && !l.some(c=>c.n===a.n)) l.push({n:a.n, d:a.d||"", p:+a.p||0, partes:null}); });
+ const ord=e.cord||[];
+ if(ord.length) l.sort((a,b)=>{ const ia=ord.indexOf(a.n), ib=ord.indexOf(b.n); return (ia<0?999:ia)-(ib<0?999:ib); });
+ const itens=l.filter(c=>c.p>0).map(c=>({n:"Combo "+c.n, m:c.p, d:c.d, cb:c}));
+ const k=MENU.findIndex(c=>c[0]==="COMBOS");
+ if(k>=0) MENU[k][1]=itens; else if(itens.length) MENU.push(["COMBOS",itens]);
+}
+/* 16-10-2026: dentro de cada categoria, por nome e depois por preço.
+   "Nome" = a primeira palavra (Frappé…, Sumo…, Pão…, Combo…), por ordem alfabética: os da mesma
+   família ficam juntos; dentro da família, do mais barato ao mais caro; empate de preço, pelo nome todo. */
+function ordenarProdutos(){
+ const fam=n=>normalizar(String(n).split(/\s+/)[0]);
+ MENU.forEach(c=>c[1].sort((a,b)=>
+  fam(a.n).localeCompare(fam(b.n),"pt") || ((+a.m||0)-(+b.m||0)) || a.n.localeCompare(b.n,"pt",{sensitivity:"base"})));
+}
 /* categorias pela ordem que mais vende — menos scroll na hora de ponta */
 function ordenarCategorias(){
  const pos=c=>{ const i=ORDEM_CAT.indexOf(String(c[0]).replace(/&amp;/g,"&").trim()); return i<0?99:i; };
  MENU.sort((a,b)=>pos(a)-pos(b));
 }
+/* o que uma linha do pedido gasta do stock, por unidade: o próprio produto, ou as partes do combo */
+function itemPorNome(n){
+ for(const c of MENU){ if(c[0]==="COMBOS") continue; const i=c[1].find(v=>v.n===n); if(i) return i; }
+ return null;
+}
+function stkLinha(x){
+ if(x.stk) return x.stk;
+ const base=x.base||x.nome;
+ if(/^Combo /.test(base)){                      // pedido antigo ou reaberto: lê as partes do nome
+  const m=/\(([^()]*)\)\s*$/.exec(x.nome||""), o={};
+  if(m) m[1].split(/\s*,\s*/).forEach(n=>{ if(itemPorNome(n)) o[n]=(o[n]||0)+1; });
+  return o;
+ }
+ return {[base]:1};
+}
 /* stock já comprometido nos balcões abertos, ainda por enviar */
 function reservado(nome){
- return balcoes.reduce((s,b)=>s+b.itens.filter(x=>(x.base||x.nome)===nome).reduce((t,x)=>t+x.q,0),0);
+ return balcoes.reduce((s,b)=>s+b.itens.reduce((t,x)=>t+(stkLinha(x)[nome]||0)*x.q,0),0);
 }
 function restam(nome){
  if(stock[nome]===undefined) return null;
@@ -772,7 +860,52 @@ function desenharCats(){
  $("cats").innerHTML=MENU.map((c,i)=>
   `<button class="${i===cat&&!busca?"sel":""}" onclick="irCat(${i})">${esc(c[0])}</button>`).join("");
 }
-function irCat(i){ cat=i; limparBusca(); desenharCats(); desenharProdutos(); }
+/* tocar numa categoria: desliza até ela */
+function irCat(i){
+ const mudou=(i!==cat);
+ cat=i; limparBusca(); marcarCat();
+ irPagina(i,true);
+ if(mudou) trazerCatsAVista();
+}
+/* ---------- SWIPE ENTRE CATEGORIAS (16-10-2026) ---------- */
+function irPagina(i,suave){
+ const tr=$("trilho"); if(!tr || !tr.clientWidth) return;
+ tr.scrollTo({left:i*tr.clientWidth, behavior:suave?"smooth":"auto"});
+ if(!suave) ajustarAltura();
+}
+function marcarCat(){
+ const bs=$("cats").children;
+ for(let k=0;k<bs.length;k++) bs[k].classList.toggle("sel", k===cat && !busca);
+ const b=bs[cat], row=$("cats");
+ if(b && row.scrollWidth>row.clientWidth)          // telemóvel: o botão da categoria fica à vista
+  row.scrollTo({left:Math.max(0,b.offsetLeft-(row.clientWidth-b.offsetWidth)/2), behavior:"smooth"});
+}
+function ajustarAltura(){
+ const tr=$("trilho"), pg=tr && tr.children[cat];
+ if(pg) tr.style.height=pg.offsetHeight+"px";
+}
+/* se o ecrã estiver lá em baixo, sobe até aos botões das categorias (a nova pode ser mais curta) */
+function trazerCatsAVista(){
+ const r=$("cats").getBoundingClientRect();
+ if(r.top<0) window.scrollBy({top:r.top-10, behavior:"smooth"});
+}
+let _tDesl=0, _catAntes=0;
+function aoDeslizar(){
+ const tr=$("trilho"), w=tr.clientWidth||1;
+ const i=Math.max(0,Math.min(MENU.length-1,Math.round(tr.scrollLeft/w)));
+ if(i!==cat){ cat=i; marcarCat(); }
+ clearTimeout(_tDesl); _tDesl=setTimeout(fimDeslizar,130);
+}
+function fimDeslizar(){
+ ajustarAltura();
+ if(cat!==_catAntes){ _catAntes=cat; trazerCatsAVista(); }
+}
+(function(){
+ const tr=document.getElementById("trilho"); if(!tr) return;
+ tr.addEventListener("scroll",aoDeslizar,{passive:true});
+ let _w=0;
+ window.addEventListener("resize",()=>{ const w=tr.clientWidth; if(w && w!==_w){ _w=w; irPagina(cat,false); } });
+})();
 
 /* devolve os produtos a mostrar: da categoria activa, ou — a pesquisar —
    de todo o menu, cada um com a categoria a que pertence */
@@ -793,7 +926,7 @@ function qtdNoPedido(nome){
    (Médio / Grande). O nome no pedido continua igual: "X" é o médio, "X (Grande)" o grande. */
 function cartaoProduto(ci,ii,i,catNome){
  const r=restam(i.n);
- const fora=esgotados.includes(i.n) || r===0;
+ const fora=esgotados.includes(i.n) || r===0 || (i.cb && !comboDisponivel(i.cb));
  const cls=r===null?"":(r===0?"zero":(r<=3?"baixo":"ok"));
  const stk=r===null?"":`<span class="stk ${cls}">${r===0?"esgotado":"restam "+r}</span>`;
  const cat=catNome?`<span class="catnome">${esc(catNome)}</span>`:"";
@@ -802,7 +935,7 @@ function cartaoProduto(ci,ii,i,catNome){
  const badge=q>0?`<span class="qtd-badge">${q}</span>`:"";
  const tira=q>0?`<button type="button" class="tira" onclick="tirarUm(${ci},${ii})" aria-label="Retirar ${esc(i.n)} do pedido">${IC_X}</button>`:"";
  return `<div class="pw"><button class="prod${fora?" fora":""}${q>0?" sel":""}" onclick="add(${ci},${ii})">
-  ${badge}${cat}<b>${esc(i.n)}</b><span class="preco">${preco} ECV</span>${stk}</button>${tira}</div>`;
+  ${badge}${cat}<b>${esc(i.n)}</b>${i.cb&&i.d?`<span class="cbd">${esc(i.d)}</span>`:""}<span class="preco">${preco} ECV</span>${stk}</button>${tira}</div>`;
 }
 /* X do cartão: tira uma unidade (a última linha desse produto — tamanho ou açaí escolhido por último).
    Quando chega a zero, o cartão deixa de estar seleccionado. */
@@ -813,45 +946,135 @@ function tirarUm(ci,ii){
  try{ if(navigator.vibrate) navigator.vibrate(25); }catch(e){}
  mudarQtd(k,-1);
 }
+/* Sem pesquisa: uma página por categoria (swipe). A pesquisar: uma grelha só com os resultados. */
 function desenharProdutos(){
- const lista=produtosAMostrar();
- if(!lista.length){ $("prods").innerHTML='<div class="vazio">Nenhum produto encontrado.</div>'; return; }
- $("prods").innerHTML=lista.map(({ci,ii,item:i,catNome})=>cartaoProduto(ci,ii,i,catNome)).join("");
+ const tr=$("trilho"), pr=$("prods");
+ if(busca){
+  tr.style.display="none"; pr.style.display="";
+  const lista=produtosAMostrar();
+  pr.innerHTML = lista.length ? lista.map(({ci,ii,item:i,catNome})=>cartaoProduto(ci,ii,i,catNome)).join("")
+                              : '<div class="vazio">Nenhum produto encontrado.</div>';
+  return;
+ }
+ const escondido=(tr.style.display==="none");
+ pr.style.display="none"; tr.style.display="";
+ if(tr.children.length!==MENU.length)
+  tr.innerHTML=MENU.map((c,ci)=>`<div class="pag" data-ci="${ci}" role="group" aria-label="${esc(c[0])}"></div>`).join("");
+ MENU.forEach((c,ci)=>{
+  const ant=ci>0?`<button type="button" onclick="irCat(${ci-1})" aria-label="Categoria anterior">‹<span> ${esc(MENU[ci-1][0])}</span></button>`:"";
+  const seg=ci<MENU.length-1?`<button type="button" onclick="irCat(${ci+1})" aria-label="Categoria seguinte"><span>${esc(MENU[ci+1][0])} </span>›</button>`:"";
+  tr.children[ci].innerHTML=`<div class="pagtit"><b>${esc(c[0])}</b><span class="viz">${ant}${seg}</span></div>`+
+   `<div class="grid">${c[1].map((i,ii)=>cartaoProduto(ci,ii,i)).join("") || '<div class="vazio">Sem produtos.</div>'}</div>`;
+ });
+ if(escondido || Math.round(tr.scrollLeft/(tr.clientWidth||1))!==cat) irPagina(cat,false);
+ ajustarAltura();
 }
-function add(ci,ii,sz){
+function add(ci,ii){
  const i=MENU[ci][1][ii];
  const r=restam(i.n);
  if(r!==null && r<=0){ alert("Já não há "+i.n+" para hoje."); return; }
+ if(i.cb && !comboDisponivel(i.cb)){ alert("Já não há o que este combo leva."); return; }
  if(i.top){ abrirAcai(i); return; }            // açaí: escolher o que leva
- if(i.g && !sz){ abrirTamanho(ci,ii); return; } // bebida com dois tamanhos: escolher agora
- const nome=i.n+(sz==="G"?" (Grande)":"");     // mantém "Grande" no pedido/recibo
- const preco=(sz==="G"&&i.g)?i.g:i.m;
- meter(nome,i.n,preco);
+ if(i.g || i.cb || temLeite(ci,i) || extrasDe(ci)){ abrirTamanho(ci,ii); return; }   // escolher tamanho/leite/extras/partes
+ meter(i.n,i.n,i.m);
 }
-/* ---------- TAMANHO (Médio / Grande) ---------- */
-let tamEscolha=null;
+/* ---------- FOLHA DE OPÇÕES (tamanho, leite, extras, partes do combo) ----------
+   Abre com o leite normal marcado e sem extras: no caso normal basta tocar no tamanho.
+   O nome no pedido segue o do site: "Iced Latte (Grande, leite aveia)" · "Sumo de Laranja (gengibre)".
+   Sem "Grande" é o médio, como sempre nas Vendas. */
+const normCat=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
+function temLeite(ci,i){ return CAT_LEITE.includes(normCat(MENU[ci][0])) && !SEM_LEITE.includes(i.n) && !i.top && !i.cb; }
+function extrasDe(ci){ return CAT_EXTRAS[normCat(MENU[ci][0])]||null; }
+function disponivel(n){ const r=restam(n); return !esgotados.includes(n) && !(r!==null && r<=0); }
+function opcoesParte(p){ const l=p.filter(n=>itemPorNome(n)); return l.length?l:p; }   // sem os produtos retirados do menu
+function comboDisponivel(cb){ return !cb.partes || cb.partes.every(p=>opcoesParte(p).some(disponivel)); }
+let opc=null;
 function abrirTamanho(ci,ii){
  const i=MENU[ci][1][ii];
- tamEscolha={ci,ii};
+ opc={ci,ii,i,leite:"Normal",ex:[],esc:[]};
+ if(i.cb && i.cb.partes) opc.esc=i.cb.partes.map(p=>opcoesParte(p).find(disponivel)||null);
  $("tNome").textContent=i.n;
- $("tOps").innerHTML=[["M","Médio",i.m],["G","Grande",i.g]].map(([sz,nm,p])=>
-  `<button type="button" data-sz="${sz}" onclick="escolherTamanho('${sz}')"><b>${nm}</b><span>${p} ECV</span></button>`).join("");
+ desenharOpcoesProd();
  $("tamBg").classList.add("on");
 }
-function fecharTamanho(){ $("tamBg").classList.remove("on"); tamEscolha=null; }
-function escolherTamanho(sz){ const e=tamEscolha; fecharTamanho(); if(e) add(e.ci,e.ii,sz); }
-document.addEventListener("keydown",e=>{ if(e.key==="Escape" && tamEscolha) fecharTamanho(); });
-/* no pedido, o médio diz "Médio" por baixo do nome — já não há cartão (M) para confirmar */
+function fecharTamanho(){ $("tamBg").classList.remove("on"); opc=null; }
+function precoOpc(sz){
+ const o=opc, i=o.i;
+ let p=(sz==="G"&&i.g)?i.g:i.m;
+ if(temLeite(o.ci,i) && o.leite!=="Normal"){ const L=LEITES.find(l=>l[0]===o.leite); if(L) p+=L[1]; }
+ const ex=extrasDe(o.ci)||[];
+ o.ex.forEach(n=>{ const e=ex.find(x=>x[0]===n); if(e) p+=e[1]; });
+ return p;
+}
+function desenharOpcoesProd(){
+ const o=opc, i=o.i;
+ const bt=(txt,on,fn,extra,dis,fixo)=>`<button type="button" class="tp${on?" on":""}${fixo?" fixo":""}"${dis?" disabled":""}${fn?` onclick="${fn}"`:""}>${esc(txt)}${extra?` <small>${esc(extra)}</small>`:""}</button>`;
+ let h="";
+ $("tSub").textContent = (i.cb && i.cb.d) ? i.cb.d : "";
+ if(i.cb && i.cb.partes){
+  i.cb.partes.forEach((p,k)=>{
+   const l=opcoesParte(p), varias=l.length>1;
+   h+=`<div class="op-grp"><div class="vgrp"><span>${varias?"Escolha":"Inclui"}</span></div><div class="vtops">`+
+    l.map((n,j)=>{ const ok=disponivel(n); return bt(n, o.esc[k]===n, (varias&&ok)?`opEsc(${k},${j})`:"", ok?"":"esgotado", !ok, !varias); }).join("")+`</div></div>`;
+  });
+ }
+ if(temLeite(o.ci,i)){
+  h+=`<div class="op-grp"><div class="vgrp"><span>Leite</span><em>normal incluído</em></div><div class="vtops">`+
+   LEITES.map(([n,v],j)=>bt(n, o.leite===n, `opLeite(${j})`, v?"+"+v:"")).join("")+`</div></div>`;
+ }
+ const ex=extrasDe(o.ci);
+ if(ex){
+  h+=`<div class="op-grp"><div class="vgrp"><span>Extras</span><em class="pago">+${ex[0][1]} ECV cada</em></div><div class="vtops">`+
+   ex.map(([n,v],j)=>bt(n, o.ex.includes(n), `opExtra(${j})`, "+"+v)).join("")+`</div></div>`;
+ }
+ if(i.g) h+=`<div class="vgrp" style="margin:0 0 8px"><span>Tamanho — toque para juntar ao pedido</span></div>`;
+ $("tCorpo").innerHTML=h;
+ const falta=!!(i.cb && i.cb.partes && o.esc.some(x=>!x));
+ $("tOps").innerHTML = i.g
+  ? [["M","Médio"],["G","Grande"]].map(([sz,nm])=>`<button type="button" data-sz="${sz}" onclick="escolherTamanho('${sz}')"><b>${nm}</b><span>${precoOpc(sz)} ECV</span></button>`).join("")
+  : `<button type="button" class="um" data-sz="M"${falta?" disabled":""} onclick="escolherTamanho('M')"><b>${falta?"Esgotado":"Juntar ao pedido"}</b><span>${precoOpc("M")} ECV</span></button>`;
+}
+function opLeite(j){ if(!opc) return; opc.leite=LEITES[j][0]; desenharOpcoesProd(); }
+function opExtra(j){
+ if(!opc) return; const n=(extrasDe(opc.ci)||[])[j]; if(!n) return;
+ const k=opc.ex.indexOf(n[0]); if(k>=0) opc.ex.splice(k,1); else opc.ex.push(n[0]);
+ desenharOpcoesProd();
+}
+function opEsc(k,j){ if(!opc||!opc.i.cb) return; opc.esc[k]=opcoesParte(opc.i.cb.partes[k])[j]; desenharOpcoesProd(); }
+function escolherTamanho(sz){
+ const o=opc; if(!o) return;
+ const i=o.i;
+ if(i.cb){
+  if(i.cb.partes){
+   if(o.esc.some(x=>!x)) return;
+   const falta=o.esc.find(n=>!disponivel(n));
+   if(falta){ alert("Já não há "+falta+" para hoje."); return; }
+   const stk={}; o.esc.forEach(n=>{ stk[n]=(stk[n]||0)+1; });
+   fecharTamanho();
+   meter(i.n+" ("+o.esc.join(", ")+")", i.n, i.m, stk);
+  } else { fecharTamanho(); meter(i.n+(i.d?" ("+i.d+")":""), i.n, i.m, {}); }   // combo novo do /admin: sem partes
+  return;
+ }
+ const det=[];
+ if(sz==="G" && i.g) det.push("Grande");
+ if(temLeite(o.ci,i) && o.leite!=="Normal") det.push("leite "+o.leite.toLowerCase());
+ o.ex.forEach(n=>det.push(n.toLowerCase()));
+ const preco=precoOpc(sz);
+ fecharTamanho();
+ meter(i.n+(det.length?" ("+det.join(", ")+")":""), i.n, preco);
+}
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && opc) fecharTamanho(); });
+/* no pedido, o médio diz "Médio" por baixo do nome */
 function tamanhoTxt(x){
- if(x.nome!==x.base) return "";
- const i=MENU.reduce((a,c)=>a||c[1].find(v=>v.n===x.base),null);
- return (i && i.g && !i.top) ? "Médio · " : "";
+ const i=itemPorNome(x.base||x.nome);
+ if(!i || !i.g || i.top) return "";
+ return /\((?:[^)]*,\s*)?Grande\b/.test(x.nome) ? "" : "Médio · ";
 }
 /* mete uma linha no balcão activo (base = nome do stock) */
-function meter(nome,base,preco){
+function meter(nome,base,preco,stk){
  const b=balcoes[activo];
  const ex=b.itens.find(x=>x.nome===nome);
- if(ex) ex.q++; else b.itens.push({nome,base,preco,q:1});
+ if(ex) ex.q++; else b.itens.push(Object.assign({nome,base,preco,q:1}, stk?{stk}:{}));
  try{ if(navigator.vibrate) navigator.vibrate(12); }catch(e){}
  guardar(); desenharTabs(); desenharPedido(); desenharProdutos(); desenharStock();
 }
@@ -1020,7 +1243,7 @@ async function enviar(){
   code, nome: b.nome || ("Cliente "+(activo+1)), tel:"", modo:"recolha",
   slot, quando:"hoje", dia:null,
   itens: b.itens.map(x=>`${x.q}x ${x.nome}`),
-  stock: b.itens.reduce((o,x)=>{ const n=x.base||x.nome; o[n]=(o[n]||0)+x.q; return o; },{}),
+  stock: b.itens.reduce((o,x)=>{ const m=stkLinha(x); Object.keys(m).forEach(n=>{ o[n]=(o[n]||0)+m[n]*x.q; }); return o; },{}),
   linhas: b.itens.map(x=>({n:x.nome, q:x.q, p:x.preco})),
   total: totalBalcao(),
   notas: (b.edita ? "MODIFICADO (substitui "+b.edita.code+") · " : "") + "Cliente à espera · " + (b.pago?"PAGO ("+metTxt(b.met)+")":"POR PAGAR")
@@ -1486,7 +1709,8 @@ async function manterEcraAceso(){
 <div class="acai-bg" id="tamBg" onclick="if(event.target===this)fecharTamanho()">
  <div class="tam-box" role="dialog" aria-modal="true" aria-labelledby="tNome">
   <h3 id="tNome"></h3>
-  <div class="sub">Tamanho</div>
+  <div class="sub" id="tSub"></div>
+  <div id="tCorpo"></div>
   <div class="tam-ops" id="tOps"></div>
   <button type="button" class="cancel" onclick="fecharTamanho()">Cancelar</button>
  </div>
