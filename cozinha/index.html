@@ -655,12 +655,22 @@ async function aplicarMenuStk(){
     const ed = d && !d.erro ? migrarNomes(d.edit || null) : null;
     if(!ed) return;
     const norm = s => String(s || "").replace(/&amp;/g, "&").trim().toUpperCase();
+    /* categorias criadas / retiradas no /admin (chaves "__cat:" dentro de ed.ord — as mesmas do site) */
+    const o = ed.ord || {}, lst = k => Array.isArray(o[k]) ? o[k] : [];
+    const novas = [];
+    lst("__cat:add").forEach(n => { n = String(n).replace(/[<>"]/g, "").trim();
+      if(n && !MENU_STK.some(x => norm(x[0]) === norm(n))){ const c = [n, []]; MENU_STK.push(c); novas.push(c); } });
     (ed.add || []).forEach(a => {
       const c = MENU_STK.find(x => norm(x[0]) === norm(a.c));
       if(c && !c[1].some(i => i.n === a.n)) c[1].push({n: a.n, m: a.m});
     });
     const off = ed.off || [];
     if(off.length) MENU_STK.forEach(c => { c[1] = c[1].filter(i => !off.includes(i.n)); });
+    const catOff = lst("__cat:off").map(norm);
+    for(let i = MENU_STK.length - 1; i >= 0; i--){
+      const c = MENU_STK[i];
+      if(catOff.includes(norm(c[0])) || (novas.includes(c) && !c[1].length)) MENU_STK.splice(i, 1);
+    }
     _menuStkOk = true;
   }catch(e){}
 }
