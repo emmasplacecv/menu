@@ -670,6 +670,14 @@ function sair(){
 }
 
 /* ---------- MENU: preços e produtos geridos no /admin ---------- */
+/* categorias criadas / retiradas no /admin (chaves "__cat:" dentro de ed.ord — as mesmas do site).
+   A ordem dos separadores aqui continua a de ORDEM_CAT (a que mais vende); as criadas vão para o fim. */
+function catsDoAdmin(ed){
+ const o=(ed&&ed.ord)||{}, norm=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
+ const lst=k=>Array.isArray(o[k])?o[k]:[];
+ const off=lst("__cat:off").map(norm);
+ return {norm, off, add:lst("__cat:add").map(n=>String(n).replace(/[<>"]/g,"").trim()).filter(Boolean)};
+}
 async function aplicarEdicao(){
  let ed=null;
  try{ const r=await fetch(PROMO_API+"/menu-edit"); const d=await r.json(); if(!d.erro) ed=d.edit||null; }catch(e){}
@@ -687,6 +695,8 @@ async function aplicarEdicao(){
   if(o.m!=null) i.m=o.m;
   if(o.g!=null) i.g=o.g; else if(o.g===null && "g" in o) delete i.g;
  }));
+ const cx=catsDoAdmin(ed), novas=[];
+ cx.add.forEach(n=>{ if(!MENU.some(x=>norm(x[0])===norm(n))){ const c=[n,[]]; MENU.push(c); novas.push(c); } });
  (ed.add||[]).forEach(a=>{
   const c=MENU.find(x=>norm(x[0])===norm(a.c)); if(!c) return;
   if(c[1].some(i=>i.n===a.n)) return;
@@ -695,6 +705,11 @@ async function aplicarEdicao(){
  });
  const off=ed.off||[];
  if(off.length) MENU.forEach(c=>{ c[1]=c[1].filter(i=>!off.includes(i.n)); });
+ // retiradas no /admin e criadas ainda sem produtos saem dos separadores
+ for(let i=MENU.length-1;i>=0;i--){
+  const c=MENU[i];
+  if((cx.off.includes(norm(c[0])) && c[0]!=="COMBOS") || (novas.includes(c) && !c[1].length)) MENU.splice(i,1);
+ }
 }
 async function carregarEsgotados(){
  try{ const r=await fetch(PROMO_API+"/soldout"); const d=await r.json(); esgotados=(d.itens||[]).map(nomeAtual); }catch(e){}
