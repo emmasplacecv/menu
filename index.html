@@ -3453,6 +3453,31 @@ async function carregarEstado(){
 
 /* Alterações feitas no painel de gestão: preços, produtos removidos e novos.
    Se o servidor não responder, fica o menu de base deste ficheiro. */
+/* ---------- CATEGORIAS geridas no /admin (17-10-2026) ----------
+   Vêm dentro de ed.ord com três chaves especiais (as MESMAS do /admin, /vendas e /cozinha):
+   "__cat:add" criadas no painel · "__cat:off" retiradas · "__cat:ordem" ordem na página e na barra.
+   Uma categoria criada sem produtos não aparece (o build() salta categorias vazias). */
+const CAT_ORD="__cat:ordem", CAT_OFF="__cat:off", CAT_ADD="__cat:add";
+function aplicarCats(ed){
+ const o=(ed&&ed.ord)||{}, norm=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
+ const lst=k=>Array.isArray(o[k])?o[k]:[];
+ lst(CAT_ADD).forEach((nome,k)=>{
+  const limpo=String(nome).replace(/[<>"]/g,"").trim(); if(!limpo) return;
+  if(MENU.some(c=>norm(c.cat)===norm(limpo))) return;
+  const tk="cx_"+k, rot=limpo.replace(/&(?!amp;)/g,"&amp;");
+  MENU.push({cat:rot,tk:tk,pt:2,items:[]});
+  Object.keys(I18N).forEach(l=>{ if(I18N[l] && typeof I18N[l]==="object") I18N[l][tk]=rot; });   // nome na fita da categoria
+  NAV_TXT[tk]={pt:limpo.charAt(0)+limpo.slice(1).toLowerCase()};                                  // na barra: "Smoothies"
+ });
+ const off=lst(CAT_OFF).map(norm);
+ if(off.length) for(let i=MENU.length-1;i>=0;i--) if(off.includes(norm(MENU[i].cat))) MENU.splice(i,1);
+ const ord=lst(CAT_ORD).map(norm);
+ if(ord.length){
+  const tks=[]; ord.forEach(n=>{ const c=MENU.find(x=>norm(x.cat)===n); if(c && !tks.includes(c.tk)) tks.push(c.tk); });
+  const resto=ORDEM_CAT.filter(t=>!tks.includes(t));
+  ORDEM_CAT.length=0; tks.concat(resto).forEach(t=>ORDEM_CAT.push(t));
+ }
+}
 async function carregarMenuEdit(){
  let ed=null;
  try{
@@ -3463,6 +3488,7 @@ async function carregarMenuEdit(){
  aplicarConfig();
  if(!ed) return;
  ed=migrarNomes(ed);
+ aplicarCats(ed);
  // preços alterados
  MENU.forEach(c=>c.items.forEach(i=>{
   const o=ed.p&&ed.p[i.n];
