@@ -123,6 +123,13 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
  background:transparent;color:var(--vermelho);font-size:15px;cursor:pointer;font-family:inherit;}
 .mrow .x.on{background:var(--vermelho);color:#fff;}
 .novo{background:#EEF6EE;border-color:#9CC29C;}
+/* categorias */
+.mrow.cr .n{font-weight:600;letter-spacing:.4px;}
+.mrow.cr .n small{font-weight:400;letter-spacing:0;}
+.catnova{margin-top:4px;margin-bottom:6px;}
+.catnova .btn{margin-top:8px;}
+.cat.catoff{color:var(--vermelho);}
+.vaz{font-size:13px;color:var(--ink2);padding:6px 2px 10px;}
 /* açaí: linhas de preço por baixo do produto */
 .mrow.sub{margin-left:37px;background:#FBF6EC;border-style:dashed;}
 .mrow.sub .n{font-size:14px;color:var(--ink);}
@@ -354,7 +361,7 @@ body{padding-bottom:76px;}
 
   <div id="abaMen" style="display:none">
     <div class="aviso">
-      Aqui mexe no <b>menu permanente</b>: preços, retirar produtos e acrescentar novos.
+      Aqui mexe no <b>menu permanente</b>: categorias (criar, retirar, ordenar), preços, retirar produtos e acrescentar novos.
       Para dizer só que algo <b>acabou hoje</b>, use o separador Esgotados.
     </div>
     <div id="menuEdit"></div>
@@ -856,6 +863,99 @@ function precoDe(nome, base){
 function marcar(){ sujo=true; $("btnGravar").textContent="Guardar alterações •"; }
 
 const normc=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
+
+/* ---------- CATEGORIAS (17-10-2026): criar, retirar e ordenar ----------
+   Guardadas dentro de edit.ord com três chaves especiais — o Worker já aceita "ord", não é preciso mexer nele:
+     "__cat:ordem" ordem das categorias no site · "__cat:off" retiradas (site, /vendas, cozinha) · "__cat:add" criadas aqui.
+   As MESMAS chaves são lidas no site, em /vendas e em /cozinha: não mudar só aqui.
+   Retirar uma categoria do menu base não apaga nada: volta com outro toque no ✕.
+   Apagar uma categoria criada aqui apaga também os produtos que lhe foram acrescentados. */
+const CAT_ORD="__cat:ordem", CAT_OFF="__cat:off", CAT_ADD="__cat:add";
+const CATS_BASE=MENU.map(c=>c[0]);
+const ITENS_BASE={}; MENU.forEach(([c,l])=>{ ITENS_BASE[normc(c)]=l; });
+/* ordem de origem do site (ORDEM_CAT do index.html), usada enquanto não se gravar outra */
+const ORDEM_SITE=["AÇAÍ & ÁGUA DE COCO","BEBIDAS FRIAS","MATCHA & COCO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
+function catLista(k){ return (edit.ord&&Array.isArray(edit.ord[k]))?edit.ord[k]:[]; }
+function catSet(k,l){ if(l.length) edit.ord[k]=l; else delete edit.ord[k]; }
+function catNova(n){ return !CATS_BASE.some(b=>normc(b)===normc(n)); }
+function catOff(n){ return catLista(CAT_OFF).map(normc).includes(normc(n)); }
+function catsOrdenadas(){
+ const todas=CATS_BASE.concat(catLista(CAT_ADD).filter(n=>catNova(n)));
+ const vistos=new Set(), unicas=todas.filter(n=>{ const k=normc(n); if(vistos.has(k)) return false; vistos.add(k); return true; });
+ const ord=catLista(CAT_ORD).map(normc), base=ord.length?ord:ORDEM_SITE.map(normc);
+ const pos=n=>{ const i=base.indexOf(normc(n)); return i<0?999:i; };
+ return unicas.map((n,i)=>({n,i})).sort((a,b)=>(pos(a.n)-pos(b.n))||(a.i-b.i)).map(x=>x.n);
+}
+/* o MENU deste painel passa a ter as categorias do site, pela mesma ordem (as criadas entram vazias) */
+function sincronizarCats(){
+ const novo=catsOrdenadas().map(n=>[n, ITENS_BASE[normc(n)]||[]]);
+ MENU.length=0; novo.forEach(x=>MENU.push(x));
+}
+function moverCat(i,dir){
+ const l=catsOrdenadas(), j=i+dir;
+ if(j<0||j>=l.length) return;
+ [l[i],l[j]]=[l[j],l[i]];
+ catSet(CAT_ORD,l.map(normc)); marcar(); desenharMenu();
+}
+function reporOrdemCats(){ catSet(CAT_ORD,[]); marcar(); desenharMenu(); }
+function tglCat(n){
+ const off=catLista(CAT_OFF);
+ if(catOff(n)) catSet(CAT_OFF, off.filter(x=>normc(x)!==normc(n)));
+ else{
+  if(!confirm("Retirar a categoria «"+n+"» do site, de /vendas e da cozinha?\n\nNão se perde nada: os produtos ficam guardados e a categoria volta com outro toque no ✕.")) return;
+  catSet(CAT_OFF, off.concat([normc(n)]));
+ }
+ marcar(); desenharMenu();
+}
+function apagarCat(n){
+ const prods=edit.add.filter(a=>normc(a.c)===normc(n));
+ if(!confirm("Apagar a categoria «"+n+"»?"+(prods.length?"\n\nTem "+prods.length+" produto(s) acrescentado(s) — também são apagados.":""))) return;
+ edit.add=edit.add.filter(a=>normc(a.c)!==normc(n));
+ catSet(CAT_ADD, catLista(CAT_ADD).filter(x=>normc(x)!==normc(n)));
+ catSet(CAT_ORD, catLista(CAT_ORD).filter(x=>normc(x)!==normc(n)));
+ catSet(CAT_OFF, catLista(CAT_OFF).filter(x=>normc(x)!==normc(n)));
+ delete edit.ord[n];
+ marcar(); desenharMenu();
+}
+function criarCat(){
+ const n=$("catNome").value.replace(/[<>"]/g,"").replace(/\s+/g," ").trim().toUpperCase().slice(0,50);
+ if(!n){ alert("Escreva o nome da categoria."); return; }
+ if(n.indexOf("__")===0 || n==="COMBOS"){ alert("Esse nome está reservado. Escolha outro."); return; }
+ const l=catsOrdenadas();
+ if(l.some(x=>normc(x)===normc(n))){ alert("Já existe uma categoria com esse nome."); return; }
+ if(l.length>=25){ alert("Já tem 25 categorias. Apague uma antes de criar outra."); return; }
+ catSet(CAT_ADD, catLista(CAT_ADD).concat([n]));
+ catSet(CAT_ORD, l.concat([n]).map(normc));          // entra no fim
+ $("catNome").value="";
+ marcar(); desenharMenu();
+ const sel=$("nCat"); if(sel){ const k=MENU.findIndex(x=>normc(x[0])===normc(n)); if(k>=0) sel.value=String(k); }
+ alert("Categoria «"+n+"» criada.\n\nAcrescente-lhe produtos em «Acrescentar produto» (mais abaixo) e depois carregue em Guardar alterações. Sem produtos não aparece no site.");
+}
+function htmlCats(){
+ const l=catsOrdenadas(), q=s=>JSON.stringify(s).replace(/"/g,"&quot;");
+ let h=`<div class="cat">CATEGORIAS · ORDEM NO SITE</div>
+  <div class="ordbar"><button onclick="reporOrdemCats()">Repor ordem de origem</button></div>`;
+ l.forEach((n,i)=>{
+  const off=catOff(n), nova=catNova(n);
+  const nProd=nova ? edit.add.filter(a=>normc(a.c)===normc(n)).length : null;
+  h+=`<div class="mrow cr${off?" rem":""}${nova?" novo":""}">
+   <div class="setas">
+    <button onclick="moverCat(${i},-1)" ${i===0?"disabled":""} aria-label="Subir">▲</button>
+    <button onclick="moverCat(${i},1)" ${i===l.length-1?"disabled":""} aria-label="Descer">▼</button>
+   </div>
+   <div class="n">${n}${off?"<small>Retirada — não aparece em lado nenhum. Toque no ✕ para repor.</small>"
+     :(nova?`<small>Criada aqui · ${nProd} produto${nProd===1?"":"s"}${nProd?"":" — sem produtos não aparece no site"}</small>`:"")}</div>
+   ${nova ? `<button class="x" onclick="apagarCat(${q(n)})" title="Apagar categoria">🗑</button>`
+          : `<button class="x ${off?"on":""}" onclick="tglCat(${q(n)})" title="${off?"Repor":"Retirar"} categoria">✕</button>`}
+  </div>`;
+ });
+ h+=`<div class="box catnova">
+   <input class="fld" id="catNome" maxlength="50" placeholder="Nome da nova categoria (ex: SMOOTHIES)">
+   <button class="btn" onclick="criarCat()">Criar categoria</button>
+  </div>`;
+ return h;
+}
+
 function itensDaCat(ci){
  const cat=MENU[ci][0];
  let l=MENU[ci][1].map(it=>({n:it.n,d:it.d,m:it.m,g:it.g,novo:false}));
@@ -940,12 +1040,16 @@ function addComboNovo(){
 }
 
 function desenharMenu(){
- $("nCat").innerHTML=MENU.map(([c],k)=>`<option value="${k}">${c}</option>`).join("");
+ sincronizarCats();
+ const selAnt=$("nCat").value;
+ $("nCat").innerHTML=MENU.map(([c],k)=>`<option value="${k}">${c}${catOff(c)?" (retirada)":""}</option>`).join("");
+ if(selAnt && +selAnt<MENU.length) $("nCat").value=selAnt;
  const q=s=>JSON.stringify(s).replace(/"/g,"&quot;");
- let h="";
+ let h=htmlCats();
  MENU.forEach(([cat],ci)=>{
   const l=itensDaCat(ci);
-  h+=`<div class="cat">${cat}</div>
+  h+=`<div class="cat${catOff(cat)?" catoff":""}">${cat}${catOff(cat)?" · RETIRADA":""}</div>
+   ${(!l.length&&catNova(cat))?'<div class="vaz">Sem produtos. Acrescente em «Acrescentar produto», no fim desta página.</div>':""}
    <div class="ordbar">
     <button onclick="ordenarPreco(${ci},1)">Preço ↑</button>
     <button onclick="ordenarPreco(${ci},-1)">Preço ↓</button>
@@ -1052,8 +1156,12 @@ async function gravarMenu(){
    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(edit)});
   const d=await r.json();
   if(d.erro){ alert(d.erro); return; }
-  edit=d.edit; limparAcaiAntigo(); sujo=false; $("btnGravar").textContent="Guardar alterações";
-  alert("Menu actualizado. O site já mostra as alterações.");
+  const pedi=[CAT_ORD,CAT_OFF,CAT_ADD].filter(k=>edit.ord&&edit.ord[k]&&edit.ord[k].length);
+  const veio=d.edit&&d.edit.ord||{};
+  const falhou=pedi.filter(k=>!Array.isArray(veio[k])||veio[k].length!==edit.ord[k].length);
+  edit=d.edit; edit.ord=edit.ord||{}; limparAcaiAntigo(); sujo=false; $("btnGravar").textContent="Guardar alterações";
+  if(falhou.length) alert("Atenção: o servidor guardou o menu mas NÃO guardou as categorias.\n\nAvise o Claude: é preciso acrescentar isto no servidor (Worker).");
+  else alert("Menu actualizado. O site já mostra as alterações.");
   desenharMenu();
  }catch(e){ alert("Não foi possível guardar. Verifique a ligação."); }
 }
