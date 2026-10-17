@@ -1017,6 +1017,115 @@ textarea.fld{min-height:74px;resize:vertical;}
  .capa .capa-mural *,.capa .mur,.capa .mur *{animation:none!important;}
 }
 
+/* ===== CAPA: BANNER TROPICAL DO AÇAÍ — o primeiro banner (17-10-2026) =====
+   Açaí com 8% no site (desconto real 7,9%: 950 → 875). Fundo roxo-açaí, com sol, coqueiro, folhas de palmeira,
+   hibisco, tucano, bagas de açaí e ondas — o ar do Brasil sem bandeira. Tudo SVG/CSS: nítido, leve e nos 5 idiomas.
+   O texto é o mesmo painel do mural (#capaMural), com as cores invertidas (letra creme/amarela sobre roxo).
+   Em ecrã largo junta-se a foto do açaí num círculo, com o tucano pousado em cima.
+   Liga/desliga em CAPA_ACAI (mais abaixo); sai sozinho com o açaí esgotado ou fora do menu. */
+.capa .capa-trop{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .9s ease;
+ background:radial-gradient(120% 95% at 96% 4%,rgba(255,138,61,.6) 0%,rgba(255,90,118,.22) 30%,transparent 56%),
+  linear-gradient(165deg,#64295E 0%,#47193F 55%,#2F0F2B 100%);}
+.capa .capa-trop.on{opacity:1;}
+.capa .capa-trop>*{position:absolute;display:block;}
+.capa .tr-defs{width:0;height:0;overflow:hidden;}
+.capa .trf{fill:#25B874;transform-box:fill-box;transform-origin:0% 74%;animation:trFolha 3.3s ease-in-out infinite alternate;}
+.capa .trf.tr-esc{fill:#15955C;}
+.capa .trf2{transform-box:fill-box;transform-origin:0% 57%;animation:trFolha 4.1s -1s ease-in-out infinite alternate;}
+.capa .tr-pet{fill:#FF5A76;stroke:#E23D5E;stroke-width:1.5;}
+/* sol a girar devagar, com raios */
+.capa .tr-sol{right:-38px;top:-40px;width:136px;height:136px;border-radius:50%;
+ background:radial-gradient(circle,#FFE79A 0 27%,#FFC736 28% 42%,#FF9F43 43% 45%,transparent 46%),
+  repeating-conic-gradient(rgba(255,199,54,.38) 0deg 7deg,transparent 7deg 18deg);
+ -webkit-mask:radial-gradient(circle,#000 46%,rgba(0,0,0,.85) 47%,transparent 71%);mask:radial-gradient(circle,#000 46%,rgba(0,0,0,.85) 47%,transparent 71%);
+ animation:trGira 40s linear infinite;}
+.capa .tr-pontos{right:30%;top:10px;width:46px;height:30px;opacity:.75;
+ background-image:radial-gradient(circle,#FFC736 1.7px,transparent 1.9px);background-size:10px 10px;animation:murPontos 2.475s ease-in-out infinite alternate;}
+/* coqueiro: abana a partir da base; as folhas abanam cada uma por si */
+.capa .tr-coq{right:-58px;bottom:-26px;width:150px;height:196px;transform-origin:32% 100%;animation:trCoqueiro 4.95s ease-in-out infinite alternate;}
+/* mar: duas ondas a correr em sentidos opostos */
+.capa .tr-mar{left:52%;right:0;bottom:0;height:16px;overflow:hidden;}
+.capa .tr-mar i{position:absolute;left:0;bottom:0;display:block;width:calc(100% + 80px);height:16px;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 18'%3E%3Cpath fill='%230C8C80' d='M0 9Q10 3 20 9T40 9T60 9T80 9V18H0Z'/%3E%3C/svg%3E") repeat-x 0 0/80px 16px;animation:trOnda 6s linear infinite;}
+.capa .tr-mar i+i{height:11px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 18'%3E%3Cpath fill='%2312B5A6' d='M0 7Q10 1 20 7T40 7T60 7T80 7V18H0Z'/%3E%3C/svg%3E");background-size:80px 11px;animation-duration:4.2s;animation-direction:reverse;}
+.capa .tr-foto,.capa .tr-tucano,.capa .tr-bananeira,.capa .tr-bagas,.capa .tr-h2{display:none;}
+.capa .tr-folha{width:118px;height:44px;overflow:visible;}
+.capa .tr-f1{right:-22px;bottom:4px;rotate:-152deg;}
+.capa .tr-f2{right:22px;bottom:-14px;width:92px;rotate:-118deg;}
+.capa .tr-flor{overflow:visible;animation:trFlor 3.3s ease-in-out infinite alternate;}
+.capa .tr-h1{right:52px;bottom:12px;width:34px;height:34px;}
+.capa .tr-bagas circle{fill:#2A0C2F;}
+.capa .tr-s1{display:none;width:15px;height:15px;color:#FFF8E8;animation:murBrilho 1.65s ease-in-out infinite;}
+.capa .tr-s2{right:24%;top:16%;width:22px;height:22px;color:#FFC736;animation:murBrilho 3.3s -1.2s ease-in-out infinite;}
+.capa .tr-tuc{transform-box:fill-box;transform-origin:30% 100%;animation:trTucano 3.6s ease-in-out infinite;}
+@keyframes trGira{to{transform:rotate(360deg)}}
+@keyframes trFolha{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+@keyframes trCoqueiro{from{transform:rotate(-2.2deg)}to{transform:rotate(2.2deg)}}
+@keyframes trOnda{from{transform:translateX(0)}to{transform:translateX(-80px)}}
+@keyframes trFlor{from{transform:rotate(-10deg) scale(.96)}to{transform:rotate(10deg) scale(1.05)}}
+@keyframes trTucano{0%,58%,100%{transform:rotate(0deg)}66%{transform:rotate(-9deg)}74%{transform:rotate(3deg)}82%{transform:rotate(-6deg)}}
+/* o texto sobre o roxo: número amarelo, etiqueta creme, frase creme */
+.capa.trop .mur,.capa.trop .mur-k,.capa.trop .mur-l,.capa.trop .mur-n{color:#FFF8E8;}
+.capa.trop .mur-k{color:#FFC736;}
+.capa.trop .mur-5{color:#FFC736;text-shadow:3px 3px 0 #FF5A76,7px 7px 0 #12B5A6;}
+.capa.trop .mur-off{background:#FFF8E8;color:var(--roxo);box-shadow:3px 3px 0 #FF5A76;}
+.capa.trop .mur-l b{color:#FFC736;background:linear-gradient(transparent 62%,rgba(255,90,118,.6) 62%,rgba(255,90,118,.6) 94%,transparent 94%);}
+.capa.trop .mur-n{opacity:.9;}
+.capa.trop .capa-txt{--tom:#FFC736;--tom2:#FFC736;}
+.capa.mural.trop .capa-pts button{background:rgba(255,248,232,.3);}
+.capa.mural.trop .capa-cta{background:#FFC736;color:var(--roxo);}
+.capa:not(.trop) .capa-trop *{animation-play-state:paused;}
+@media(min-width:720px){
+ .capa .tr-sol{right:auto;left:calc(100% - 300px);top:-58px;width:200px;height:200px;}
+ .capa .tr-pontos{right:44%;top:auto;bottom:22px;width:70px;height:40px;}
+ .capa.trop .mur-n{max-width:22em;}
+ .capa .tr-coq{right:150px;bottom:-34px;width:170px;height:236px;}
+ .capa .tr-foto{display:block;right:-24px;top:50%;width:184px;height:184px;margin-top:-92px;border-radius:50%;border:7px solid #FFF8E8;
+  background:#EADBC6 url('img/capa-4.webp') no-repeat 50% 42%/243% auto;box-shadow:8px 8px 0 #FF5A76;animation:murBoia 2.475s ease-in-out infinite alternate;}
+ .capa .tr-tucano{display:block;right:128px;bottom:18px;width:74px;height:63px;}
+ .capa .tr-bananeira{display:block;right:120px;bottom:-18px;width:140px;height:70px;rotate:-14deg;}
+ .capa .tr-bagas{display:block;right:10px;bottom:8px;width:60px;height:52px;animation:murBoia 2.1s -.6s ease-in-out infinite alternate;}
+ .capa .tr-f1{right:-30px;bottom:-6px;width:160px;height:60px;}
+ .capa .tr-f2{display:none;}
+ .capa .tr-h1{right:270px;bottom:14px;width:40px;height:40px;}
+ .capa .tr-h2{display:block;right:176px;top:24%;width:30px;height:30px;animation-delay:-1.6s;}
+ .capa .tr-mar{left:40%;height:20px;}
+ .capa .tr-mar i{height:20px;background-size:80px 20px;}
+ .capa .tr-mar i+i{height:13px;background-size:80px 13px;}
+ .capa .tr-s1{display:block;right:auto;left:calc(100% - 330px);top:30%;width:22px;height:22px;}
+ .capa .tr-s2{right:2%;top:12%;width:26px;height:26px;}
+}
+@media(min-width:900px){
+ .capa .tr-foto{right:4%;width:216px;height:216px;margin-top:-104px;border-width:8px;}
+ .capa .tr-tucano{right:calc(4% + 160px);width:90px;height:76px;}
+ .capa .tr-coq{right:206px;width:190px;height:262px;}
+ .capa .tr-bananeira{right:calc(4% + 170px);}
+ .capa .tr-bagas{right:calc(4% - 8px);}
+ .capa .tr-h1{right:calc(4% + 330px);}
+ .capa .tr-h2{right:calc(4% + 222px);}
+}
+@media(min-width:1021px){
+ .capa.trop .mur-n{max-width:29em;}
+ .capa .tr-foto{right:6%;width:230px;height:230px;margin-top:-112px;}
+ .capa .tr-tucano{right:calc(6% + 172px);bottom:30px;width:104px;height:88px;}
+ .capa .tr-coq{right:calc(6% + 220px);width:230px;height:300px;}
+ .capa .tr-sol{left:auto;right:calc(6% + 150px);width:230px;height:230px;top:-70px;}
+ .capa .tr-bananeira{right:calc(6% + 190px);width:170px;height:85px;}
+ .capa .tr-bagas{right:calc(6% - 8px);}
+ .capa .tr-h1{right:calc(6% + 360px);bottom:18px;width:46px;height:46px;}
+ .capa .tr-h2{right:calc(6% + 240px);}
+ .capa .tr-s1{left:auto;right:calc(6% + 330px);}
+}
+@media(min-width:1021px) and (max-width:1199px){       /* ecrã largo mas apertado: o coqueiro chega-se ao açaí e a nota parte-se em duas linhas */
+ .capa.trop .mur-n{max-width:22em;}
+ .capa .tr-coq{right:calc(6% + 176px);width:200px;height:270px;}
+ .capa .tr-sol{right:calc(6% + 120px);}
+}
+@media(prefers-reduced-motion:reduce){
+ .capa .capa-trop{transition:none;}
+ .capa .capa-trop *,.capa .capa-trop{animation:none!important;}
+}
+
 /* ===== PEDIDO REGISTADO: janela de pagamento (09-10-2026, noite) =====
    Três zonas sempre à vista: topo (estado do pedido + relógio), dados da conta e, em baixo, os botões de
    anexar o comprovativo e de enviar. Só o meio desliza.
@@ -1107,6 +1216,29 @@ textarea.fld{min-height:74px;resize:vertical;}
       <svg class="mur-s2" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c1 7 4 10 12 12-8 2-11 5-12 12-1-7-4-10-12-12 8-2 11-5 12-12z"/></svg>
       <svg class="mur-z" viewBox="0 0 92 20" fill="none"><path stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" d="M3 14c7-12 13-12 20 0s13 12 20 0 13-12 20 0 13 12 20 0"/></svg>
       <div class="mur-fotos"><span class="mur-f mur-f2"></span><span class="mur-f mur-f1"></span></div>
+    </div>
+    <!-- 17-10-2026: BANNER TROPICAL DO AÇAÍ (−8% no site): fundo roxo-açaí com sol, coqueiro, folhas, hibisco, tucano e bagas,
+         tudo em SVG/CSS a mexer (sem vídeo nem GIF: fica nítido em qualquer ecrã e leve). O texto é o mesmo painel #capaMural. -->
+    <div class="capa-trop" id="capaTropFundo" aria-hidden="true">
+      <svg class="tr-defs" width="0" height="0" focusable="false"><defs>
+        <path id="trFr" d="M0.0 0.0 L4.6 -1.4 L13.7 -1.7 L12.6 -5.2 L24.2 -3.0 L20.4 -8.3 L33.4 -3.4 L28.2 -10.5 L41.4 -3.1 L35.9 -11.9 L48.5 -2.5 L43.7 -12.5 L55.1 -1.7 L51.7 -12.4 L61.6 -0.8 L59.8 -11.5 L68.1 0.0 L68.3 -9.7 L75.1 1.0 L77.0 -7.0 L82.6 2.2 L86.0 -3.3 L90.9 3.6 L100.0 4.0 L95.9 -3.7 L87.2 -5.4 L89.7 -10.4 L78.7 -10.5 L82.6 -16.2 L70.1 -14.4 L74.6 -21.1 L61.4 -17.3 L65.8 -24.9 L52.7 -19.0 L56.3 -27.3 L44.0 -19.5 L46.2 -28.0 L35.3 -18.9 L35.9 -26.9 L26.8 -17.0 L25.7 -23.7 L18.6 -13.8 L16.1 -18.4 L10.6 -9.5 L7.3 -11.0 L3.1 -4.0Z"/>
+        <g id="trFlor"><g class="tr-pet"><path d="M0 0C-14-10-16-34 0-42C16-34 14-10 0 0Z" transform="rotate(0)"/><path d="M0 0C-14-10-16-34 0-42C16-34 14-10 0 0Z" transform="rotate(72)"/><path d="M0 0C-14-10-16-34 0-42C16-34 14-10 0 0Z" transform="rotate(144)"/><path d="M0 0C-14-10-16-34 0-42C16-34 14-10 0 0Z" transform="rotate(216)"/><path d="M0 0C-14-10-16-34 0-42C16-34 14-10 0 0Z" transform="rotate(288)"/></g><circle r="9" fill="#C2183F"/><path d="M0 0L16-26" stroke="#FFC736" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="-27" r="3" fill="#FFC736"/><circle cx="20" cy="-23" r="2.5" fill="#FFC736"/><circle cx="12" cy="-30" r="2.5" fill="#FFC736"/></g>
+        <linearGradient id="trBico" x1="0" x2="1"><stop offset="0" stop-color="#FFB13B"/><stop offset=".7" stop-color="#FF8A3D"/><stop offset="1" stop-color="#F06A2A"/></linearGradient>
+      </defs></svg>
+      <i class="tr-sol"></i>
+      <i class="tr-pontos"></i>
+      <svg class="tr-coq" viewBox="-20 -40 280 365"><path d="M90.9 320.8 L89.8 310.1 L88.9 299.5 L88.2 288.9 L87.8 278.3 L87.5 267.8 L87.5 257.4 L87.7 246.9 L88.1 236.6 L88.7 226.3 L89.5 216.0 L90.6 205.8 L91.9 195.6 L93.4 185.5 L95.1 175.4 L97.0 165.3 L99.2 155.3 L101.5 145.4 L104.1 135.4 L107.0 125.6 L110.0 115.7 L113.3 106.0 L116.7 96.2 L120.5 86.5 L124.4 76.9 L111.6 71.1 L107.1 80.9 L102.8 90.7 L98.7 100.5 L94.9 110.5 L91.3 120.5 L87.9 130.6 L84.7 140.7 L81.7 150.9 L79.0 161.2 L76.5 171.5 L74.2 181.9 L72.1 192.4 L70.3 202.9 L68.7 213.6 L67.3 224.2 L66.1 235.0 L65.2 245.8 L64.5 256.6 L64.0 267.6 L63.8 278.6 L63.8 289.6 L64.0 300.7 L64.4 311.9 L65.1 323.2Z" fill="#9A6440"/><path d="M88.9 299.5 Q76.2 299.1 64.0 300.7 M87.8 278.3 Q75.7 277.4 63.8 278.6 M87.5 257.4 Q76.1 256.0 64.5 256.6 M88.1 236.6 Q77.4 234.8 66.1 235.0 M89.5 216.0 Q79.6 213.8 68.7 213.6 M91.9 195.6 Q82.6 193.1 72.1 192.4 M95.1 175.4 Q86.6 172.5 76.5 171.5 M99.2 155.3 Q91.4 152.2 81.7 150.9 M104.1 135.4 Q97.1 132.2 87.9 130.6 M110.0 115.7 Q103.8 112.3 94.9 110.5 M116.7 96.2 Q111.3 92.7 102.8 90.7" fill="none" stroke="#6E4127" stroke-width="2.4" stroke-linecap="round"/><g class="tr-copa"><g transform="translate(118 74) rotate(-48) scale(1.32)"><use class="trf" href="#trFr" style="animation-delay:0.00s"/></g><g transform="translate(118 74) rotate(-14) scale(1.32)"><use class="trf tr-esc" href="#trFr" style="animation-delay:-0.41s"/></g><g transform="translate(118 74) rotate(20) scale(1.32)"><use class="trf" href="#trFr" style="animation-delay:-0.82s"/></g><g transform="translate(118 74) rotate(55) scale(1.32)"><use class="trf tr-esc" href="#trFr" style="animation-delay:-1.23s"/></g><g transform="translate(118 74) scale(-1 1) rotate(-44) scale(1.25)"><use class="trf" href="#trFr" style="animation-delay:-1.64s"/></g><g transform="translate(118 74) scale(-1 1) rotate(-8) scale(1.25)"><use class="trf tr-esc" href="#trFr" style="animation-delay:-2.05s"/></g><g transform="translate(118 74) scale(-1 1) rotate(26) scale(1.25)"><use class="trf" href="#trFr" style="animation-delay:-2.46s"/></g><g transform="translate(118 74) scale(-1 1) rotate(58) scale(1.25)"><use class="trf tr-esc" href="#trFr" style="animation-delay:-2.87s"/></g><g transform="translate(118 74) rotate(-82) scale(1.05)"><use class="trf tr-esc" href="#trFr" style="animation-delay:-1.1s"/></g></g><circle cx="110" cy="84" r="8" fill="#6B3E26"/><circle cx="125" cy="85" r="8" fill="#5A321E"/><circle cx="117" cy="95" r="7.5" fill="#7A4A2B"/></svg>
+      <div class="tr-mar"><i></i><i></i></div>
+      <span class="tr-foto"></span>
+      <svg class="tr-folha tr-f1" viewBox="-4 -30 108 40"><use class="trf" href="#trFr"/></svg>
+      <svg class="tr-folha tr-f2" viewBox="-4 -30 108 40"><use class="trf tr-esc" href="#trFr" style="animation-delay:-1.4s"/></svg>
+      <svg class="tr-bananeira" viewBox="0 0 140 70"><g class="trf2"><path d="M4 40C30 6 96-2 136 22C100 56 40 64 4 40Z" fill="#17A365"/><path d="M4 40C46 30 90 24 136 22M24 36L30 18M40 33L48 12M58 30L66 8M76 28L86 8M96 26L106 10M116 24L124 14M26 37L34 52M44 34L54 54M62 32L74 54M82 29L94 50M102 27L114 44" fill="none" stroke="#0E6E46" stroke-width="1.4" stroke-linecap="round"/></g></svg>
+      <svg class="tr-flor tr-h1" viewBox="-50 -50 100 100"><use href="#trFlor"/></svg>
+      <svg class="tr-flor tr-h2" viewBox="-50 -50 100 100"><use href="#trFlor"/></svg>
+      <svg class="tr-bagas" viewBox="0 0 80 70"><path d="M40 6C44 18 46 26 50 34M44 16C34 22 30 30 28 36M46 22C56 26 60 32 62 40" stroke="#7FA344" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="28" cy="42" r="7"/><circle cx="40" cy="46" r="7"/><circle cx="52" cy="40" r="7"/><circle cx="62" cy="48" r="7"/><circle cx="34" cy="55" r="7"/><circle cx="48" cy="56" r="7"/><circle cx="58" cy="60" r="7"/><circle cx="22" cy="52" r="7"/><circle cx="42" cy="64" r="7"/><g fill="#C79BD0" opacity=".75"><circle cx="25.7" cy="39.7" r="2"/><circle cx="37.7" cy="43.7" r="2"/><circle cx="49.7" cy="37.7" r="2"/><circle cx="59.7" cy="45.7" r="2"/><circle cx="31.7" cy="52.7" r="2"/><circle cx="45.7" cy="53.7" r="2"/><circle cx="55.7" cy="57.7" r="2"/><circle cx="19.7" cy="49.7" r="2"/><circle cx="39.7" cy="61.7" r="2"/></g></svg>
+      <svg class="tr-tucano" viewBox="0 0 130 110"><g class="tr-tuc"><path d="M40 62L30 104 46 98 50 70Z" fill="#1B1219"/><path d="M50 24C30 26 22 50 28 70C33 86 46 92 58 88C68 84 70 72 68 58C66 42 64 26 50 24Z" fill="#1B1219"/><path d="M60 30C70 36 70 50 64 60C56 56 52 42 60 30Z" fill="#FFF3D1"/><path d="M60 58C64 62 64 68 60 72C56 68 56 62 60 58Z" fill="#E8344F"/><path d="M36 46C44 50 50 62 48 76C40 70 34 58 36 46Z" fill="#33242F"/><path d="M62 22C78 14 108 16 124 32C108 32 84 34 64 36Z" fill="url(#trBico)"/><path d="M64 36C86 35 108 34 123 33C110 42 86 46 64 42Z" fill="#E85D22"/><path d="M114 25C119 27 122 29 124 32C120 33 116 33 112 33Z" fill="#1B1219"/><circle cx="56" cy="27" r="6" fill="#47B8F0"/><circle cx="57" cy="27" r="2.8" fill="#111"/><circle cx="58" cy="26" r="1" fill="#fff"/></g><path d="M48 88L46 100M58 86L58 99" stroke="#47B8F0" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg class="tr-s1" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c1 7 4 10 12 12-8 2-11 5-12 12-1-7-4-10-12-12 8-2 11-5 12-12z"/></svg>
+      <svg class="tr-s2" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c1 7 4 10 12 12-8 2-11 5-12 12-1-7-4-10-12-12 8-2 11-5 12-12z"/></svg>
     </div>
     <div class="capa-txt entra">
       <p class="capa-a" id="capaA"></p>
@@ -1754,6 +1886,65 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
+/* ---- 17-10-2026: AÇAÍ −8% NO SITE (hora marcada) e o banner tropical da capa: textos nos 5 idiomas ----
+   {p8} = percentagem anunciada (DESC_ACAI_TXT) · {a8} = preço deste açaí no site · {pa} = preço deste açaí
+   {v1} = preço do açaí do menu no site · {pb} = preço do açaí do menu (balcão) · {p} = percentagem (linha do total)
+   tr… = banner tropical do açaí · murLResto = o banner dos 5% quando o do açaí está na capa */
+(function(){
+ const R={
+  pt:{descAcai:"Açaí online (−{p}%)",
+   incentAcai:"Escolha <b>hora marcada</b> e ganhe <b>{p8}% no açaí</b> (cada um a <b>{a8}$</b>) e <b>5%</b> no resto do pedido.",
+   incentAcai1:"Escolha <b>hora marcada</b> e pague cada açaí a <b>{a8}$</b> em vez de {pa}$ (−{p8}%).",
+   horaGanhoAcai8:" e <b>{p8}% no açaí</b> (cada um a {a8}$)",
+   horaGanhoSoA:"Escolha <b>hora marcada</b> e pague menos: cada açaí a <b>{a8}$</b> (−{p8}%).",
+   horaGanhoSoB:"✓ Com hora marcada paga menos: cada açaí a <b>{a8}$</b> (−{p8}%).",
+   acaiOpt:"<b>Só no site:</b> −{p8}% com hora marcada para levantar, pago por transferência: <b>{v1}$</b> em vez de {pb}$.",
+   trK:"Açaí só no site!",trL:"no açaí, para <b>levantar</b>*",trCta:"Pedir açaí",
+   trAlt:"Açaí com {p8}% de desconto no site: {v1}$ em vez de {pb}$, pago por transferência bancária, com hora marcada para levantar. Não válido para pagamentos no balcão.",
+   murLResto:"no resto do menu, para <b>levantar</b>*"},
+  en:{descAcai:"Online açaí (−{p}%)",
+   incentAcai:"Choose a <b>scheduled time</b>: <b>{p8}% off açaí</b> (<b>{a8}$</b> each) and <b>5% off</b> the rest of your order.",
+   incentAcai1:"Choose a <b>scheduled time</b> and pay <b>{a8}$</b> per açaí instead of {pa}$ (−{p8}%).",
+   horaGanhoAcai8:" and <b>{p8}% off açaí</b> ({a8}$ each)",
+   horaGanhoSoA:"Choose a <b>scheduled time</b> and pay less: <b>{a8}$</b> per açaí (−{p8}%).",
+   horaGanhoSoB:"✓ With a scheduled time you pay less: <b>{a8}$</b> per açaí (−{p8}%).",
+   acaiOpt:"<b>Online only:</b> −{p8}% with a scheduled pick-up time, paid by bank transfer: <b>{v1}$</b> instead of {pb}$.",
+   trK:"Açaí · online only!",trL:"on açaí, for <b>pick-up</b>*",trCta:"Order açaí",
+   trAlt:"Açaí {p8}% off online: {v1}$ instead of {pb}$, paid by bank transfer, with a scheduled pick-up time. Not valid for payment at the counter.",
+   murLResto:"on the rest of the menu, for <b>pick-up</b>*"},
+  fr:{descAcai:"Açaí en ligne (−{p} %)",
+   incentAcai:"Choisissez une <b>heure précise</b> : <b>{p8} % de remise sur l'açaí</b> (<b>{a8}$</b> chacun) et <b>5 %</b> sur le reste de la commande.",
+   incentAcai1:"Choisissez une <b>heure précise</b> et payez l'açaí <b>{a8}$</b> au lieu de {pa}$ (−{p8} %).",
+   horaGanhoAcai8:" et <b>{p8} % sur l'açaí</b> ({a8}$ chacun)",
+   horaGanhoSoA:"Choisissez une <b>heure précise</b> et payez moins : l'açaí à <b>{a8}$</b> (−{p8} %).",
+   horaGanhoSoB:"✓ Avec une heure précise, vous payez moins : l'açaí à <b>{a8}$</b> (−{p8} %).",
+   acaiOpt:"<b>Sur le site uniquement :</b> −{p8} % avec retrait à heure choisie, payé par virement : <b>{v1}$</b> au lieu de {pb}$.",
+   trK:"Açaí · sur le site !",trL:"sur l'açaí, à <b>retirer</b>*",trCta:"Commander un açaí",
+   trAlt:"Açaí à −{p8} % en ligne : {v1}$ au lieu de {pb}$, payé par virement, retrait à heure choisie. Non valable pour un paiement au comptoir.",
+   murLResto:"sur le reste de la carte, à <b>retirer</b>*"},
+  de:{descAcai:"Açaí online (−{p} %)",
+   incentAcai:"Wählen Sie eine <b>Wunschzeit</b>: <b>{p8} % Rabatt auf Açaí</b> (je <b>{a8}$</b>) und <b>5 %</b> auf den Rest der Bestellung.",
+   incentAcai1:"Wählen Sie eine <b>Wunschzeit</b> und zahlen Sie <b>{a8}$</b> pro Açaí statt {pa}$ (−{p8} %).",
+   horaGanhoAcai8:" und <b>{p8} % auf Açaí</b> (je {a8}$)",
+   horaGanhoSoA:"Wählen Sie eine <b>Wunschzeit</b> und zahlen Sie weniger: <b>{a8}$</b> pro Açaí (−{p8} %).",
+   horaGanhoSoB:"✓ Mit Wunschzeit zahlen Sie weniger: <b>{a8}$</b> pro Açaí (−{p8} %).",
+   acaiOpt:"<b>Nur online:</b> −{p8} % mit Abholung zur Wunschzeit, per Überweisung bezahlt: <b>{v1}$</b> statt {pb}$.",
+   trK:"Açaí · nur online!",trL:"auf Açaí, zur <b>Abholung</b>*",trCta:"Açaí bestellen",
+   trAlt:"Açaí mit {p8} % Rabatt online: {v1}$ statt {pb}$, per Überweisung bezahlt, Abholung zur Wunschzeit. Nicht gültig bei Zahlung an der Theke.",
+   murLResto:"auf den Rest der Karte, zur <b>Abholung</b>*"},
+  nl:{descAcai:"Açaí online (−{p}%)",
+   incentAcai:"Kies een <b>tijdstip</b>: <b>{p8}% korting op açaí</b> (<b>{a8}$</b> per stuk) en <b>5%</b> op de rest van je bestelling.",
+   incentAcai1:"Kies een <b>tijdstip</b> en betaal <b>{a8}$</b> per açaí in plaats van {pa}$ (−{p8}%).",
+   horaGanhoAcai8:" en <b>{p8}% op açaí</b> ({a8}$ per stuk)",
+   horaGanhoSoA:"Kies een <b>tijdstip</b> en betaal minder: <b>{a8}$</b> per açaí (−{p8}%).",
+   horaGanhoSoB:"✓ Met een tijdstip betaal je minder: <b>{a8}$</b> per açaí (−{p8}%).",
+   acaiOpt:"<b>Alleen online:</b> −{p8}% bij afhalen op gekozen tijd, betaald per overschrijving: <b>{v1}$</b> in plaats van {pb}$.",
+   trK:"Açaí · alleen online!",trL:"op açaí, om <b>af te halen</b>*",trCta:"Bestel açaí",
+   trAlt:"Açaí met {p8}% korting online: {v1}$ in plaats van {pb}$, betaald per overschrijving, afhalen op gekozen tijd. Niet geldig bij betaling aan de balie.",
+   murLResto:"op de rest van de kaart, om <b>af te halen</b>*"}
+ };
+ for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
+})();
 /* ---- Aviso antes de confirmar, em pedidos para outro dia: sem transferência e comprovativo não fica concluído ---- */
 (function(){
  const R={
@@ -2173,7 +2364,7 @@ function build(){
  desenharDestaque();
  desenharCamp();
  desenharNav();
- if(typeof _capaPronta!=="undefined" && _capaPronta) desenharCapa(false);
+ if(typeof _capaPronta!=="undefined" && _capaPronta){ desenharCapa(false); capaCampanha(); }   // o açaí pode ter esgotado: o banner dele sai
 }
 
 /* ---------- ESCOLHA DE OPÇÕES ---------- */
@@ -2240,7 +2431,7 @@ function acaiHTML(i){
  const grupo=(n,k,tag,chips)=>`<div class="acai-h"><div class="lbl"><i>${n}</i>${t(k)}</div>${tag?`<em>${tag}</em>`:""}</div>
    <div class="opttop g2">${chips}</div>`;
  const inc=t("acaiInc");
- return (escMostra()?`<div class="campopt">${et("escOpt")}</div>`:(campMostra()?`<div class="campopt">${ct("campOpt")}${campDiaTxt()?" "+ct("campPara"):""}</div>`:""))+`<div class="acai-pr" id="acaiPr">`+
+ return (escMostra()?`<div class="campopt">${et("escOpt")}</div>`:(campMostra()?`<div class="campopt">${ct("campOpt")}${campDiaTxt()?" "+ct("campPara"):""}</div>`:`<div class="campopt">${et("acaiOpt")}</div>`))+`<div class="acai-pr" id="acaiPr">`+
    ["p","sp"].map(n=>`<div data-n="${n}"><span>${t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
    grupo(1,"acaiG1",inc,i.base.map(s=>chip(s)).join(""))+
    grupo(2,"acaiG2",inc,i.fr.map(s=>chip(s)).join(""))+
@@ -2314,6 +2505,7 @@ function addToCart(name,price,opts,nd,meta,icat,pt){
  const ex=cart.find(x=>x.key===key);
  if(ex) ex.q++; else cart.push({key,name,price,opts,q:1,nd:nd||0,meta:meta||{},icat:icat||null,pt:(pt==null?2:pt)});
  refresh();
+ if(name===CAMP_PROD && horaAcaiAuto(true)){ horaDoCliente=false; fillSlots(); }   // fillSlots escolhe a 1.ª hora e refaz os totais
 }
 function chg(k,d){
  const it=cart.find(x=>x.key===k); if(!it)return;
@@ -2545,14 +2737,15 @@ function escPeriodo(){
 }
 /* textos da campanha nova e do mural:
    {v2} {v3} = preço por copo com 2 / com 3 ou mais · {v} = o deste pedido · {off2} {off3} {off} = desconto em cada copo
-   {v1} = 1 açaí no site com hora marcada (com os 5%) · {pb} = preço ao balcão · {h} = " · quando" · {d} = primeiro dia */
+   {v1} = 1 açaí no site com hora marcada (com os 7,9%, "8%") · {pb} = preço ao balcão · {h} = " · quando" · {d} = primeiro dia */
 function et(k){
  const q=escPeriodo(), n=nAcai(), pb=acaiMenuP(), e=(n>=3?3:2);
  const it=cart.find(i=>i.name===CAMP_PROD), pa=it?it.price:pb;      // preço do açaí que está (ou entraria) no pedido
  return String(t(k)||"").replace(/\{c2\}/g,pa-escOff(2)).replace(/\{c3\}/g,pa-escOff(3)).replace(/\{c\}/g,pa-escOff(e))
   .replace(/\{v2\}/g,ESC_PRECO2).replace(/\{v3\}/g,ESC_PRECO3).replace(/\{v\}/g,escPreco(e))
   .replace(/\{off2\}/g,escOff(2)).replace(/\{off3\}/g,escOff(3)).replace(/\{off\}/g,escOff(e))
-  .replace(/\{v1\}/g,precoOnline(pb)).replace(/\{pb\}/g,pb)
+  .replace(/\{v1\}/g,precoAcaiOnline(pb)).replace(/\{pb\}/g,pb)
+  .replace(/\{a8\}/g,precoAcaiOnline(pa)).replace(/\{pa\}/g,pa).replace(/\{p8\}/g,DESC_ACAI_TXT)
   .replace(/\{h\}/g, q ? " · "+q : "").replace(/\{d\}/g, cfgEsc&&cfgEsc.de ? escData(cfgEsc.de).replace(/\.$/,"") : "");
 }
 function descCampBruto(){ return campCalc().v + escCalc().v; }      // nunca as duas: com a nova ligada a antiga não se lê
@@ -2597,15 +2790,29 @@ function temCategoria(catNome){ return cart.some(i=>i.icat===catNome); }
 
 /* 5% para encomendas no site com levantamento em hora marcada */
 const DESC_ONLINE=5, TAXA_SERVICO=5;
-/* 10-10-2026: o açaí deixou de ser excepção — entra nos 5% como tudo o resto.
-   Só fica de fora dos 5% quando já leva uma oferta de campanha (escalões ou a antiga): nunca soma as duas.
-   Os códigos promocionais continuam a aplicar-se como antes. */
+/* 17-10-2026: AÇAÍ NO SITE COM HORA MARCADA = −7,9% em cada copo (anunciado como "8%").
+   Com o açaí a 950 dá 875 certos; sem granola nem leite em pó (1050) dá 967; cada topping extra (+50)
+   leva o mesmo desconto. Arredonda-se copo a copo (para dar sempre os 875).
+   O resto do pedido continua com os 5%. Só para LEVANTAR com hora marcada e pago por transferência
+   (todo o pedido do site com açaí é pago por transferência).
+   Com uma campanha do açaí ligada no /admin (escalões ou a antiga), o açaí leva a campanha e não os 7,9%:
+   nunca soma as duas. Contra um código promocional, fica o maior (como antes).
+   DESC_ACAI = o que se desconta de facto · DESC_ACAI_TXT = o que se anuncia (capa, botão, folha do açaí).
+   (10-10-2026 a 16-10-2026: o açaí levava os mesmos 5% que o resto.) */
+const DESC_ACAI=7.9, DESC_ACAI_TXT="8";
+function descAcaiUn(p){ return Math.round(p*DESC_ACAI/100); }
+function precoAcaiOnline(p){ return p-descAcaiUn(p); }
 const acaiComOferta=()=>(campCalc().v>0 || escCalc().v>0);
-const subComDesc=()=>{ const fora=acaiComOferta(); return cart.reduce((s,i)=>s+((fora && i.name===CAMP_PROD)?0:i.price*i.q),0); };
+/* o que leva os 5%: tudo menos o açaí (o açaí tem os seus 7,9%, ou a campanha) */
+const subComDesc=()=>cart.reduce((s,i)=>s+(i.name===CAMP_PROD?0:i.price*i.q),0);
 const temAcai=()=>cart.some(i=>i.name===CAMP_PROD);
-function descOnlineBruto(){
- return comHoraMarcada() ? Math.round(subComDesc()*DESC_ONLINE/100) : 0;
+const soAcai=()=>cart.length>0 && cart.every(i=>i.name===CAMP_PROD);
+function descRestoBruto(){ return comHoraMarcada() ? Math.round(subComDesc()*DESC_ONLINE/100) : 0; }
+function descAcaiBruto(){
+ if(!comHoraMarcada() || acaiComOferta()) return 0;
+ return cart.reduce((s,i)=>s+(i.name===CAMP_PROD?descAcaiUn(i.price)*i.q:0),0);
 }
+function descOnlineBruto(){ return descRestoBruto()+descAcaiBruto(); }
 
 /* NÃO ACUMULAM: aplica-se só o maior dos dois; o menor é anulado.
    Em caso de empate, fica o código (é o que o cliente trouxe na mão). */
@@ -2615,14 +2822,16 @@ function descSiteBruto(){ return descOnlineBruto()+descCampBruto(); }
 function ganhaOnline(){ return descSiteBruto() > descPromoBruto(); }
 function desconto(){    return ganhaOnline() ? 0 : descPromoBruto(); }
 function descOnline(){  return ganhaOnline() ? descOnlineBruto() : 0; }
+function descResto(){   return ganhaOnline() ? descRestoBruto() : 0; }      // os 5% (tudo menos o açaí)
+function descAcai(){    return ganhaOnline() ? descAcaiBruto() : 0; }       // os 7,9% do açaí ("8%")
 function descCamp(){    return ganhaOnline() ? descCampBruto() : 0; }
 /* Houve um desconto anulado por não acumular? Devolve o texto a mostrar. */
 function anulado(){
  const a=descPromoBruto(), b=descOnlineBruto(), c=descCampBruto();
  if(a>0 && (b+c)>0) return ganhaOnline()
    ? "Código "+promo.c+" não aplicado (−"+a+"$): fica o desconto maior."
-   : (c>0 ? "Campanha do açaí"+(b>0?" e desconto online de "+DESC_ONLINE+"%":"")+" não aplicados (−"+(b+c)+"$): fica o desconto maior."
-          : "Desconto online de "+DESC_ONLINE+"% não aplicado (−"+b+"$): fica o desconto maior.");
+   : (c>0 ? "Campanha do açaí"+(b>0?" e desconto online":"")+" não aplicados (−"+(b+c)+"$): fica o desconto maior."
+          : "Desconto online não aplicado (−"+b+"$): fica o desconto maior.");
  return "";
 }
 function subLiq(){ return Math.max(0, sub()-descOnline()-descCamp()-desconto()); }
@@ -2754,11 +2963,12 @@ function desenharPromo(){
  }
 }
 function totalsHTML(){
- const s=sub(), dsc=desconto(), d5=descOnline(), sv=servico(), cp=campCalc(), dc=descCamp();
+ const s=sub(), dsc=desconto(), d5=descOnline(), dr=descResto(), da=descAcai(), sv=servico(), cp=campCalc(), dc=descCamp();
  /* a entrega é grátis ACIMA de 750 — 750 certos ainda paga */
  const falta=Math.max(5, Math.ceil((FREE+1-subLiq())/5)*5);
  let h=`<div class="tot"><span>${t("subtotal")}</span><b>${s} ECV</b></div>`;
- if(d5) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descon")} (−${DESC_ONLINE}%)</span><b>−${d5} ECV</b></div>`;
+ if(dr) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descon")} (−${DESC_ONLINE}%)</span><b>−${dr} ECV</b></div>`;
+ if(da) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descAcai").replace("{p}",DESC_ACAI_TXT)}</span><b>−${da} ECV</b></div>`;
  const ec=escCalc();
  if(dc) h+=`<div class="tot" style="color:#2E6B32"><span>${ec.v?et("escTot"):ct(cp.tipo===3?"campTot3":"campTot2")}</span><b>−${dc} ECV</b></div>`;
  if(dsc) h+=`<div class="tot" style="color:#2E6B32"><span>${t("desconto")} (${promo.c})</span><b>−${dsc} ECV</b></div>`;
@@ -2769,8 +2979,8 @@ function totalsHTML(){
    <br><br>${t("manha")}</div>`;
  const anul=anulado();
  if(anul) h+=`<div class="warn">${t("naoacum")} ${anul}</div>`;
- else if(!d5 && mode==="recolha" && !descPromoBruto() && subComDesc()>0)
-  h+=`<div class="warn">${t("incent")}</div>`;
+ else if(!d5 && mode==="recolha" && !descPromoBruto() && (subComDesc()>0 || (temAcai() && !acaiComOferta())))
+  h+=`<div class="warn">${(temAcai() && !acaiComOferta()) ? et(soAcai()?"incentAcai1":"incentAcai") : t("incent")}</div>`;
  /* campanha do açaí: o que falta para a oferta seguinte, e a regra quando já se aplica */
  const maisUm=(k,f)=>`<div class="warn campw campmais"><span>${(f||ct)(k)}</span><button type="button" onclick="campJuntar()"><i aria-hidden="true">+</i>1 ${esc(td(CAMP_PROD))}</button></div>`;
  if(escAcai){
@@ -2829,23 +3039,47 @@ function setMode(m,doUtilizador){
  build();               // menu adapta-se ao modo
  rotularChips();
  acertarHora();
+ horaAcaiAuto();
  fillSlots();
  if($("pisoNome")) $("pisoNome").innerHTML=nomePiso(piso)+"<small>"+notaPiso(piso)+"</small>";
  if($("chkSheet").classList.contains("on")) refreshChk();
 }
+/* 17-10-2026: HORA MARCADA AUTOMÁTICA COM AÇAÍ — quem junta um açaí (para levantar) fica logo com
+   "Hora marcada", que é o que dá os 8%. Vem escolhida a primeira hora livre e o cliente muda-a na lista.
+   Se depois tocar em "Assim que possível", o desconto sai do total nesse instante e fica o aviso verde
+   a dizer quanto perde. A escolha do cliente respeita-se (não volta a marcar ao reabrir o pedido),
+   até ele juntar outro açaí. Nas entregas não se mexe: o desconto é só para levantar. */
+let horaDoCliente=false;
+function marcarHora(){
+ const a=$("chipAsap"), m=$("chipMarcada"); if(!a||!m) return false;
+ timeMode="marcada";
+ a.classList.remove("sel"); m.classList.add("sel");
+ $("slotBox").style.display="block";
+ return true;
+}
+function horaAcaiAuto(forcar){
+ if(mode!=="recolha" || !temAcai() || timeMode==="marcada") return false;
+ if(horaDoCliente && !forcar) return false;
+ return marcarHora();
+}
 function setTime(el){
+ horaDoCliente=true;
  timeMode=el.dataset.t;
  el.parentNode.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel"));el.classList.add("sel");
  $("slotBox").style.display=(timeMode==="marcada")?"block":"none";
  if(timeMode==="marcada") fillSlots();
  refreshChk(); desenharHoraGanho();
 }
+/* percentagem no botão "Hora marcada": 8% quando o pedido é só açaí, senão os 5% */
+function pctHora(){ return (soAcai() && !campAcaiPotencial()) ? DESC_ACAI_TXT : DESC_ONLINE; }
+/* com hora marcada, este açaí levaria uma campanha (e não os 8%)? */
+function campAcaiPotencial(){ const n=nAcai(); return (escAcai && n>=2 && escOff(n)>0) || (campAcai && n>=2 && pagaAntes()); }
 function rotularChips(){
  const _m=$("chipMarcada"), _a=$("chipAsap");
  if(_m&&_a){
   const rec=(mode==="recolha");
   _a.textContent=t("asap")+(rec?" "+t("semdesc"):"");
-  _m.innerHTML=t("marcada")+(rec?'<span class="dsc">−'+DESC_ONLINE+'%</span>':"");
+  _m.innerHTML=t("marcada")+(rec?'<span class="dsc">−'+pctHora()+'%</span>':"");
   _m.classList.toggle("ganha",rec);
   desenharHoraGanho();
   return;
@@ -2853,7 +3087,7 @@ function rotularChips(){
  const m=$("chipMarcada"), a=$("chipAsap");
  if(!m) return;
  if(mode==="recolha"){
-  m.innerHTML="Hora marcada · <b>−"+DESC_ONLINE+"%</b>";
+  m.innerHTML="Hora marcada · <b>−"+pctHora()+"%</b>";
   a.textContent="Assim que possível (sem desconto)";
  }else{
   m.textContent="Hora marcada";
@@ -2900,6 +3134,7 @@ async function fillSlots(){
  }
  if(d && out.length && notarServico(slotHoje,diaISO)) aplicarConfig();
  refreshChk(); desenharHoraGanho();
+ if($("cartSheet").classList.contains("on")) renderCart();     // o total do carrinho também muda com a hora
 }
 function getGeo(){
  if(!navigator.geolocation){$("geoMsg").textContent="O seu telemóvel não permite partilhar localização.";return;}
@@ -2997,7 +3232,8 @@ async function sendWA(){
  L.push("");
  L.push(`Subtotal: ${s} ECV`);
  if(desconto()) L.push(`Desconto (${promo.c} — ${promo.d}): -${desconto()} ECV`);
- if(descOnline()) L.push(`Desconto encomenda online (-${DESC_ONLINE}%): -${descOnline()} ECV`);
+ if(descResto()) L.push(`Desconto encomenda online (-${DESC_ONLINE}%): -${descResto()} ECV`);
+ if(descAcai()) L.push(`Desconto açaí online (-${DESC_ACAI_TXT}%, ${nAcai()} açaí${nAcai()>1?"s":""}): -${descAcai()} ECV`);
  if(descCamp()) L.push(escCalc().v ? `Campanha açaí (${escCalc().n} açaís, -${escCalc().off} ECV em cada): -${descCamp()} ECV`
    : `Campanha açaí (${campCalc().tipo===3?"3 açaís, 1 grátis":"2 açaís, 2.º com -"+CAMP_PCT2+"%"}): -${descCamp()} ECV`);
  if(servico()) L.push(`Taxa de serviço (${TAXA_SERVICO}%): ${servico()} ECV`);
@@ -3077,7 +3313,7 @@ async function sendWA(){
  mtrTag("pedido_campanha", descCamp() ? (escCalc().v ? (escCalc().n>=3 ? "acai3" : "acai2") : "acai_antiga") : "nao");
  mtr("pedido_submetido");
  const info={code:codigo, nome:nome, tel:tel, total:total(), banco:banco, resumo:L.join("\n")};
- cart=[]; promo=null; codigo="";
+ cart=[]; promo=null; codigo=""; horaDoCliente=false;
  refresh(); renderCart(); mostrarRepetir();
  mostrarConfirmacao(precisa, info);
 }
@@ -3281,7 +3517,7 @@ function openCheckout(){
  if(!cart.length)return;
  mtr("checkout_iniciado");
  if(!codigo) codigo=novoCodigo();
- acertarHora(); refreshChk(); desenharHoraGanho(); fillSlots(); show("chkSheet");
+ acertarHora(); horaAcaiAuto(); rotularChips(); refreshChk(); desenharHoraGanho(); fillSlots(); show("chkSheet");
  const cfg0=cfgSinal();                    // as opções do dia podem ter mudado desde que a página abriu
  carregarConfig().then(()=>{ if(cfg0!==cfgSinal()) aplicarConfig(); });
 }
@@ -3289,8 +3525,13 @@ function openCheckout(){
 function desenharHoraGanho(){
  const el=$("horaGanho"); if(!el) return;
  if(mode!=="recolha"){ el.classList.remove("on"); el.innerHTML=""; return; }
- const n=nAcai(), x = (escAcai && n>=2 && escOff(n)>0) ? et("horaGanhoAcai") : "";
- el.innerHTML = et(timeMode==="marcada" ? "horaGanhoB" : "horaGanhoA").replace("{x}",x);
+ const n=nAcai(), marc=(timeMode==="marcada"), camp=campAcaiPotencial();
+ /* 17-10-2026: o açaí tem os seus 8% — só açaí: diz o preço de cada copo; açaí e mais coisas: os 5% e os 8% */
+ if(n && !camp && soAcai()) el.innerHTML = et(marc ? "horaGanhoSoB" : "horaGanhoSoA");
+ else{
+  const x = (escAcai && n>=2 && escOff(n)>0) ? et("horaGanhoAcai") : ((n && !camp) ? et("horaGanhoAcai8") : "");
+  el.innerHTML = et(marc ? "horaGanhoB" : "horaGanhoA").replace("{x}",x);
+ }
  el.classList.add("on");
 }
 function refreshChk(){
@@ -3614,31 +3855,45 @@ const CAPA=[
     frase do açaí (usa a mesma foto — foto:3), é a primeira a aparecer e fica "mais" milésimos além das outras.
     Os textos estão nos 5 idiomas, nas chaves capaCamp* e cc*. */
  {prod:"Açaí", camp:true, foto:3, mais:3000},
+ /* 17-10-2026: BANNER TROPICAL DO AÇAÍ (−8% no site) — o PRIMEIRO banner. Fundo #capaTropFundo, texto no painel do mural.
+    Passagens: "8% de desconto no açaí" → "875$ o açaí" (→ preços da campanha dos escalões, se estiver anunciada).
+    Sai sozinho com o açaí esgotado ou retirado do menu. Para o tirar, pôr CAPA_ACAI=false.
+    Os textos estão nas chaves tr… (5 idiomas); os números vêm de DESC_ACAI_TXT e do preço do açaí no menu. */
+ {mural:"acai"},
  /* MURAL DOS DESCONTOS — não é foto de produto: é o painel de cor, animado, com as regras de desconto do site.
-    É SEMPRE o primeiro banner. Para o tirar, pôr CAPA_MURAL=false.
-    Os números vêm do carrinho (DESC_ONLINE, preço do açaí no menu, ESC_PRECO2, ESC_PRECO3); as frases estão nas chaves mur… (5 idiomas). */
+    Vem logo a seguir ao do açaí ("5% no resto do menu"); sem o banner do açaí é o primeiro e diz só "5% nos pedidos online".
+    Para o tirar, pôr CAPA_MURAL=false (tira também o do açaí).
+    Os números vêm do carrinho (DESC_ONLINE); as frases estão nas chaves mur… (5 idiomas). */
  {mural:true, mais:2500}
 ];
-const CAPA_MURAL=true;
+const CAPA_MURAL=true, CAPA_ACAI=true;
 const CAPA_SEG=6500;
 /* tempo de cada passagem do mural: 5% e 750$ = MUR_T1; 675$ e 600$ (campanha) = MUR_T2, um pouco mais para se ler.
    MUR_SAI = quanto dura o apagar da passagem antes de entrar a seguinte */
 const MUR_T1=5000, MUR_T2=6000, MUR_SAI=450;
-let _capaK=0, _capaT=0, _capaPts="", _capaCamp="", _murB=0, _murT=0, _murS=0;
-/* as "batidas" do mural: a regra dos 5%; o preço do açaí no site (com os 5%) enquanto houver açaí;
-   e, com a campanha dos escalões anunciada, o preço por copo de cada escalão.
+let _capaK=0, _capaT=0, _capaPts="", _capaCamp="", _murB=0, _murT=0, _murS=0, _murTipo=true;
+/* o açaí está à venda (no menu e não esgotado)? então o banner dele entra na capa */
+function acaiVende(){ return !!findMenuItem(CAMP_PROD) && !esgotados.includes(CAMP_PROD); }
+function acaiNaCapa(){ return CAPA_MURAL && CAPA_ACAI && acaiVende(); }
+/* as "batidas" de cada painel de cor (tipo = CAPA[i].mural; sem tipo, o que está à vista):
+   "acai" (banner tropical): 8% no açaí · o preço do açaí no site (875$) · com a campanha dos escalões anunciada,
+          o preço por copo de cada escalão;
+   true (mural amarelo): os 5% — "no resto do menu" quando o banner do açaí está na capa.
    n = o que aparece em grande · o = a etiqueta ao lado · c = tamanho ("d3" para preços com 4 algarismos) */
-function murBatidas(){
- const b=[{ms:MUR_T1, n:DESC_ONLINE+"%", o:t("murOff"), c:(DESC_ONLINE>=10?"d2":""), k:t("murK"), l:t("murL"), nota:t("murN")}];
- if(!findMenuItem(CAMP_PROD) || esgotados.includes(CAMP_PROD)) return b;
- const pb=acaiMenuP(), v1=precoOnline(pb);
- if(pb && v1<pb) b.push({ms:MUR_T1, acai:1, n:v1+"$", o:t("murAcaiO"), c:"d3", k:t("murK"), l:t("murAcaiL"), nota:t("murAcaiN").replace("{pb}",pb)});
- if(escMostra()){
-  const q=escPeriodo(), k=td(CAMP_PROD)+(q ? " · "+q : "!");                  // "Açaí · 12 – 18 de out."
-  if(escOff(2)>0) b.push({ms:MUR_T2, acai:1, n:ESC_PRECO2+"$", o:t("murCada"), c:"d3", k:k, l:t("murL2"), nota:t("murN2")});
-  if(escOff(3)>0) b.push({ms:MUR_T2, acai:1, n:ESC_PRECO3+"$", o:t("murCada"), c:"d3", k:k, l:t("murL3"), nota:t("murN2")});
+function murBatidas(tipo){
+ if(tipo===undefined) tipo=_murTipo;
+ if(tipo==="acai"){
+  const pb=acaiMenuP(), v1=precoAcaiOnline(pb), k=t("trK");
+  const b=[{ms:MUR_T1, n:DESC_ACAI_TXT+"%", o:t("murOff"), c:"", k:k, l:t("trL"), nota:t("murN")}];
+  if(pb && v1<pb) b.push({ms:MUR_T1, n:v1+"$", o:t("murAcaiO"), c:"d3", k:k, l:t("murAcaiL"), nota:t("murAcaiN").replace("{pb}",pb)});
+  if(escMostra()){
+   const q=escPeriodo(), kq=td(CAMP_PROD)+(q ? " · "+q : "!");                  // "Açaí · 12 – 18 de out."
+   if(escOff(2)>0) b.push({ms:MUR_T2, n:ESC_PRECO2+"$", o:t("murCada"), c:"d3", k:kq, l:t("murL2"), nota:t("murN2")});
+   if(escOff(3)>0) b.push({ms:MUR_T2, n:ESC_PRECO3+"$", o:t("murCada"), c:"d3", k:kq, l:t("murL3"), nota:t("murN2")});
+  }
+  return b;
  }
- return b;
+ return [{ms:MUR_T1, n:DESC_ONLINE+"%", o:t("murOff"), c:(DESC_ONLINE>=10?"d2":""), k:t("murK"), l:t(acaiNaCapa()?"murLResto":"murL"), nota:t("murN")}];
 }
 /* mostra a batida k. Com "bate": a anterior apaga-se devagar (MUR_SAI) e a nova entra (o número carimba e a frase sobe) */
 function murPor(k,bate){
@@ -3667,33 +3922,39 @@ function murRelogio(){
  passo();
 }
 function capaDur(i){
- if(CAPA[i]&&CAPA[i].mural){ const b=murBatidas(); if(b.length>1) return b.reduce((t,x)=>t+(x.ms||MUR_T1),0)-60; }     // dá a volta completa aos números e segue
+ if(CAPA[i]&&CAPA[i].mural){ const b=murBatidas(CAPA[i].mural); if(b.length>1) return b.reduce((t,x)=>t+(x.ms||MUR_T1),0)-60; }     // dá a volta completa aos números e segue
  return CAPA_SEG+((CAPA[i]&&CAPA[i].mais)||0);
 }
 function capaLista(){
- const l=[]; let mur=-1;
+ const l=[], murs=[];
  CAPA.forEach((c,i)=>{
-  if(c.mural){ if(CAPA_MURAL) mur=i; return; }
+  if(c.mural){ if(CAPA_MURAL && (c.mural!=="acai" || acaiNaCapa())) murs.push(i); return; }
   const f=findMenuItem(c.prod); if(!f || esgotados.includes(f.item.n)) return;
   if(c.camp){ if(campMostra()) l.unshift(i); return; }
   if(campMostra() && c.prod===CAMP_PROD) return;
   l.push(i);
  });
- if(mur>=0) l.unshift(mur);                                    // o mural abre sempre a capa
- return l.length?l:[0];
+ const r=murs.concat(l);                                       // os painéis de cor abrem a capa: açaí, depois os 5%
+ return r.length?r:[0];
 }
 /* texto de uma foto: frase + resposta, ou o quadro da campanha (3 açaís -> 1 grátis · 2 açaís -> 2.º com −50%) */
 function capaTexto(i){
  const sec=document.querySelector(".home-hero.capa"), c=CAPA[i], pt=(LANG==="pt"), q=$("capaCamp"), m=$("capaMural");
  sec.classList.toggle("camp",!!c.camp);
  sec.classList.toggle("mural",!!c.mural);
+ sec.classList.toggle("trop",c.mural==="acai");
  if(!c.mural) sec.classList.remove("mur2","mur-acai");
  if(m) m.hidden=!c.mural;
  if(c.mural){
+  _murTipo=c.mural;
   /* o que se vê é o painel #capaMural; a frase e o título ficam só para leitores de ecrã (dizem tudo de uma vez) */
-  $("capaA").textContent=String(t("murK")).replace(/\s*!$/,"");
-  const nb=murBatidas().length;                  // 1 = só os 5% · 2 = mais o açaí no site · 3 ou 4 = mais a campanha
-  $("home-title").textContent=t("murAlt")+(nb>1 ? " "+et("murAltA") : "")+(nb>2 ? " "+et("murAlt2") : "");
+  if(c.mural==="acai"){
+   $("capaA").textContent=String(t("trK")).replace(/\s*!$/,"");
+   $("home-title").textContent=et("trAlt")+(murBatidas().length>2 ? " "+et("murAlt2") : "");
+  }else{
+   $("capaA").textContent=String(t("murK")).replace(/\s*!$/,"");
+   $("home-title").textContent=t("murAlt");
+  }
   murPor(_murB,false);
   if(q){ q.hidden=true; q.innerHTML=""; }
  }else if(c.camp){
@@ -3715,7 +3976,8 @@ function desenharCapa(animar){
  const lista=capaLista(); if(!lista.includes(_capaK)) _capaK=lista[0];
  const c=CAPA[_capaK], f=c.mural?null:findMenuItem(c.prod), foto=c.mural?-1:(c.foto!=null?c.foto:_capaK);
  sec.querySelectorAll(".hero-slide").forEach((s,i)=>s.classList.toggle("on",i===foto));
- const fundo=$("capaMuralFundo"); if(fundo) fundo.classList.toggle("on",!!c.mural);
+ const fundo=$("capaMuralFundo"); if(fundo) fundo.classList.toggle("on",c.mural===true);
+ const trop=$("capaTropFundo"); if(trop) trop.classList.toggle("on",c.mural==="acai");
  sec.classList.toggle("roxo",c.camp?true:_capaK%2===1);
  sec.style.setProperty("--capa-seg",(capaDur(_capaK)/1000)+"s");      // a barrinha enche no tempo desta foto
  if(c.mural && animar) _murB=0;                                       // ao chegar ao mural começa-se pelo primeiro número
@@ -3723,7 +3985,11 @@ function desenharCapa(animar){
  if(c.mural && animar) murPor(0,true);
  murRelogio();
  const cta=$("capaCta"), fim=!f||esgotados.includes(f.item.n);
- if(c.mural){                                   // no mural o botão leva ao menu (só aparece em ecrã largo)
+ if(c.mural==="acai"){                         // banner do açaí: o botão abre o açaí (só aparece em ecrã largo)
+  cta.hidden=false;
+  cta.innerHTML='<span>'+esc(t("trCta"))+'</span>';
+  cta.onclick=()=>abrirProduto(CAMP_PROD);
+ } else if(c.mural){                            // no mural o botão leva ao menu (só aparece em ecrã largo)
   cta.hidden=false;
   cta.innerHTML='<span>'+esc(t("murCta"))+'</span>';
   cta.onclick=()=>scrollHome("menu");
@@ -3733,7 +3999,7 @@ function desenharCapa(animar){
   cta.innerHTML='<i aria-hidden="true">+</i><span>'+esc(td(f.item.n))+'</span><b>'+p+'$</b>';
   cta.onclick=()=>pick(f.ci,f.ii);
  } else { cta.hidden=true; cta.onclick=null; }
- const pts = lista.length>1 ? lista.map(i=>`<button type="button" class="${i===_capaK?"on":""}" onclick="capaIr(${i})" aria-label="${esc(CAPA[i].mural?(DESC_ONLINE+"% · "+t("murOff")):CAPA[i].camp?ct("capaCampB"):td(CAPA[i].prod))}"></button>`).join("") : "";
+ const pts = lista.length>1 ? lista.map(i=>`<button type="button" class="${i===_capaK?"on":""}" onclick="capaIr(${i})" aria-label="${esc(CAPA[i].mural==="acai"?(td(CAMP_PROD)+" · "+DESC_ACAI_TXT+"% "+t("murOff")):CAPA[i].mural?(DESC_ONLINE+"% · "+t("murOff")):CAPA[i].camp?ct("capaCampB"):td(CAPA[i].prod))}"></button>`).join("") : "";
  if(pts!==_capaPts || animar){ $("capaPts").innerHTML=pts; _capaPts=pts; }
  if(animar){ const tx=sec.querySelector(".capa-txt"); tx.classList.remove("entra"); void tx.offsetWidth; tx.classList.add("entra"); }
 }
@@ -3773,14 +4039,14 @@ function capaRelogio(){
 }
 /* a campanha ligou-se ou desligou-se: a capa abre na foto da campanha (ou volta à primeira) e mede-se de novo */
 function capaCampanha(){
- const sinal=campMostra()+"|"+escMostra()+"|"+escPeriodo();
+ const sinal=campMostra()+"|"+escMostra()+"|"+escPeriodo()+"|"+acaiNaCapa();
  if(sinal===_capaCamp) return;
  _capaCamp=sinal;
  _capaK=capaLista()[0]; _murB=0;
  desenharCapa(true); capaMedir(); capaRelogio();
 }
 _capaK=capaLista()[0];          // abre no primeiro banner da rotação (o mural, quando está ligado)
-_capaCamp=campMostra()+"|"+escMostra()+"|"+escPeriodo();
+_capaCamp=campMostra()+"|"+escMostra()+"|"+escPeriodo()+"|"+acaiNaCapa();
 var _capaPronta=true;          // antes desta linha a lista CAPA ainda não existe: build() e traduzir() não a podem usar
 desenharCapa(false); capaMedir(); capaRelogio();
 (function(){ let t=0, w=window.innerWidth;
