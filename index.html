@@ -429,6 +429,12 @@ textarea.fld{min-height:74px;resize:vertical;}
 #bankChips .chip.pref.sel{border-color:#D9A21B;background:var(--dark);color:#FFF3D6;
  box-shadow:0 0 0 3px rgba(255,196,0,.20),0 3px 14px rgba(201,138,0,.30);}
 #bankChips .chip .estrela{width:14px;height:14px;margin-left:5px;vertical-align:-2px;}
+/* 19-10-2026: descrição pequena por baixo, como o antigo "Outro banco → BAI" */
+#bankChips .chip small.sub{display:block;margin-top:3px;font-size:11.5px;font-weight:400;color:#8B5E3C;}
+#bankChips .chip.sel small.sub{color:#EAD9BE;}
+/* 19-10-2026: quem é o titular, numa linha pequena por baixo do nome (cartão do fecho e ecrã final) */
+.bankcard .ln b small.tsub{display:block;margin-top:2px;font-family:'Jost',sans-serif;font-size:11.5px;font-weight:300;letter-spacing:0;color:#D9C7A8;}
+.pgdados .ln b small.tsub{display:block;margin-top:1px;font-size:12px;font-weight:400;color:var(--ink2);}
 #bankChips .chip.pref::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;pointer-events:none;
  background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.55) 50%,transparent 100%);
  transform:skewX(-18deg);animation:nibBrilho 4.5s ease-in-out 1s infinite;}
@@ -1978,11 +1984,11 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
    ---- AÇAÍ NO DESTAQUE (19-10-2026): o que vem no copo, numa linha da legenda (dropInc) ---- */
 (function(){
  const R={
-  pt:{nibChip:"Outras contas bancárias",dropIncA:"4 frutas",dropIncB:"leite em pó",dropIncD:"leite condensado",dropIncC:"toppings"},
-  en:{nibChip:"Other banks",dropIncA:"4 fruits",dropIncB:"milk powder",dropIncD:"condensed milk",dropIncC:"toppings"},
-  fr:{nibChip:"Autres banques",dropIncA:"4 fruits",dropIncB:"lait en poudre",dropIncD:"lait concentré",dropIncC:"toppings"},
-  de:{nibChip:"Andere Banken",dropIncA:"4 Früchte",dropIncB:"Milchpulver",dropIncD:"Kondensmilch",dropIncC:"Toppings"},
-  nl:{nibChip:"Andere banken",dropIncA:"4 soorten fruit",dropIncB:"melkpoeder",dropIncD:"gecondenseerde melk",dropIncC:"toppings"}
+  pt:{nibChip:"Outras contas bancárias",nibSub:"outros bancos → BCA",nibTit:"Sócio-gerente do Emma's Place",dropIncA:"4 frutas",dropIncB:"leite em pó",dropIncD:"leite condensado",dropIncC:"toppings"},
+  en:{nibChip:"Other banks",nibSub:"other banks → BCA",nibTit:"Managing partner of Emma's Place",dropIncA:"4 fruits",dropIncB:"milk powder",dropIncD:"condensed milk",dropIncC:"toppings"},
+  fr:{nibChip:"Autres banques",nibSub:"autres banques → BCA",nibTit:"Associé-gérant d'Emma's Place",dropIncA:"4 fruits",dropIncB:"lait en poudre",dropIncD:"lait concentré",dropIncC:"toppings"},
+  de:{nibChip:"Andere Banken",nibSub:"andere Banken → BCA",nibTit:"Geschäftsführender Gesellschafter von Emma's Place",dropIncA:"4 Früchte",dropIncB:"Milchpulver",dropIncD:"Kondensmilch",dropIncC:"Toppings"},
+  nl:{nibChip:"Andere banken",nibSub:"andere banken → BCA",nibTit:"Zaakvoerder van Emma's Place",dropIncA:"4 soorten fruit",dropIncB:"melkpoeder",dropIncD:"gecondenseerde melk",dropIncC:"toppings"}
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
@@ -2227,7 +2233,7 @@ function migrarNomes(ed){
    chipK = texto traduzido do botão (bloco "BANCO PREFERIDO" mais acima). */
 const BANCOS=[
  {id:"nib",   b:"BCA",              t:"João Leal",    lbl:"NIB",   c:"000300008362331310176",
-  pref:true, chipK:"nibChip"},
+  pref:true, chipK:"nibChip", subK:"nibSub", titK:"nibTit"},
  {id:"bai",   b:"BAI",              t:"Emma's Place", lbl:"Conta", c:"100400076861001"}
 ];
 const ESTRELA_BANCO='<svg class="estrela" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="#FFC400" stroke="#C98A00" stroke-width="1.3" stroke-linejoin="round"/></svg>';
@@ -3375,7 +3381,7 @@ function mostrarConfirmacao(precisa, d){
    '<div class="pgdados">'+
     '<div class="pgvalor"><span>'+t("okPagar")+'</span><b>'+d.total+' ECV</b></div>'+
     '<div class="ln"><span>'+t("okBanco")+'</span><b>'+esc(d.banco.b)+'</b></div>'+
-    '<div class="ln"><span>'+t("okTitular")+'</span><b>'+esc(d.banco.t)+'</b></div>'+
+    '<div class="ln"><span>'+t("okTitular")+'</span><b>'+esc(d.banco.t)+(d.banco.titK?'<small class="tsub">'+t(d.banco.titK)+'</small>':'')+'</b></div>'+
     '<div class="ln"><span>'+esc(d.banco.lbl)+'</span><b>'+esc(d.banco.c)+'</b>'+cop("conta")+'</div>'+
     '<div class="ln"><span>'+t("okDescr")+'</span><b>'+esc(d.code)+'</b>'+cop("codigo")+'</div>'+
    '</div>'+
@@ -3602,7 +3608,7 @@ function refreshChk(){
  if(precisa){
   if(!banco) banco=BANCOS.find(b=>b.pref)||null;   // o banco preferido já vem escolhido; o cliente pode mudar
   $("bankChips").innerHTML=BANCOS.map(b=>
-   `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)"><span>${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO:""}</span></button>`).join("");
+   `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)"><span>${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO:""}${b.subK?`<small class="sub">${t(b.subK)}</small>`:""}</span></button>`).join("");
   drawBank();
  }
 }
@@ -3618,7 +3624,7 @@ function drawBank(){
  box.style.display="block";
  const nota=banco.notaK?t(banco.notaK):banco.nota;
  box.innerHTML=`<div class="bk">${banco.b}</div>
-  <div class="ln"><span>${t("titular")}</span><b>${banco.t}</b></div>
+  <div class="ln"><span>${t("titular")}</span><b>${banco.t}${banco.titK?`<small class="tsub">${t(banco.titK)}</small>`:""}</b></div>
   <div class="ln"><span>${banco.lbl}</span><b>${banco.c}</b></div>
   ${nota?`<div class="bnota">${nota}</div>`:""}
   <div class="ln"><span>${t("valorex")}</span><span class="amt">${total()} ECV</span></div>
