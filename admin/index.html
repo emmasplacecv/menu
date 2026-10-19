@@ -352,7 +352,7 @@ body{padding-bottom:76px;}
 
   <div id="abaStk" style="display:none">
     <div class="aviso">
-      Quantidades que tem <b>hoje</b> de cada comida. A cozinha vai dando baixa a cada venda.
+      Quantidades que tem <b>hoje</b> de cada produto (comidas, açaí, água de coco). Cada venda dá baixa sozinha.
       Quando chega a <b>0</b>, o produto aparece esgotado no site automaticamente.
       <br><br>Deixe em branco o que não quer controlar. Amanhã recomeça do zero.
     </div>
@@ -578,13 +578,16 @@ async function alternarEstado(){
 }
 
 
-/* ---------- STOCK DO DIA (só comidas) ---------- */
-const CAT_COMIDA = ["DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
+/* ---------- STOCK DO DIA (tudo menos as bebidas feitas na hora) ----------
+   19-10-2026: antes era uma lista fechada de comidas — o açaí, a água de coco, as categorias
+   criadas aqui e os produtos acrescentados no separador Menu não apareciam.
+   A MESMA lista está na /cozinha (separador Stock): mudar nos dois. */
+const CAT_SEM_QTD = ["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS","SUMOS NATURAIS"];
 let stock = {}, stockSujo = false, stockMudados = new Set();
 
-function ehComida(cat){
+function controlaQtd(cat){
   const n = String(cat||"").replace(/&amp;/g,"&").trim().toUpperCase();
-  return CAT_COMIDA.includes(n);
+  return !CAT_SEM_QTD.includes(n);
 }
 
 async function carregarStock(){
@@ -600,8 +603,11 @@ async function carregarStock(){
 
 function desenharStock(){
   let h = "";
-  MENU.forEach(([cat, itens]) => {
-    if(!ehComida(cat)) return;
+  MENU.forEach(([cat], ci) => {
+    if(!controlaQtd(cat) || catOff(cat)) return;
+    /* produtos do menu base + os acrescentados no separador Menu, sem os retirados */
+    const itens = itensDaCat(ci).filter(it => !(edit.off || []).includes(it.n));
+    if(!itens.length) return;
     h += `<div class="cat">${cat}</div>`;
     itens.forEach(it => {
       const q = stock[it.n];
