@@ -528,13 +528,18 @@ if("serviceWorker" in navigator){
 
 
 /* ---------- STOCK DO DIA ---------- */
-const MENU_STK = [["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Americano", "m": 120, "g": 150}, {"n": "Cappuccino", "m": 140, "g": 180}, {"n": "Latte Clássico", "m": 130, "g": 170, "d": "meia de leite"}, {"n": "Mocha", "m": 170, "g": 190}, {"n": "Latte de Caramelo", "m": 180, "g": 200}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 175, "g": 200}, {"n": "Iced Latte de Caramelo", "m": 275, "g": 300}, {"n": "Café Instantâneo Gelado", "m": 225, "g": 250}, {"n": "Frappé de Chocolate", "m": 275, "g": 300}, {"n": "Frappé de Caramelo", "m": 300, "g": 325}, {"n": "Frappé Clássico", "m": 225, "g": 250}, {"n": "Iced Mocha", "m": 275, "g": 300}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 350}, {"n": "Sumo de Manga", "m": 450}, {"n": "Sumo de Papaia", "m": 350}, {"n": "Sumo de Ananás", "m": 500}, {"n": "Sumo de Maçã", "m": 350}]], ["DONUTS & MUFFINS", [{"n": "Donut de Chocolate", "m": 135}, {"n": "Donut de Doce de Leite", "m": 120}, {"n": "Muffin de Chocolate", "m": 100}, {"n": "Muffin de Laranja", "m": 95}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 150, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 140, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 190, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 190, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 180, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta Mista", "m": 180}, {"n": "Tosta de Fiambre", "m": 160}, {"n": "Tosta de Queijo", "m": 160}, {"n": "Tosta com Manteiga", "m": 120}, {"n": "Wrap de Frango", "m": 400}, {"n": "Wrap de Atum", "m": 400}]], ["ALMOÇO", [{"n": "Salada Fria de Frango", "m": 420, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 420, "d": "massa espiral, legumes, molho leve"}, {"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Poke Bowl de Frango", "m": 600}, {"n": "Poke Bowl de Atum", "m": 700}, {"n": "Poke Bowl de Salmão", "m": 700}]]];
-const CAT_COMIDA = ["DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
+/* 19-10-2026: lista igual à da Gestão e das Vendas (antes faltava a categoria AÇAÍ & ÁGUA DE COCO).
+   Ao mudar produtos/categorias no código do site, actualizar também aqui, no /admin e em /vendas. */
+const MENU_STK = [["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "d": "copo de 355 ml · preços nas três linhas abaixo"}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 375}, {"n": "Sumo de Maçã", "m": 375}, {"n": "Sumo de Manga", "m": 400}, {"n": "Sumo de Papaia", "m": 450}, {"n": "Sumo de Ananás", "m": 500}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
+/* 19-10-2026: quantidade em TODAS as categorias menos as bebidas feitas na hora.
+   Antes era uma lista fechada de comidas: o açaí, a água de coco e as categorias novas do /admin ficavam de fora.
+   A MESMA lista está no /admin (separador Stock): mudar nos dois. */
+const CAT_SEM_QTD = ["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS","SUMOS NATURAIS"];
 let stock = {}, fora = [];
 
-function ehComida(cat){
+function controlaQtd(cat){
   const n = String(cat||"").replace(/&amp;/g,"&").trim().toUpperCase();
-  return CAT_COMIDA.includes(n);
+  return !CAT_SEM_QTD.includes(n);
 }
 
 function verSeccao(q){
@@ -574,7 +579,7 @@ function limparBuscaStk(){ document.getElementById("fBuscaStk").value=""; pesqui
 function desenharStock(){
   let h = "", achou = false;
   MENU_STK.forEach(([cat, itens], ci) => {
-    if(!ehComida(cat)) return;
+    if(!controlaQtd(cat)) return;
     const filtrados = itens
       .map((it, ii) => ({ it, ii }))
       .filter(({it}) => !buscaStk || normalizar(it.n).includes(buscaStk));
