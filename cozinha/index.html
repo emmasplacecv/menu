@@ -317,7 +317,7 @@ async function carregar(){
    pedidos=d.pedidos||[];
    if(d._offline) falhas=Math.max(falhas,2);          // veio da cópia deste aparelho (sem internet)
    else { _ultimaOk=Date.now(); falhas=0; }
-   verificarNovos(pedidos);
+   verificarNovos(pedidos.filter(p => !p.balcao));   // 19-10-2026: vendas do balcão só ficam registadas, sem som nem vibração
    /* só redesenha quando alguma coisa mudou — assim o ecrã não salta
       nem perde um toque a meio de cada 3 segundos */
    const nova=pedidos.map(p=>p.id+":"+p.status+":"+p.slot+":"+(p.balcaoPago?1:0)+":"+(p.notas||"")).join("|");
