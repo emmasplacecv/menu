@@ -417,12 +417,20 @@ textarea.fld{min-height:74px;resize:vertical;}
 .bankcard .ref{background:#F7F1E4;color:var(--dark);border-radius:10px;padding:8px 10px;margin-top:10px;
  font-size:13.5px;text-align:center;line-height:1.5;}
 .bankcard .ref b{font-family:monospace;font-size:16px;letter-spacing:1px;}
-/* 18-10-2026: banco preferido (NIB) — contorno dourado, estrela amarela e "recomendamos" por baixo (como no açaí) */
-#bankChips .chip.pref{border-color:#C98A00;background:#FFF8E6;padding:6px 15px;line-height:1.2;}
-#bankChips .chip.pref.sel{border-color:var(--dark);background:var(--dark);}
+/* 18-10-2026: banco preferido (NIB) — primeiro, estrela amarela, letra um pouco mais forte e brilho discreto
+   (halo dourado + um reflexo que passa devagar). Sem "recomendamos". */
+#bankChips .chip.pref{position:relative;overflow:hidden;font-weight:600;border-color:#D9A21B;
+ background:linear-gradient(135deg,#FFF9E8 0%,#FFEFC2 100%);
+ box-shadow:0 0 0 3px rgba(255,196,0,.14),0 3px 12px rgba(201,138,0,.22);}
+#bankChips .chip.pref.sel{border-color:#D9A21B;background:var(--dark);color:#FFF3D6;
+ box-shadow:0 0 0 3px rgba(255,196,0,.20),0 3px 14px rgba(201,138,0,.30);}
 #bankChips .chip .estrela{width:14px;height:14px;margin-left:5px;vertical-align:-2px;}
-#bankChips .chip small.rec{display:block;margin-top:2px;font-size:11.5px;font-weight:500;letter-spacing:.2px;color:#8B5E3C;}
-#bankChips .chip.sel small.rec{color:#EAD9BE;}
+#bankChips .chip.pref::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;pointer-events:none;
+ background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.55) 50%,transparent 100%);
+ transform:skewX(-18deg);animation:nibBrilho 4.5s ease-in-out 1s infinite;}
+#bankChips .chip.pref.sel::after{background:linear-gradient(100deg,transparent 0%,rgba(255,232,170,.24) 50%,transparent 100%);}
+@keyframes nibBrilho{0%{left:-60%}22%{left:125%}100%{left:125%}}
+@media (prefers-reduced-motion:reduce){#bankChips .chip.pref::after{animation:none;display:none;}}
 
 @media(min-width:720px){
  .cards{grid-template-columns:1fr 1fr;}
@@ -532,6 +540,13 @@ textarea.fld{min-height:74px;resize:vertical;}
 .drop-add:hover{filter:brightness(1.07);}
 .drop-add:active{transform:scale(.96);}
 .drop-add i{font-style:normal;font-size:15px;line-height:1;}
+/* 18-10-2026: o que vem no copo de açaí, em cima da foto (o preço sozinho parecia caro) */
+.drop-inc{position:absolute;top:10px;left:10px;z-index:2;pointer-events:none;max-width:calc(100% - 20px);
+ padding:6px 10px 7px;border-radius:12px;background:rgba(74,37,69,.9);border:1px solid rgba(243,213,179,.55);
+ box-shadow:0 4px 12px rgba(0,0,0,.22);color:#F7F1E4;line-height:1.15;}
+.drop-inc b{display:block;font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:#F3D5B3;}
+.drop-inc span{display:block;margin-top:1px;font-size:11.5px;font-weight:500;letter-spacing:.2px;}
+@media (max-width:420px){.drop-inc{top:8px;left:8px;padding:5px 8px 6px;}.drop-inc b{font-size:14px;}.drop-inc span{font-size:10.5px;}}
 
 /* ---- Selector de zona de entrega ---- */
 .zonabox{position:relative;}
@@ -619,6 +634,7 @@ textarea.fld{min-height:74px;resize:vertical;}
  font-size:12px;font-weight:600;text-align:center;line-height:1.3;}
 .drop-media figcaption .drop-st b{display:inline;font:inherit;}
 .drop-media figure.off img{filter:grayscale(.9) brightness(.72);}
+.drop-media figure.off .drop-inc{opacity:.5;}
 .drop-media figure.off .drop-add{display:none;}
 .drop-media figure.off>button{cursor:default;}
 .drop-media figure[hidden]{display:none;}
@@ -1300,6 +1316,7 @@ textarea.fld{min-height:74px;resize:vertical;}
     <div class="drop-media">
       <figure data-prod="Açaí">
         <button type="button" onclick="abrirProduto('Açaí')" aria-label="Açaí"><img src="img/destaque-acai.webp" alt="Açaí" loading="eager"></button>
+        <span class="drop-inc"><b data-i18n="dropInc1"></b><span data-i18n="dropInc2"></span></span>
         <figcaption><b data-i18n="dropP1"></b><span data-i18n="dropP1s"></span><span class="drop-price"></span><small class="drop-st"></small>
           <button type="button" class="drop-add" onclick="abrirProduto('Açaí')"><i>+</i><span data-i18n="addCurto"></span></button></figcaption>
       </figure>
@@ -1951,14 +1968,15 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
-/* ---- BANCO PREFERIDO (18-10-2026): botão "Qualquer banco · NIB" e nota da conta do João Leal ---- */
+/* ---- BANCO PREFERIDO (18-10-2026): texto do botão "Qualquer banco · NIB" ----
+   ---- AÇAÍ NO DESTAQUE (18-10-2026): o que vem no copo, escrito em cima da foto (dropInc1 + dropInc2) ---- */
 (function(){
  const R={
-  pt:{nibChip:"Qualquer banco · NIB",nibNota:"João Leal é sócio-gerente do Emma's Place. Pode transferir a partir de qualquer banco."},
-  en:{nibChip:"Any bank · NIB",nibNota:"João Leal is the managing partner of Emma's Place. You can transfer from any bank."},
-  fr:{nibChip:"Toute banque · NIB",nibNota:"João Leal est l'associé-gérant d'Emma's Place. Virement possible depuis n'importe quelle banque."},
-  de:{nibChip:"Jede Bank · NIB",nibNota:"João Leal ist geschäftsführender Gesellschafter von Emma's Place. Überweisung von jeder Bank möglich."},
-  nl:{nibChip:"Elke bank · NIB",nibNota:"João Leal is zaakvoerder van Emma's Place. U kunt vanaf elke bank overschrijven."}
+  pt:{nibChip:"Qualquer banco · NIB",dropInc1:"4 frutas",dropInc2:"Granola e toppings"},
+  en:{nibChip:"Any bank · NIB",dropInc1:"4 fruits",dropInc2:"Granola &amp; toppings"},
+  fr:{nibChip:"Toute banque · NIB",dropInc1:"4 fruits",dropInc2:"Granola et toppings"},
+  de:{nibChip:"Jede Bank · NIB",dropInc1:"4 Früchte",dropInc2:"Granola &amp; Toppings"},
+  nl:{nibChip:"Elke bank · NIB",dropInc1:"4 soorten fruit",dropInc2:"Granola &amp; toppings"}
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
@@ -2196,11 +2214,12 @@ function migrarNomes(ed){
  return e;
 }
 /* 18-10-2026: a transferência por NIB passou para a conta do João Leal no BCA (antes: NIB do BAI, Emma's Place).
-   É a conta preferida (pref): aparece primeiro, já escolhida, com estrela e "recomendamos" — destaque discreto.
-   chipK/notaK = textos traduzidos (bloco "BANCO PREFERIDO" mais acima). */
+   É a conta preferida (pref): aparece primeiro, já escolhida, com estrela, letra um pouco mais forte e brilho
+   discreto — sem "recomendamos" nem nota (pedido de 18-10-2026, 23h27).
+   chipK = texto traduzido do botão (bloco "BANCO PREFERIDO" mais acima). */
 const BANCOS=[
  {id:"nib",   b:"BCA",              t:"João Leal",    lbl:"NIB",   c:"000300008362331310176",
-  pref:true, chipK:"nibChip", notaK:"nibNota"},
+  pref:true, chipK:"nibChip"},
  {id:"bca",   b:"BCA",              t:"Na Via",       lbl:"Conta", c:"9261676510001",
   nota:"Na Via é a empresa que trata da organização e entrega dos pedidos do Emma's Place."},
  {id:"bai",   b:"BAI",              t:"Emma's Place", lbl:"Conta", c:"100400076861001"},
@@ -3578,7 +3597,7 @@ function refreshChk(){
  if(precisa){
   if(!banco) banco=BANCOS.find(b=>b.pref)||null;   // o banco preferido já vem escolhido; o cliente pode mudar
   $("bankChips").innerHTML=BANCOS.map(b=>
-   `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)">${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO+`<small class="rec">${t("acaiRec")}</small>`:""}</button>`).join("");
+   `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)">${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO:""}</button>`).join("");
   drawBank();
  }
 }
