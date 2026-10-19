@@ -6,7 +6,7 @@
       Com internet vai sempre buscar a versão nova primeiro; sem internet usa a cópia.
       O que se vende sem internet fica numa fila (ver /painel-offline.js). */
 
-const VERSAO = "ep-cozinha-v8";       /* mudar o número sempre que este ficheiro mudar */
+const VERSAO = "ep-cozinha-v9";       /* mudar o número sempre que este ficheiro mudar */
 const ESSENCIAL = ["./", "manifest-cozinha.json", "/painel-offline.js", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", event => {
