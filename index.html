@@ -417,6 +417,10 @@ textarea.fld{min-height:74px;resize:vertical;}
 .bankcard .ref{background:#F7F1E4;color:var(--dark);border-radius:10px;padding:8px 10px;margin-top:10px;
  font-size:13.5px;text-align:center;line-height:1.5;}
 .bankcard .ref b{font-family:monospace;font-size:16px;letter-spacing:1px;}
+/* 19-10-2026: só duas opções de banco — dois rectângulos largos lado a lado, fáceis de tocar */
+#bankChips{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+#bankChips .chip{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;
+ padding:10px 12px;border-radius:14px;font-size:15px;line-height:1.2;text-align:center;}
 /* 18-10-2026: banco preferido (NIB) — primeiro, estrela amarela, letra um pouco mais forte e brilho discreto
    (halo dourado + um reflexo que passa devagar). Sem "recomendamos". */
 #bankChips .chip.pref{position:relative;overflow:hidden;font-weight:600;border-color:#D9A21B;
@@ -540,13 +544,15 @@ textarea.fld{min-height:74px;resize:vertical;}
 .drop-add:hover{filter:brightness(1.07);}
 .drop-add:active{transform:scale(.96);}
 .drop-add i{font-style:normal;font-size:15px;line-height:1;}
-/* 18-10-2026: o que vem no copo de açaí, em cima da foto (o preço sozinho parecia caro) */
-.drop-inc{position:absolute;top:10px;left:10px;z-index:2;pointer-events:none;max-width:calc(100% - 20px);
- padding:6px 10px 7px;border-radius:12px;background:rgba(74,37,69,.9);border:1px solid rgba(243,213,179,.55);
- box-shadow:0 4px 12px rgba(0,0,0,.22);color:#F7F1E4;line-height:1.15;}
-.drop-inc b{display:block;font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:#F3D5B3;}
-.drop-inc span{display:block;margin-top:1px;font-size:11.5px;font-weight:500;letter-spacing:.2px;}
-@media (max-width:420px){.drop-inc{top:8px;left:8px;padding:5px 8px 6px;}.drop-inc b{font-size:14px;}.drop-inc span{font-size:10.5px;}}
+/* 19-10-2026: o que vem no copo de açaí (o preço sozinho parecia caro) — linha pequena na legenda,
+   por cima do nome, para não tapar a fruta e a granola da foto */
+.drop-media figcaption .drop-inc{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 6px;}
+.drop-media figcaption .drop-inc em{display:inline-block;margin:0;padding:2px 7px 3px;border-radius:999px;font-style:normal;
+ font-family:'Jost',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.2px;line-height:1.25;color:#F7F1E4;
+ background:rgba(74,37,69,.6);border:1px solid rgba(243,213,179,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+ text-shadow:0 1px 2px rgba(0,0,0,.45);}   /* roxo-açaí (#4A2545) com 40% de transparência */
+@media (min-width:700px){.drop-media figcaption .drop-inc em{font-size:12px;padding:3px 9px 4px;}}
+@media (max-width:420px){.drop-media figcaption .drop-inc{gap:3px;margin-bottom:5px;}.drop-media figcaption .drop-inc em{font-size:9px;padding:1px 5px 2px;letter-spacing:-.1px;}}
 
 /* ---- Selector de zona de entrega ---- */
 .zonabox{position:relative;}
@@ -634,7 +640,7 @@ textarea.fld{min-height:74px;resize:vertical;}
  font-size:12px;font-weight:600;text-align:center;line-height:1.3;}
 .drop-media figcaption .drop-st b{display:inline;font:inherit;}
 .drop-media figure.off img{filter:grayscale(.9) brightness(.72);}
-.drop-media figure.off .drop-inc{opacity:.5;}
+.drop-media figure.off .drop-inc{opacity:.6;}
 .drop-media figure.off .drop-add{display:none;}
 .drop-media figure.off>button{cursor:default;}
 .drop-media figure[hidden]{display:none;}
@@ -1316,8 +1322,7 @@ textarea.fld{min-height:74px;resize:vertical;}
     <div class="drop-media">
       <figure data-prod="Açaí">
         <button type="button" onclick="abrirProduto('Açaí')" aria-label="Açaí"><img src="img/destaque-acai.webp" alt="Açaí" loading="eager"></button>
-        <span class="drop-inc"><b data-i18n="dropInc1"></b><span data-i18n="dropInc2"></span></span>
-        <figcaption><b data-i18n="dropP1"></b><span data-i18n="dropP1s"></span><span class="drop-price"></span><small class="drop-st"></small>
+        <figcaption><span class="drop-inc"><em data-i18n="dropIncA"></em><em data-i18n="dropIncB"></em><em data-i18n="dropIncD"></em><em data-i18n="dropIncC"></em></span><b data-i18n="dropP1"></b><span data-i18n="dropP1s"></span><span class="drop-price"></span><small class="drop-st"></small>
           <button type="button" class="drop-add" onclick="abrirProduto('Açaí')"><i>+</i><span data-i18n="addCurto"></span></button></figcaption>
       </figure>
       <figure data-prod="Água de Coco Grande">
@@ -1616,11 +1621,12 @@ const MENU=[
 
  {cat:"AÇAÍ &amp; ÁGUA DE COCO",tk:"c_acai",pt:3,note:"Disponibilidade limitada — pode acabar durante o dia",items:[
   /* AÇAÍ — copo de 355 ml, vai sempre cheio. Os preços mudam-se no /admin (separador Menu);
-     os valores aqui são os de reserva, usados só enquanto o painel não tiver outros guardados.
+     os valores aqui são os de reserva, usados enquanto o servidor não responde (ou se falhar) — têm de ser
+     iguais aos do painel (19-10-2026: 950 / 1050; antes estavam 790 / 890 e o site mostrava 728$ sem rede).
      p  = com granola e/ou leite em pó            sp = sem os dois, mesmo com fruta (leva mais açaí)
      xp = cada topping extra da lista xt
      rec = escolha com estrela e "recomendamos" */
-  {n:"Açaí",d:"copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings",ml:355,p:790,sp:890,xp:50,
+  {n:"Açaí",d:"copo de 355 ml · monte o seu com granola, leite em pó, fruta e toppings",ml:355,p:950,sp:1050,xp:50,
    base:["Granola","Leite em pó"],fr:["Banana","Morango","Frutos vermelhos","Kiwi"],tp:["Leite condensado"],rec:"Leite em pó",
    xt:["Caramelo","Chocolate","Morango"],
    top:["Granola","Leite em pó","Banana","Morango","Frutos vermelhos","Kiwi","Leite condensado"]},
@@ -1968,15 +1974,15 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
-/* ---- BANCO PREFERIDO (18-10-2026): texto do botão "Qualquer banco · NIB" ----
-   ---- AÇAÍ NO DESTAQUE (18-10-2026): o que vem no copo, escrito em cima da foto (dropInc1 + dropInc2) ---- */
+/* ---- BANCO PREFERIDO (18/19-10-2026): texto do botão "Outras contas bancárias" (NIB) ----
+   ---- AÇAÍ NO DESTAQUE (19-10-2026): o que vem no copo, numa linha da legenda (dropInc) ---- */
 (function(){
  const R={
-  pt:{nibChip:"Qualquer banco · NIB",dropInc1:"4 frutas",dropInc2:"Granola e toppings"},
-  en:{nibChip:"Any bank · NIB",dropInc1:"4 fruits",dropInc2:"Granola &amp; toppings"},
-  fr:{nibChip:"Toute banque · NIB",dropInc1:"4 fruits",dropInc2:"Granola et toppings"},
-  de:{nibChip:"Jede Bank · NIB",dropInc1:"4 Früchte",dropInc2:"Granola &amp; Toppings"},
-  nl:{nibChip:"Elke bank · NIB",dropInc1:"4 soorten fruit",dropInc2:"Granola &amp; toppings"}
+  pt:{nibChip:"Outras contas bancárias",dropIncA:"4 frutas",dropIncB:"leite em pó",dropIncD:"leite condensado",dropIncC:"toppings"},
+  en:{nibChip:"Other banks",dropIncA:"4 fruits",dropIncB:"milk powder",dropIncD:"condensed milk",dropIncC:"toppings"},
+  fr:{nibChip:"Autres banques",dropIncA:"4 fruits",dropIncB:"lait en poudre",dropIncD:"lait concentré",dropIncC:"toppings"},
+  de:{nibChip:"Andere Banken",dropIncA:"4 Früchte",dropIncB:"Milchpulver",dropIncD:"Kondensmilch",dropIncC:"Toppings"},
+  nl:{nibChip:"Andere banken",dropIncA:"4 soorten fruit",dropIncB:"melkpoeder",dropIncD:"gecondenseerde melk",dropIncC:"toppings"}
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
@@ -2216,14 +2222,13 @@ function migrarNomes(ed){
 /* 18-10-2026: a transferência por NIB passou para a conta do João Leal no BCA (antes: NIB do BAI, Emma's Place).
    É a conta preferida (pref): aparece primeiro, já escolhida, com estrela, letra um pouco mais forte e brilho
    discreto — sem "recomendamos" nem nota (pedido de 18-10-2026, 23h27).
+   19-10-2026: só duas opções, em dois rectângulos largos — "Outras contas bancárias" (NIB) e BAI.
+   Saíram BCA/Na Via (9261676510001) e Caixa Económica (4947894710001).
    chipK = texto traduzido do botão (bloco "BANCO PREFERIDO" mais acima). */
 const BANCOS=[
  {id:"nib",   b:"BCA",              t:"João Leal",    lbl:"NIB",   c:"000300008362331310176",
   pref:true, chipK:"nibChip"},
- {id:"bca",   b:"BCA",              t:"Na Via",       lbl:"Conta", c:"9261676510001",
-  nota:"Na Via é a empresa que trata da organização e entrega dos pedidos do Emma's Place."},
- {id:"bai",   b:"BAI",              t:"Emma's Place", lbl:"Conta", c:"100400076861001"},
- {id:"cecv",  b:"Caixa Económica",   t:"Emma's Place", lbl:"Conta", c:"4947894710001"}
+ {id:"bai",   b:"BAI",              t:"Emma's Place", lbl:"Conta", c:"100400076861001"}
 ];
 const ESTRELA_BANCO='<svg class="estrela" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="#FFC400" stroke="#C98A00" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
@@ -3597,7 +3602,7 @@ function refreshChk(){
  if(precisa){
   if(!banco) banco=BANCOS.find(b=>b.pref)||null;   // o banco preferido já vem escolhido; o cliente pode mudar
   $("bankChips").innerHTML=BANCOS.map(b=>
-   `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)">${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO:""}</button>`).join("");
+   `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)"><span>${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO:""}</span></button>`).join("");
   drawBank();
  }
 }
