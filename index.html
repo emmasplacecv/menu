@@ -417,6 +417,12 @@ textarea.fld{min-height:74px;resize:vertical;}
 .bankcard .ref{background:#F7F1E4;color:var(--dark);border-radius:10px;padding:8px 10px;margin-top:10px;
  font-size:13.5px;text-align:center;line-height:1.5;}
 .bankcard .ref b{font-family:monospace;font-size:16px;letter-spacing:1px;}
+/* 18-10-2026: banco preferido (NIB) — contorno dourado, estrela amarela e "recomendamos" por baixo (como no açaí) */
+#bankChips .chip.pref{border-color:#C98A00;background:#FFF8E6;padding:6px 15px;line-height:1.2;}
+#bankChips .chip.pref.sel{border-color:var(--dark);background:var(--dark);}
+#bankChips .chip .estrela{width:14px;height:14px;margin-left:5px;vertical-align:-2px;}
+#bankChips .chip small.rec{display:block;margin-top:2px;font-size:11.5px;font-weight:500;letter-spacing:.2px;color:#8B5E3C;}
+#bankChips .chip.sel small.rec{color:#EAD9BE;}
 
 @media(min-width:720px){
  .cards{grid-template-columns:1fr 1fr;}
@@ -1945,6 +1951,17 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
  };
  for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
 })();
+/* ---- BANCO PREFERIDO (18-10-2026): botão "Qualquer banco · NIB" e nota da conta do João Leal ---- */
+(function(){
+ const R={
+  pt:{nibChip:"Qualquer banco · NIB",nibNota:"João Leal é sócio-gerente do Emma's Place. Pode transferir a partir de qualquer banco."},
+  en:{nibChip:"Any bank · NIB",nibNota:"João Leal is the managing partner of Emma's Place. You can transfer from any bank."},
+  fr:{nibChip:"Toute banque · NIB",nibNota:"João Leal est l'associé-gérant d'Emma's Place. Virement possible depuis n'importe quelle banque."},
+  de:{nibChip:"Jede Bank · NIB",nibNota:"João Leal ist geschäftsführender Gesellschafter von Emma's Place. Überweisung von jeder Bank möglich."},
+  nl:{nibChip:"Elke bank · NIB",nibNota:"João Leal is zaakvoerder van Emma's Place. U kunt vanaf elke bank overschrijven."}
+ };
+ for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
+})();
 /* ---- Aviso antes de confirmar, em pedidos para outro dia: sem transferência e comprovativo não fica concluído ---- */
 (function(){
  const R={
@@ -2178,13 +2195,18 @@ function migrarNomes(ed){
  if(ed.ord){ e.ord={}; Object.keys(ed.ord).forEach(c=>{ e.ord[c]=[...new Set((ed.ord[c]||[]).map(nomeAtual))]; }); }
  return e;
 }
+/* 18-10-2026: a transferência por NIB passou para a conta do João Leal no BCA (antes: NIB do BAI, Emma's Place).
+   É a conta preferida (pref): aparece primeiro, já escolhida, com estrela e "recomendamos" — destaque discreto.
+   chipK/notaK = textos traduzidos (bloco "BANCO PREFERIDO" mais acima). */
 const BANCOS=[
+ {id:"nib",   b:"BCA",              t:"João Leal",    lbl:"NIB",   c:"000300008362331310176",
+  pref:true, chipK:"nibChip", notaK:"nibNota"},
  {id:"bca",   b:"BCA",              t:"Na Via",       lbl:"Conta", c:"9261676510001",
   nota:"Na Via é a empresa que trata da organização e entrega dos pedidos do Emma's Place."},
  {id:"bai",   b:"BAI",              t:"Emma's Place", lbl:"Conta", c:"100400076861001"},
- {id:"cecv",  b:"Caixa Económica",   t:"Emma's Place", lbl:"Conta", c:"4947894710001"},
- {id:"outro", b:"Outro banco → BAI",t:"Emma's Place", lbl:"NIB",   c:"000810040007686100125"}
+ {id:"cecv",  b:"Caixa Económica",   t:"Emma's Place", lbl:"Conta", c:"4947894710001"}
 ];
+const ESTRELA_BANCO='<svg class="estrela" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="#FFC400" stroke="#C98A00" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
 /* ---------- ESTADO ---------- */
 let _ultimoN=0;
@@ -3554,8 +3576,9 @@ function refreshChk(){
  $("payBox").style.display=precisa?"block":"none";
  $("noPayBox").style.display=precisa?"none":"block";
  if(precisa){
+  if(!banco) banco=BANCOS.find(b=>b.pref)||null;   // o banco preferido já vem escolhido; o cliente pode mudar
   $("bankChips").innerHTML=BANCOS.map(b=>
-   `<button class="chip${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)">${b.b}</button>`).join("");
+   `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)">${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO+`<small class="rec">${t("acaiRec")}</small>`:""}</button>`).join("");
   drawBank();
  }
 }
@@ -3569,10 +3592,11 @@ function drawBank(){
  const box=$("bankCard");
  if(!banco){box.style.display="none";return;}
  box.style.display="block";
+ const nota=banco.notaK?t(banco.notaK):banco.nota;
  box.innerHTML=`<div class="bk">${banco.b}</div>
   <div class="ln"><span>${t("titular")}</span><b>${banco.t}</b></div>
   <div class="ln"><span>${banco.lbl}</span><b>${banco.c}</b></div>
-  ${banco.nota?`<div class="bnota">${banco.nota}</div>`:""}
+  ${nota?`<div class="bnota">${nota}</div>`:""}
   <div class="ln"><span>${t("valorex")}</span><span class="amt">${total()} ECV</span></div>
   <div class="ref">${t("refnota")}<br><b data-clarity-mask="true">${codigo}</b></div>`;
 }
