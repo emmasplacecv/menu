@@ -1269,6 +1269,11 @@ function desenharComprovativos(){
  document.querySelectorAll("#pedidos [data-atraso]").forEach(el=>{ el.style.display = _compTem.get(el.dataset.atraso)===true ? "none" : ""; });
 }
 
+/* 20-10-2026: venda do balcão = marca "balcao" OU código BAL-… (as Vendas criam sempre BAL-ddmm-XXX,
+   o site PED-ddmm-XXX). Corrige as vendas de 19 e 20-10 que o servidor gravou como pedidos do site. */
+const ehBalcao=p=>!!(p&&(p.balcao||/^BAL-/.test(String(p.code||""))));
+const metBalcao={dinheiro:"dinheiro",vinti4:"Vinti4",transf:"transferência"};
+
 async function carregarPedidos(){
  try{
   // pedidos de hoje + dos 2 dias seguintes (encomendas feitas fora de horas
@@ -1284,7 +1289,7 @@ async function carregarPedidos(){
   if(res[0] && res[0].erro) throw 0;
   pedidos=[];
   res.forEach((d,k)=>{
-   (d.pedidos||[]).forEach(p=>{ p._dia=dias[k]; p._futuro=(k>0); pedidos.push(p); });
+   (d.pedidos||[]).forEach(p=>{ p._dia=dias[k]; p._futuro=(k>0); if(ehBalcao(p)) p.balcao=true; pedidos.push(p); });
   });
   pedidos.sort((a,b)=>instantePedido(b)-instantePedido(a));   // 16-10-2026: mais recentes em cima (antes: por hora de levantamento)
   /* 16-10-2026: o som da Gestão é só para pedidos do site; as vendas do balcão não tocam aqui */
@@ -1295,7 +1300,10 @@ async function carregarPedidos(){
  $("pedidos").innerHTML=pedidos.map(p=>{
   const ent=p.modo==="entrega";
   let acts="";
-  if(p.status==="aguarda")
+  /* 20-10-2026: vendas do balcão são pagas e entregues no balcão — na Gestão ficam só como registo
+     (sem comprovativo, sem confirmar, sem levantamento). Fica o 🗑 Apagar, para testes e enganos. */
+  if(p.balcao) acts="";
+  else if(p.status==="aguarda")
    acts=`<button class="bok" onclick="mudar('${p.id}','confirmado')">Comprovativo recebido</button>
          <button class="bno" onclick="mudar('${p.id}','cancelado')">Cancelar</button>`;
   else if(p.status==="confirmado")
@@ -1307,7 +1315,7 @@ async function carregarPedidos(){
    acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Entregue":"Levantado"}</button>`;
   return `<div class="ped ${p.status}">
    <div class="top"><span class="hora">${p.slot||"—"}</span>
-    <span class="tipo ${ent?"ent":""}">${ent?"ENTREGA":"LEVANTAR"}</span></div>
+    <span class="tipo ${ent?"ent":""}">${p.balcao?"BALCÃO":(ent?"ENTREGA":"LEVANTAR")}</span></div>
    <div class="cli"><b>${p.nome||"(sem nome)"}</b>${p.tel?` · <a href="tel:${p.tel.replace(/\s/g,"")}" style="color:var(--verde);font-weight:600;text-decoration:none">${p.tel}</a>`:""}
     · <span class="cod">${p.code||""}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
     ${p._futuro?' · <b style="color:#8A5A12">'+(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
@@ -1316,7 +1324,7 @@ async function carregarPedidos(){
    ${p.zona?`<div class="mor">📍 ${p.zona}${p.morada?" — "+p.morada:""}</div>`:(p.morada?`<div class="mor">📍 ${p.morada}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${p.piso}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${p.taxaAndar} ECV</div>`:""}
    ${p.notas?`<div class="nt">Notas: ${p.notas}</div>`:""}
    <div class="tot">${p.total} ECV</div>
-   ${p.balcao?`<div class="nt"><b style="color:${p.balcaoPago?"#3F6B33":"#8C2F2F"}">BALCÃO · ${p.balcaoPago?"PAGO":"POR PAGAR"}</b></div>`:
+   ${p.balcao?`<div class="nt"><b style="color:${p.balcaoPago?"#3F6B33":"#8C2F2F"}">VENDA NO BALCÃO · ${p.balcaoPago?"PAGO"+(metBalcao[p.balcaoMetodo]?" ("+metBalcao[p.balcaoMetodo]+")":""):"POR PAGAR"}</b></div>`:
      (p.code?`<div class="nt"><span data-comp="${String(p.code).replace(/"/g,"")}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a> <span style="opacity:.65">(abre em separador novo; dá erro se o cliente ainda não anexou)</span></div>`:"")}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
    <div class="acts">${acts}<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')">🗑 Apagar</button></div>
@@ -1393,6 +1401,7 @@ async function hisCarregar(){
  if(hist.lido!==marca) return;                     // entretanto mudou o período
  hist.dias=dias; hist.faltam=res.filter(r=>!r.ok).map(r=>r.dia);
  hist.ped=[].concat(...res.map(r=>r.lista));
+ hist.ped.forEach(p=>{ if(ehBalcao(p)) p.balcao=true; });   // 20-10-2026
  hist.ped.sort((a,b)=>instantePedido(b)-instantePedido(a));   // 16-10-2026: em cada dia, os mais recentes em cima
  $("hisMsg").className = hist.faltam.length ? "hmsg alerta" : "hmsg";
  $("hisMsg").textContent = hist.faltam.length
