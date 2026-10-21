@@ -2576,7 +2576,8 @@ function build(){
    const bb=esgotados.includes(b.i.n)||(mode==="entrega"&&b.i.nd);
    return (ba===bb) ? (a.ii-b.ii) : (ba?1:-1);
   });
-  blocos.push(estante("cat-"+ci, c.tk, rotuloCat(c), c.note?td(c.note):"", ordenados.map(({i,ii})=>cartaoProd(i,ci,ii))));
+  const notaCat=(c.note && !(/poke/i.test(c.note) && !c.items.some(x=>/poke/i.test(x.n)))) ? td(c.note) : "";   // sem poke bowls no menu, sem a nota deles
+  blocos.push(estante("cat-"+ci, c.tk, rotuloCat(c), notaCat, ordenados.map(({i,ii})=>cartaoProd(i,ci,ii))));
   if(c.tk==="c_quentes" && EM_BREVE.length) blocos.push(blocoEmBreve());
  });
  if(EM_BREVE.length && !blocos.some(b=>b.includes('id="cat-embreve"'))) blocos.push(blocoEmBreve());
