@@ -1313,6 +1313,44 @@ textarea.fld{min-height:74px;resize:vertical;}
  .cat2-t h3{font-size:27px;}
 }
 @media(prefers-reduced-motion:reduce){ .pc,.pc:hover{transition:none;transform:none;} }
+/* fotos que não são quadradas (ex.: as fotos 4:3 enviadas pelo Miguel) ficam centradas no quadrado */
+.pc-foto img{object-position:50% 55%;}
+/* entrada dos cartões */
+.anim-ok #menuCards .pc{opacity:0;transform:translateY(18px);
+ transition:opacity .5s ease var(--d,0ms),transform .55s cubic-bezier(.2,.7,.2,1) var(--d,0ms),box-shadow .2s ease;}
+.anim-ok #menuCards .pc.vis{opacity:1;transform:none;}
+.anim-ok #menuCards .pc.vis:active{transform:scale(.985);transition-delay:0ms;}
+@media(min-width:900px){ .anim-ok #menuCards .pc.vis:hover{transform:translateY(-3px);transition-delay:0ms;} }
+
+/* ===== FAIXA "EM BREVE" (bebidas especiais) — abaixo dos Mais pedidos em peso visual ===== */
+.eb-band{margin:4px 0 30px;padding:14px 14px 12px;border-radius:20px;background:#F3E8EF;border:1px solid #E6D2E1;
+ scroll-margin-top:var(--salto);text-align:left;}
+.eb-band,.eb-band h3,.eb-band p{text-align:left;}
+.eb-h{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:2px 10px;margin:0 2px 10px;}
+.eb-h h3,.eb-h p{justify-self:start;}
+.eb-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:999px;background:var(--roxo);color:#F7F1E4;
+ font:600 10.5px/1.2 'Jost',sans-serif;letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap;}
+.eb-pill i{width:6px;height:6px;border-radius:50%;background:#F3D5B3;animation:ebPulso 2.4s ease-in-out infinite;}
+@keyframes ebPulso{0%,100%{opacity:.35;transform:scale(.8);}50%{opacity:1;transform:scale(1.15);}}
+.eb-h h3{font-family:'Playfair Display',serif;font-weight:700;font-size:17px;line-height:1.15;color:var(--roxo);}
+.eb-h p{grid-column:1/-1;font-size:12.5px;line-height:1.35;color:#6E5468;margin-top:3px;}
+.eb-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.eb-it{display:flex;align-items:center;gap:8px;min-width:0;background:rgba(255,252,246,.75);border-radius:14px;padding:6px 8px 6px 6px;}
+.eb-it img,.eb-ph{width:48px;height:48px;flex:none;border-radius:11px;object-fit:cover;background:#F3E9DC;}
+.eb-ph{display:grid;place-items:center;color:var(--roxo);} .eb-ph .cat-ico{width:24px;height:24px;}
+.eb-tx{min-width:0;display:flex;flex-direction:column;}
+.eb-tx b{font:600 12px/1.18 'Jost',sans-serif;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.eb-tx small{display:none;}
+@media(min-width:720px){
+ .eb-band{padding:16px 18px 14px;}
+ .eb-h{grid-template-columns:auto auto 1fr;}
+ .eb-h p{grid-column:auto;margin:0 0 0 6px;}
+ .eb-h h3{font-size:20px;}
+ .eb-list{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+ .eb-it img,.eb-ph{width:64px;height:64px;}
+ .eb-tx small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:11.5px;line-height:1.3;color:#6E5468;margin-top:2px;}
+}
+@media(prefers-reduced-motion:reduce){ .eb-pill i{animation:none;opacity:1;} }
 </style>
 </head>
 <body>
@@ -1450,6 +1488,7 @@ textarea.fld{min-height:74px;resize:vertical;}
     </div>
     <div class="best-grid" id="bestGrid"></div>
   </section>
+  <div id="emBreveBox"></div>
 <div class="cards" id="menuCards"></div>
 
   <section class="combos" id="cat-combos">
@@ -2572,7 +2611,7 @@ function cartaoProd(i,ci,ii){
  const nome=td(i.n), foto=fotoProd(i.n), tk=MENU[ci]&&MENU[ci].tk;
  const nota=fim?`<small class="pc-st">${tm("acabou")}</small>`:(semEnt?`<small class="pc-st">${t("sonolocal")}</small>`:"");
  const abre=blocked?"":` onclick="pick(${ci},${ii})"`;
- return `<article class="pc${blocked?" blk":""}"${blocked?mtrBlq(i.n,fim,lojaFechada):""}>
+ return `<article class="pc${blocked?" blk":""}" data-k="${esc(i.n)}"${blocked?mtrBlq(i.n,fim,lojaFechada):""}>
   <div class="pc-m"><button type="button" class="pc-foto${foto?"":" sem"}"${abre} ${blocked?"disabled":""} aria-label="${esc(nome)}">${foto?`<img src="${foto}" alt="" loading="lazy" decoding="async">`:(ICO[tk]||"")}</button>
   ${blocked?`<span class="noadd pc-add" aria-hidden="true">✕</span>`:`<button type="button" class="add pc-add"${abre} aria-label="+ ${esc(nome)}">+</button>`}</div>
   <div class="pc-txt"><h4 class="pc-n">${nome}</h4>${i.d?`<p class="pc-d">${td(i.d)}</p>`:""}${nota}<div class="pc-pr">${precoCartao(i)}</div></div>
@@ -2592,6 +2631,36 @@ function blocoEmBreve(){
   return `<article class="pc breve"><div class="pc-m"><div class="pc-foto">${foto?`<img src="${foto}" alt="" loading="lazy" decoding="async">`:""}</div><span class="selo"><span>${tm("breve")}</span></span></div>
    <div class="pc-txt"><h4 class="pc-n">${td(i.n)}</h4>${i.d?`<p class="pc-d">${td(i.d)}</p>`:""}</div></article>`; });
  return estante("cat-embreve","c_especiais",tm("breveTit"),tm("breveSub"),cartoes,"embreve");
+}
+/* 21-10-2026 (tarde): as 4 bebidas novas numa FAIXA própria logo depois dos "Mais pedidos".
+   Destaque ligeiro e de propósito mais fraco que os Mais pedidos: fundo lilás claro, título mais pequeno,
+   fotos pequenas (2×2 no telemóvel, 4 em linha no computador), sem preço nem botão. Não aparecem na grelha. */
+function faixaEmBreve(){
+ if(!EM_BREVE.length) return "";
+ const itens=EM_BREVE.map(i=>{ const foto=fotoProd(i.n);
+  return `<li class="eb-it">${foto?`<img src="${foto}" alt="" loading="lazy" decoding="async">`:`<span class="eb-ph">${ICO.c_especiais}</span>`}
+   <span class="eb-tx"><b>${td(i.n)}</b>${i.d?`<small>${td(i.d)}</small>`:""}</span></li>`; }).join("");
+ return `<section class="eb-band" id="cat-embreve" aria-labelledby="eb-tit">
+  <header class="eb-h"><span class="eb-pill"><i></i>${tm("breve")}</span>
+   <h3 id="eb-tit">${tm("breveTit")}</h3><p>${tm("breveSub")}</p></header>
+  <ul class="eb-list">${itens}</ul>
+ </section>`;
+}
+/* Cartões entram com um leve deslizar ao chegarem ao ecrã (só a 1.ª vez: ao refazer o menu, os já vistos ficam quietos).
+   Sem IntersectionObserver ou com "reduzir movimento" ligado, tudo aparece logo. */
+const _pcVistos=new Set(); let _pcIO=null;
+function animarCartoes(){
+ if(!("IntersectionObserver" in window)) return;
+ try{ if(matchMedia("(prefers-reduced-motion: reduce)").matches) return; }catch(e){}
+ document.body.classList.add("anim-ok");
+ if(!_pcIO) _pcIO=new IntersectionObserver(es=>es.forEach(e=>{
+   if(!e.isIntersecting) return;
+   e.target.classList.add("vis"); _pcVistos.add(e.target.dataset.k); _pcIO.unobserve(e.target);
+  }),{rootMargin:"0px 0px -6% 0px",threshold:.08});
+ document.querySelectorAll("#menuCards .pc").forEach((c,i)=>{
+  if(_pcVistos.has(c.dataset.k)){ c.classList.add("vis"); return; }
+  c.style.setProperty("--d",((i%2)*80)+"ms"); _pcIO.observe(c);
+ });
 }
 /* "Ver todos": a estante deslizante passa a grelha (só no telemóvel; no computador é sempre grelha) */
 function abrirEstante(id,b){
@@ -2628,11 +2697,11 @@ function build(){
   });
   const notaCat=(c.note && !(/poke/i.test(c.note) && !c.items.some(x=>/poke/i.test(x.n)))) ? td(c.note) : "";   // sem poke bowls no menu, sem a nota deles
   blocos.push(estante("cat-"+ci, c.tk, rotuloCat(c), notaCat, ordenados.map(({i,ii})=>cartaoProd(i,ci,ii))));
-  if(c.tk==="c_quentes" && EM_BREVE.length) blocos.push(blocoEmBreve());
- });
- if(EM_BREVE.length && !blocos.some(b=>b.includes('id="cat-embreve"'))) blocos.push(blocoEmBreve());
+  });
  $("menuCards").innerHTML=blocos.join("");
+ if($("emBreveBox")) $("emBreveBox").innerHTML=faixaEmBreve();
  prepararEstantes();
+ animarCartoes();
 
  $("combos").innerHTML=COMBOS.map((c,i)=>{
    const f=(COMBO_FOTOS[c.n]||[]).filter(x=>PFOTOS.has(x));
