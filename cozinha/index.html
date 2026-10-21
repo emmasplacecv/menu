@@ -90,6 +90,7 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .abab.sel{background:var(--dark);color:#F7F1E4;border-color:var(--dark);}
 .avisoStk{background:#FFF6E2;border:1px solid var(--gold);border-radius:12px;padding:11px 13px;
  font-size:13.5px;color:#6E4B2F;line-height:1.5;margin:12px 0;}
+.sbeb{margin:28px 0 0;padding:10px 12px;border-radius:12px;background:var(--dark);color:#F7F1E4;font-size:13px;font-weight:600;letter-spacing:.5px;}
 .scat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:18px 0 7px;}
 .buscabox{position:relative;margin-bottom:11px;}
 .buscabox input{width:100%;padding:12px 38px 12px 14px;border:1px solid var(--line);border-radius:11px;
@@ -120,6 +121,7 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .srow.zero .sqi{color:var(--vermelho);border-color:var(--vermelho);}
 .sok{height:56px;padding:0 12px;border:0;border-radius:14px;background:var(--verde);color:#fff;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;}
 @media(max-width:520px){ .srow{flex-wrap:wrap;} .srow .sn{flex:1 1 100%;} .sqi{width:60px;} .srow .sminus{width:62px;} }
+.srow.beb{flex-wrap:nowrap;padding-top:8px;padding-bottom:8px;} .srow.beb .sn{flex:1 1 auto;} .srow.beb .stog{width:92px;height:46px;}
 .stog.no{background:var(--vermelho);color:#fff;}
 .semstk{font-size:13px;color:var(--ink2);font-weight:300;}
 .vazio{text-align:center;padding:30px 12px;color:var(--ink2);font-weight:300;}
@@ -530,7 +532,7 @@ if("serviceWorker" in navigator){
 /* ---------- STOCK DO DIA ---------- */
 /* 19-10-2026: lista igual à da Gestão e das Vendas (antes faltava a categoria AÇAÍ & ÁGUA DE COCO).
    Ao mudar produtos/categorias no código do site, actualizar também aqui, no /admin e em /vendas. */
-const MENU_STK = [["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "d": "copo de 355 ml · preços nas três linhas abaixo"}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 375}, {"n": "Sumo de Maçã", "m": 375}, {"n": "Sumo de Manga", "m": 400}, {"n": "Sumo de Papaia", "m": 450}, {"n": "Sumo de Ananás", "m": 500}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
+const MENU_STK = [["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "d": "copo de 355 ml · preços nas três linhas abaixo"}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 475, "d": "16 oz"}, {"n": "Sumo de Ananás", "m": 475, "d": "16 oz"}, {"n": "Sumo de Maracujá", "m": 475, "d": "16 oz"}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
 /* 19-10-2026: quantidade em TODAS as categorias menos as bebidas feitas na hora.
    Antes era uma lista fechada de comidas: o açaí, a água de coco e as categorias novas do /admin ficavam de fora.
    A MESMA lista está no /admin (separador Stock): mudar nos dois. */
@@ -539,8 +541,11 @@ let stock = {}, fora = [];
 
 function controlaQtd(cat){
   const n = String(cat||"").replace(/&amp;/g,"&").trim().toUpperCase();
-  return !CAT_SEM_QTD.includes(n);
+  return !CAT_SEM_QTD.includes(n) && !CAT_FEITA_NA_HORA.test(n);
 }
+/* 21-10-2026: categorias de bebidas batidas criadas no /admin (milkshakes, smoothies, batidos) são feitas na hora:
+   sem quantidade, só TEM / ACABOU — como as outras bebidas. A MESMA regra está no /admin. */
+const CAT_FEITA_NA_HORA = /MILKSHAKE|SMOOTHIE|BATIDO/;
 
 function verSeccao(q){
   const p = (q === "ped");
@@ -577,15 +582,31 @@ function pesquisarStk(v){
 function limparBuscaStk(){ document.getElementById("fBuscaStk").value=""; pesquisarStk(""); }
 
 function desenharStock(){
-  let h = "", achou = false;
-  MENU_STK.forEach(([cat, itens], ci) => {
-    if(!controlaQtd(cat)) return;
+  let h = "", achou = false, titBebidas = false;
+  /* primeiro o que tem quantidade (comida, açaí…), depois as bebidas feitas na hora (só TEM / ACABOU) */
+  const ordem = MENU_STK.map((c, ci) => ci).sort((a, b) => (controlaQtd(MENU_STK[b][0]) - controlaQtd(MENU_STK[a][0])) || (a - b));
+  ordem.forEach(ci => {
+    const [cat, itens] = MENU_STK[ci];
+    const qtd = controlaQtd(cat);
     const filtrados = itens
       .map((it, ii) => ({ it, ii }))
       .filter(({it}) => !buscaStk || normalizar(it.n).includes(buscaStk));
     if(!filtrados.length) return;
     achou = true;
+    if(!qtd && !titBebidas){ titBebidas = true; h += `<div class="sbeb">Bebidas feitas na hora — só TEM / ACABOU</div>`; }
     h += `<div class="scat">${cat}</div>`;
+    if(!qtd){
+      /* 21-10-2026: bebidas feitas na hora — sem quantidade, mas a Cozinha pode marcar ACABOU
+         (ex.: acabou o maracujá). Antes estas categorias nem apareciam aqui. */
+      filtrados.forEach(({it, ii}) => {
+        const marcado = fora.includes(it.n);
+        h += `<div class="srow beb${marcado ? " zero" : ""}">
+          <div class="sn">${it.n}<div class="semstk">${marcado ? '<span style="color:var(--vermelho);font-weight:700">acabou — indisponível</span>' : "feito na hora · sem quantidade"}</div></div>
+          <button class="stog ${marcado ? "no" : "on"}" onclick="alternarItem(${ci},${ii})">${marcado ? "ACABOU" : "TEM"}</button>
+        </div>`;
+      });
+      return;
+    }
     filtrados.forEach(({it, ii}) => {
       const q = stock[it.n];
       const temStock = (q !== undefined);
