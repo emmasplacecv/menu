@@ -300,6 +300,7 @@ header .loc{font-size:14px;color:#6E4B2F;margin-top:8px;line-height:1.6;}
 .modebox .mnote{font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.5;font-weight:300;}
 .note{font-size:13px;color:var(--ink2);font-weight:300;margin-top:9px;border-top:1px solid var(--line);padding-top:8px;}
 
+.fotos-nota{margin:6px 4px 18px;font-size:12px;line-height:1.45;color:var(--muted,#8a7b6e);text-align:center;}
 .combos{background:var(--dark);border-radius:18px;padding:18px 14px 8px;margin:18px 0;}
 .combos .ribbon{background:var(--gold);color:var(--dark);}
 .cgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:6px;}
@@ -1416,6 +1417,7 @@ textarea.fld{min-height:74px;resize:vertical;}
   <div class="ribbon" data-i18n="combos"></div>
   <div class="cgrid" id="combos"></div>
 </section>
+  <p class="fotos-nota" data-i18n="fotosNota"></p>
 </div>
 
 <!-- DEPOIS DO MENU: como funciona, mais pedidos -->
@@ -2124,6 +2126,15 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
  const L=["en","fr","de","nl"];
  Object.keys(X).forEach(pt=>L.forEach((l,k)=>{ if(I18N[l]){ I18N[l]._d=I18N[l]._d||{}; I18N[l]._d[pt]=X[pt][k]; } }));
 })();
+/* 21-10-2026: nota no fundo do menu — as fotos dos produtos são ilustrativas (geradas a partir de fotos reais) */
+(function(){
+ const N={pt:"* Imagens meramente ilustrativas. A apresentação do produto pode variar.",
+  en:"* Images are for illustration only. Actual presentation may vary.",
+  fr:"* Photos non contractuelles. La présentation peut varier.",
+  de:"* Abbildungen ähnlich. Die Präsentation kann abweichen.",
+  nl:"* Afbeeldingen ter illustratie. De presentatie kan afwijken."};
+ for(const l in N) if(I18N[l]) I18N[l].fotosNota=N[l];
+})();
 function td(s){
  const d=I18N[LANG]&&I18N[LANG]._d;
  return (d&&d[s]!=null)?d[s]:s;
@@ -2472,7 +2483,8 @@ function scrollCategory(ci){const e=alvoCat(ci);if(e)e.scrollIntoView({behavior:
 function startOrder(){scrollHome("como-encomendar");}
 
 /* ---------- FOTOS DOS PRODUTOS (21-10-2026) ----------
-   Uma foto por produto em img/p/<nome-sem-acentos>.webp (400×400, fundo creme igual ao do cartão).
+   Uma foto por produto em img/p/<nome-sem-acentos>.webp (400×400). Padrão de 21-10-2026: cenário bege com sombras de folhas
+   (igual às fotos reais do site), copos e apresentação copiados das fotos reais do balcão. São ilustrativas: nota .fotos-nota no fim do menu.
    Produto sem foto nesta lista (ex.: novo no /admin) mostra o ícone da categoria em vez da foto. */
 const PFOTOS=new Set(["espresso","espresso-duplo","latte-classico","americano","cappuccino","mocha","latte-de-caramelo",
  "iced-matcha-latte","matcha-creme-frappuccino","raw-coconut-latte","iced-caramel-macchiato","acai","agua-de-coco-grande",
