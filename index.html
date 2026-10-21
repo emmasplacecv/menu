@@ -1274,6 +1274,45 @@ textarea.fld{min-height:74px;resize:vertical;}
  .cat2-t h3{font-size:27px;}
 }
 @media(prefers-reduced-motion:reduce){ .pc-foto img{transition:none;} .shelf{scroll-behavior:auto;} }
+/* ===== 21-10-2026 (2.ª versão): MENU EM GRELHA VERTICAL =====
+   Depois dos "Mais pedidos", cada categoria é uma grelha de cartões lado a lado (2 colunas no telemóvel,
+   3–5 no computador), sem deslizar para o lado nem "Ver todos". Cartão com foto grande, preço em etiqueta
+   sobre a foto e texto curto — lê-se de relance, como a montra de um café. */
+.cat2{margin:0 0 34px;}
+.cat2-h{grid-template-columns:auto 1fr;margin:0 0 14px;padding:0 2px;}
+.cat2-tog{display:none!important;}
+.cat2-ico{width:40px;height:40px;}
+.cat2-t h3{font-size:22px;}
+.cat2-t h3 .cat2-n{font:600 11.5px/1 'Jost',sans-serif;letter-spacing:.4px;color:var(--ink2);background:#EFE4D2;border-radius:999px;
+ padding:4px 8px;margin-left:8px;vertical-align:4px;}
+.shelf,.cat2.aberta .shelf{display:grid;grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-columns:auto;
+ gap:14px 12px;overflow:visible;margin:0;padding:0;scroll-snap-type:none;-webkit-mask-image:none;mask-image:none;}
+.shelf.mais-d,.shelf.mais-e,.shelf.mais-d.mais-e{-webkit-mask-image:none;mask-image:none;}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:6px 6px 12px;
+ box-shadow:0 1px 0 rgba(52,37,29,.04),0 10px 24px -14px rgba(52,37,29,.28);display:flex;flex-direction:column;
+ transition:transform .2s ease,box-shadow .2s ease;}
+.pc:active{transform:scale(.985);}
+.pc-foto{border-radius:17px;}
+.pc-txt{padding:10px 6px 0;display:flex;flex-direction:column;flex:1;}
+.pc-n{font:600 14.5px/1.25 'Jost',sans-serif;}
+.pc-d{font-size:12px;-webkit-line-clamp:1;margin-top:3px;}
+.pc-pr{margin-top:auto;padding-top:8px;gap:2px 8px;}
+.pc-p b{font-size:17px;}
+.pc-g{opacity:.85;}
+.pc-add{right:7px;bottom:7px;width:38px;height:38px;}
+/* etiqueta "M · G" discreta: os tamanhos lêem-se como 225$ M  250$ G */
+.pc-pr small{font-size:10.5px;letter-spacing:.3px;}
+.pc.blk{opacity:.8;box-shadow:none;}
+.pc.breve{background:#FBF5EC;}
+.pc.breve .pc-txt{padding-bottom:2px;}
+@media(min-width:600px){ .shelf,.cat2.aberta .shelf{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 16px;} }
+@media(min-width:900px){
+ .shelf,.cat2.aberta .shelf{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:22px 18px;}
+ .pc:hover{transform:translateY(-3px);box-shadow:0 2px 0 rgba(52,37,29,.04),0 16px 30px -14px rgba(52,37,29,.35);}
+ .pc:hover .pc-foto img{transform:scale(1.04);}
+ .cat2-t h3{font-size:27px;}
+}
+@media(prefers-reduced-motion:reduce){ .pc,.pc:hover{transition:none;transform:none;} }
 </style>
 </head>
 <body>
@@ -2543,8 +2582,7 @@ function estante(id,tk,titulo,nota,cartoes,extra){
  const n=cartoes.length;
  return `<section class="cat2${extra?" "+extra:""}" id="${id}" data-n="${n}">
   <header class="cat2-h"><span class="cat2-ico" aria-hidden="true">${ICO[tk]||""}</span>
-   <div class="cat2-t"><h3>${esc(titulo)}</h3>${nota?`<p>${nota}</p>`:""}</div>
-   ${n>2?`<button type="button" class="cat2-tog" onclick="abrirEstante('${id}',this)" aria-expanded="false">${tm("ver")} <span>${n}</span></button>`:""}
+   <div class="cat2-t"><h3>${esc(titulo)}<span class="cat2-n">${n}</span></h3>${nota?`<p>${nota}</p>`:""}</div>
   </header>
   <div class="shelf" role="list">${cartoes.join("")}</div>
  </section>`;
