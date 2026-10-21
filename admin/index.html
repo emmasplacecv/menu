@@ -996,7 +996,30 @@ function ordenarAZ(ci){
 function reporOrdem(ci){ delete edit.ord[MENU[ci][0]]; marcar(); desenharMenu(); }
 
 /* ---------- COMBOS ---------- */
-function precoCombo(nome,base){ return (edit.cp[nome]!=null)?edit.cp[nome]:base; }
+/* 21-10-2026: os 7 combos do menu têm o preço CALCULADO = soma dos produtos −5% (arredondado para baixo aos 5 ECV;
+   em cada parte com escolha conta o produto mais caro, preço M). O site e as /vendas fazem a mesma conta.
+   Aqui só se mostra o resultado — para mudar o preço de um combo, muda-se o preço dos produtos.
+   Os combos criados aqui ("Acrescentar combo") continuam com preço escrito à mão. */
+const COMBO_PARTES={
+ "PEQUENO-ALMOÇO":[["Espresso"],["Donut de Chocolate","Donut de Doce de Leite","Muffin de Chocolate"]],
+ "LANCHE":[["Café Instantâneo Gelado","Frappé Clássico"],["Donut de Chocolate","Donut de Doce de Leite"]],
+ "SOPA E PÃO":[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"]],
+ "ALMOÇO LEVE":[["Pão Recheado de Frango","Pão Recheado Caprese"],["Sumo de Laranja"]],
+ "SALADA E PÃO":[["Salada Fria de Frango"],["Pão Recheado de Frango","Pão Recheado Caprese"]],
+ "SALADA E SUMO":[["Salada Fria de Frango"],["Sumo de Laranja"]],
+ "SUPER COMBO":[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"],["Café Instantâneo Gelado","Frappé Clássico"]]};
+function precoProdAgora(n){
+ if((edit.off||[]).includes(n)) return 0;
+ for(const c of MENU) for(const i of c[1]) if(i.n===n) return +precoDe(n,{m:i.m,g:i.g}).m||0;
+ const a=(edit.add||[]).find(x=>x.n===n); return a?(+a.m||0):0;
+}
+function precoComboAuto(nome){
+ const pt=COMBO_PARTES[nome]; if(!pt) return 0;
+ let soma=0;
+ for(const op of pt){ const v=op.map(precoProdAgora).filter(x=>x>0); if(!v.length) return 0; soma+=Math.max(...v); }
+ return Math.floor(soma*0.95/5)*5;
+}
+function precoCombo(nome,base){ const a=precoComboAuto(nome); if(a>0) return a; return (edit.cp[nome]!=null)?edit.cp[nome]:base; }
 function listaCombos(){
  let l=COMBOS_BASE.map(c=>({n:c.n,d:c.d,p:c.p,full:c.full,novo:false}));
  edit.cadd.forEach((a,k)=>l.push({n:a.n,d:a.d,p:a.p,full:false,novo:true,k:k}));
@@ -1106,7 +1129,9 @@ function desenharMenu(){
    ${c.novo
      ? `<input value="${c.p}" inputmode="numeric" onchange="setNovoCombo(${c.k},this.value)">
         <button class="x" onclick="apagarNovoCombo(${c.k})" title="Apagar">✕</button>`
-     : `<input value="${pr}" inputmode="numeric" onchange="setPrecoCombo(${q(c.n)},this.value)">
+     : (COMBO_PARTES[c.n]
+        ? `<span class="auto" title="Soma dos produtos −5%. Muda-se mudando o preço dos produtos." style="min-width:64px;text-align:right;font-weight:600">${pr}<small style="display:block;font-weight:400;font-size:11px;opacity:.7">auto −5%</small></span>`
+        : `<input value="${pr}" inputmode="numeric" onchange="setPrecoCombo(${q(c.n)},this.value)">`)+`
         <button class="x ${rem?"on":""}" onclick="setRemCombo(${q(c.n)})" title="Retirar do menu">✕</button>`}
   </div>`;
  });

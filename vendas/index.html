@@ -598,14 +598,26 @@ const SEM_LEITE=["Espresso","Espresso Duplo","Americano"];             // nestas
 const CAT_EXTRAS={"SUMOS NATURAIS":[["Gengibre",50],["Hortelã",50]]};
 /* partes = o que o cliente escolhe em cada combo; serve para a cozinha saber e para descontar o stock */
 const COMBOS_BASE=[
- {n:"PEQUENO-ALMOÇO",d:"espresso + donut ou muffin de chocolate",p:225,partes:[["Espresso"],["Donut de Chocolate","Donut de Doce de Leite","Muffin de Chocolate"]]},
- {n:"LANCHE",d:"café gelado ou frappé clássico + donut",p:405,partes:[["Café Instantâneo Gelado","Frappé Clássico"],["Donut de Chocolate","Donut de Doce de Leite"]]},
- {n:"SOPA E PÃO",d:"sopa do dia + pão recheado de frango ou caprese",p:500,partes:[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"]]},
- {n:"ALMOÇO LEVE",d:"pão recheado de frango ou caprese + sumo de laranja",p:570,partes:[["Pão Recheado de Frango","Pão Recheado Caprese"],["Sumo de Laranja"]]},
+ {n:"PEQUENO-ALMOÇO",d:"espresso + donut ou muffin de chocolate",p:220,partes:[["Espresso"],["Donut de Chocolate","Donut de Doce de Leite","Muffin de Chocolate"]]},
+ {n:"LANCHE",d:"café gelado ou frappé clássico + donut",p:400,partes:[["Café Instantâneo Gelado","Frappé Clássico"],["Donut de Chocolate","Donut de Doce de Leite"]]},
+ {n:"SOPA E PÃO",d:"sopa do dia + pão recheado de frango ou caprese",p:495,partes:[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"]]},
+ {n:"ALMOÇO LEVE",d:"pão recheado de frango ou caprese + sumo de laranja",p:665,partes:[["Pão Recheado de Frango","Pão Recheado Caprese"],["Sumo de Laranja"]]},
  {n:"SALADA E PÃO",d:"salada fria de frango + pão recheado de frango ou caprese",p:640,partes:[["Salada Fria de Frango"],["Pão Recheado de Frango","Pão Recheado Caprese"]]},
- {n:"SALADA E SUMO",d:"salada fria de frango + sumo de laranja",p:785,partes:[["Salada Fria de Frango"],["Sumo de Laranja"]]},
+ {n:"SALADA E SUMO",d:"salada fria de frango + sumo de laranja",p:875,partes:[["Salada Fria de Frango"],["Sumo de Laranja"]]},
  {n:"SUPER COMBO",d:"sopa + pão recheado de frango ou caprese + café gelado ou frappé clássico",p:760,partes:[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"],["Café Instantâneo Gelado","Frappé Clássico"]]}
 ];
+/* 21-10-2026: PREÇO DO COMBO = soma dos produtos −5% (o mesmo cálculo do site, ver precoComboAuto lá).
+   Arredondado para baixo aos 5 ECV; em cada parte com escolha conta o produto mais caro (preço M).
+   O preço posto em Gestão > Combos deixa de contar para estes combos (com partes); "p" acima é só reserva. */
+const COMBO_DESC=5;
+function precoComboAuto(partes,precoDe){
+ let soma=0;
+ for(const op of partes){ const v=op.map(precoDe).filter(x=>x>0); if(!v.length) return 0; soma+=Math.max(...v); }
+ return Math.floor(soma*(100-COMBO_DESC)/100/5)*5;
+}
+/* 21-10-2026: MILKSHAKES — tamanho único 16 oz (igual ao site). Vale enquanto no /admin estiverem com dois tamanhos;
+   gravados lá com um só preço (sem G), passa a valer o do /admin. */
+const SHAKES_16OZ={"Milkshake de morango":425,"Milkshake de Frutos silvestres":425,"Milkshake de banana e morango":500,"Milkshake tropical":600};
 let comboEd={};       // preços (cp), retirados (coff), novos (cadd) e ordem (cord) dos combos, do /admin
 
 let KEY="", cat=0, activo=0, pedidos=[];
@@ -703,6 +715,7 @@ async function aplicarEdicao(){
   const novo={n:a.n,m:a.m}; if(a.g) novo.g=a.g; if(a.d) novo.d=a.d;
   c[1].push(novo);
  });
+ MENU.forEach(c=>c[1].forEach(i=>{ const v=SHAKES_16OZ[i.n]; if(v && i.g){ i.m=v; delete i.g; } }));   // milkshakes 16 oz
  const off=ed.off||[];
  if(off.length) MENU.forEach(c=>{ c[1]=c[1].filter(i=>!off.includes(i.n)); });
  // retiradas no /admin e criadas ainda sem produtos saem dos separadores
@@ -721,7 +734,9 @@ async function carregarStock(){
 function montarCombos(){
  const e=comboEd||{};
  let l=COMBOS_BASE.map(c=>Object.assign({},c));
- Object.keys(e.cp||{}).forEach(n=>{ const c=l.find(x=>x.n===n); if(c && +e.cp[n]>0) c.p=+e.cp[n]; });
+ const pm=n=>{ for(const c of MENU){ if(c[0]==="COMBOS") continue; for(const i of c[1]) if(i.n===n) return +i.m||0; } return 0; };
+ l.forEach(c=>{ if(!c.partes) return; const v=precoComboAuto(c.partes,pm); if(v>0) c.p=v; });
+ Object.keys(e.cp||{}).forEach(n=>{ const c=l.find(x=>x.n===n); if(c && !c.partes && +e.cp[n]>0) c.p=+e.cp[n]; });
  const off=e.coff||[]; l=l.filter(c=>!off.includes(c.n));
  (e.cadd||[]).forEach(a=>{ if(a && a.n && !l.some(c=>c.n===a.n)) l.push({n:a.n, d:a.d||"", p:+a.p||0, partes:null}); });
  const ord=e.cord||[];
