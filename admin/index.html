@@ -59,6 +59,7 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
 .leite-cats .lc{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;cursor:pointer;}
 .leite-cats .lc.on{border-color:#4A2545;background:#F3E8F0;color:#4A2545;font-weight:600;}
 li b.lt{display:inline-block;padding:1px 8px;border-radius:7px;background:#4A2545;color:#fff;font-weight:700;text-transform:uppercase;font-size:.92em;}
+li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B3261E;color:#fff;font-weight:700;font-size:.92em;}
 .estado.cfg.on .ebtn{background:var(--vermelho);}
 .estado.cfg.marc{border-style:dashed;}
 .estado.cfg.marc.hora{border-color:#B5791F;background:#FFFBF0;}
@@ -1416,7 +1417,8 @@ const HIST_GUARDA=70, HIST_PAR=5;
 let hist={ped:[],dias:[],faltam:[],lido:""};
 const hEsc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 /* 22-10-2026: artigo do pedido com o leite (aveia, coco, soja…) em destaque, como na cozinha */
-function hItem(i){ return hEsc(i).replace(/(^|\(|,\s*)(leite\s(?!em p|condensado)[^,)]+)/gi,(m,a,b)=>a+'<b class="lt">🥛 '+b+'</b>'); }
+function hItem(i){ return hEsc(i).replace(/(^|\(|,\s*)(leite\s(?!em p|condensado)[^,)]+)/gi,(m,a,b)=>a+'<b class="lt">🥛 '+b+'</b>')
+ .replace(/(\(|,\s*)(sem\s[^,)]+)/gi,(m,a,b)=>a+'<b class="smx">'+b.toUpperCase()+'</b>'); }   // 22-10-2026: "sem…" (ex.: sem xarope de baunilha) a vermelho
 function hIso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function hDiaTxt(iso){ const [y,m,d]=iso.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("pt-PT",{weekday:"short",day:"2-digit",month:"2-digit"}); }
 function hLocal(dia){ try{ return JSON.parse(localStorage.getItem("ep_hist_"+dia)||"null"); }catch(e){ return null; } }

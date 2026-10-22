@@ -1012,7 +1012,7 @@ function add(ci,ii){
  if(r!==null && r<=0){ alert("Já não há "+i.n+" para hoje."); return; }
  if(i.cb && !comboDisponivel(i.cb)){ alert("Já não há o que este combo leva."); return; }
  if(i.top){ abrirAcai(i); return; }            // açaí: escolher o que leva
- if(i.g || i.cb || temLeite(ci,i) || extrasDe(ci)){ abrirTamanho(ci,ii); return; }   // escolher tamanho/leite/extras/partes
+ if(i.g || i.cb || temLeite(ci,i) || extrasDe(ci) || temBaun(i)){ abrirTamanho(ci,ii); return; }   // escolher tamanho/leite/extras/partes
  meter(i.n,i.n,i.m);
 }
 /* ---------- FOLHA DE OPÇÕES (tamanho, leite, extras, partes do combo) ----------
@@ -1028,7 +1028,7 @@ function comboDisponivel(cb){ return !cb.partes || cb.partes.every(p=>opcoesPart
 let opc=null;
 function abrirTamanho(ci,ii){
  const i=MENU[ci][1][ii];
- opc={ci,ii,i,leite:"Normal",ex:[],esc:[]};
+ opc={ci,ii,i,leite:"Normal",ex:[],esc:[],baun:true};
  if(i.cb && i.cb.partes) opc.esc=i.cb.partes.map(p=>opcoesParte(p).find(disponivel)||null);
  $("tNome").textContent=i.n;
  desenharOpcoesProd();
@@ -1059,6 +1059,10 @@ function desenharOpcoesProd(){
   h+=`<div class="op-grp"><div class="vgrp"><span>Leite</span><em>normal incluído</em></div><div class="vtops">`+
    LEITES.map(([n,v],j)=>bt(n, o.leite===n, `opLeite(${j})`, v?"+"+v:"")).join("")+`</div></div>`;
  }
+ if(temBaun(i)){   // 22-10-2026: todos os milkshakes levam xarope de baunilha (sem custo); tocar retira
+  h+=`<div class="op-grp"><div class="vgrp"><span>Xarope de baunilha</span><em>incluído · toque para retirar</em></div><div class="vtops">`+
+   bt(o.baun?"Com baunilha":"SEM baunilha", o.baun, "opBaun()", "")+`</div></div>`;
+ }
  const ex=extrasDe(o.ci);
  if(ex){
   h+=`<div class="op-grp"><div class="vgrp"><span>Extras</span><em class="pago">+${ex[0][1]} ECV cada</em></div><div class="vtops">`+
@@ -1072,6 +1076,8 @@ function desenharOpcoesProd(){
   : `<button type="button" class="um" data-sz="M"${falta?" disabled":""} onclick="escolherTamanho('M')"><b>${falta?"Esgotado":"Juntar ao pedido"}</b><span>${precoOpc("M")} ECV</span></button>`;
 }
 function opLeite(j){ if(!opc) return; opc.leite=LEITES[j][0]; desenharOpcoesProd(); }
+const temBaun=i=>/^milkshake/i.test(i.n)&&!i.cb;
+function opBaun(){ if(!opc) return; opc.baun=!opc.baun; desenharOpcoesProd(); }
 function opExtra(j){
  if(!opc) return; const n=(extrasDe(opc.ci)||[])[j]; if(!n) return;
  const k=opc.ex.indexOf(n[0]); if(k>=0) opc.ex.splice(k,1); else opc.ex.push(n[0]);
@@ -1096,6 +1102,7 @@ function escolherTamanho(sz){
  if(sz==="G" && i.g) det.push("Grande");
  if(temLeite(o.ci,i) && o.leite!=="Normal") det.push("leite "+o.leite.toLowerCase());
  o.ex.forEach(n=>det.push(n.toLowerCase()));
+ if(temBaun(i) && !o.baun) det.push("sem xarope de baunilha");
  const preco=precoOpc(sz);
  fecharTamanho();
  meter(i.n+(det.length?" ("+det.join(", ")+")":""), i.n, preco);

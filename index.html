@@ -1878,6 +1878,30 @@ function aplicarShakes16oz(ed){
  });
  MENU.forEach(c=>c.items.forEach(i=>{ const v=SHAKES_16OZ[i.n]; if(v && i.g){ i.p=v; delete i.g; } }));
  if(c) c.note="Tamanho único (16 oz)";
+ shakesBaunilha();
+}
+/* 22-10-2026: TODOS OS MILKSHAKES LEVAM XAROPE DE BAUNILHA (sem custo).
+   Descrição: "Batido de leite frio & morango & xarope de baunilha" (o "+" do /admin passa a "&"; "Batido" explica o que é).
+   Na escolha aparece "Xarope de baunilha" já marcado; se o cliente o desmarcar, o pedido leva "sem xarope de baunilha"
+   (a Cozinha mostra os "sem…" a vermelho). Traduções feitas a partir das do texto original. */
+const BAUN="Xarope de baunilha";
+const BAUN_TX={pt:["Batido de ","xarope de baunilha"],en:["Shake: ","vanilla syrup"],fr:["Boisson mixée : ","sirop de vanille"],de:["Shake: ","Vanillesirup"],nl:["Shake: ","vanillesiroop"]};
+function shakesBaunilha(){
+ const partes=x=>String(x||"").split(/\s*[+,]\s*/).map(z=>z.trim()).filter(Boolean);
+ MENU.forEach(c=>c.items.forEach(i=>{
+  if(!/^milkshake/i.test(i.n) || i._baun) return;
+  i._baun=true;
+  i.sem=(i.sem||[]).filter(z=>z!==BAUN).concat([BAUN]);
+  if(/baunilha/i.test(i.d||"")) return;
+  const orig=i.d||"", pt=partes(orig);
+  if(pt.length) pt[0]=pt[0].charAt(0).toLowerCase()+pt[0].slice(1);
+  i.d=BAUN_TX.pt[0]+pt.concat([BAUN_TX.pt[1]]).join(" & ");
+  ["en","fr","de","nl"].forEach(l=>{
+   if(!I18N[l]) return; I18N[l]._d=I18N[l]._d||{};
+   const tr=I18N[l]._d[orig]; if(tr==null && orig) return;
+   const q=partes(tr||""); I18N[l]._d[i.d]=BAUN_TX[l][0]+q.concat([BAUN_TX[l][1]]).join(" & ");
+  });
+ }));
 }
 /* 22-10-2026: LEITE À ESCOLHA por categoria. A Gestão guarda a lista em ord["__cat:leite"] (nomes das categorias);
    sem lista no servidor vale LEITE_PADRAO. As /vendas e a /cozinha lêem a mesma lista. Leite normal incluído;
@@ -2295,6 +2319,7 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
 (function(){
  const X={
   "Feitos na hora · tamanho único (16 oz)":["Freshly made · one size (16 oz)","Préparés à la minute · taille unique (16 oz)","Frisch zubereitet · eine Größe (16 oz)","Vers bereid · één maat (16 oz)"],
+  "Xarope de baunilha":["Vanilla syrup","Sirop de vanille","Vanillesirup","Vanillesiroop"],
   "Tamanho único (16 oz)":["One size (16 oz)","Taille unique (16 oz)","Eine Größe (16 oz)","Eén maat (16 oz)"],
   "Sumo de Maracujá":["Passion Fruit Juice","Jus de Fruit de la Passion","Maracujasaft","Passievruchtsap"],
   "pão recheado de frango ou caprese + sumo de laranja":["chicken or caprese stuffed bread + orange juice","pain garni poulet ou caprese + jus d'orange","gefülltes Brot mit Hähnchen oder Caprese + Orangensaft","gevuld brood kip of caprese + sinaasappelsap"],
@@ -2330,6 +2355,15 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
   de:"* Abbildungen ähnlich. Die Präsentation kann abweichen.",
   nl:"* Afbeeldingen ter illustratie. De presentatie kan afwijken."};
  for(const l in N) if(I18N[l]) I18N[l].fotosNota=N[l];
+})();
+/* 22-10-2026: nota da baunilha nos milkshakes (incluída, sem custo; pode retirar-se) */
+(function(){
+ const N={pt:"O xarope de baunilha está incluído, sem custo. Toca para retirar se não quiseres.",
+  en:"Vanilla syrup is included at no extra cost. Tap to leave it out.",
+  fr:"Le sirop de vanille est inclus, sans supplément. Touchez pour le retirer.",
+  de:"Vanillesirup ist ohne Aufpreis inklusive. Tippen, um ihn wegzulassen.",
+  nl:"Vanillesiroop is inbegrepen, zonder meerprijs. Tik om hem weg te laten."};
+ for(const l in N) if(I18N[l]) I18N[l].baunNota=N[l];
 })();
 function td(s){
  const d=I18N[LANG]&&I18N[LANG]._d;
@@ -2870,7 +2904,7 @@ function pick(ci,ii){
  /* ingredientes que o cliente pode retirar (não há acrescentar) */
  if(i.sem) h+=`<div class="lbl">${t("personalizar")}</div><div class="optsem">`+
    i.sem.map(s=>`<button class="chip sel" onclick="tglSem('${s.replace(/'/g,"\\'")}',this)">${td(s)}</button>`).join("")+
-   `</div><div class="semnota">${t("semnota")}</div>`;
+   `</div><div class="semnota">${i._baun?t("baunNota"):t("semnota")}</div>`;
  if(i.top) h+=acaiHTML(i);
  $("optBody").innerHTML=h;
  if(i.top){ acaiTopo(i); precoAcai(); }
@@ -2972,6 +3006,7 @@ function confirmAdd(){
  cur.extras.forEach(e=>{price+=e[1];opts.push(e[0].toLowerCase());});
  cur.sem.forEach(s=>opts.push("sem "+s.toLowerCase()));
  const meta={size:cur.size,milk:(cur.cat.milk&&!i.nm)?cur.milk:null,extras:cur.extras.map(e=>e[0])};
+ if(cur.sem.length) meta.sem=cur.sem.slice();
  if(i.top){ opts=optsAcai(i,cur.top,cur.xt); meta.top=cur.top.slice(); meta.xt=cur.xt.slice(); }
  addToCart(i.n,price,opts,i.nd,meta,cur.cat.cat,(i.pt!=null?i.pt:cur.cat.pt));
  closeAll(); openCart();
@@ -4136,6 +4171,7 @@ function repetirUltimo(){
    const e=(f.cat.extras||[]).find(x=>x[0]===en);
    if(e){ price+=e[1]; opts.push(en.toLowerCase()); }
   });
+  (m.sem||[]).forEach(z=>{ if((f.item.sem||[]).includes(z)) opts.push("sem "+z.toLowerCase()); });
   for(let k=0;k<s.q;k++) addToCart(f.item.n, price, opts, f.item.nd, m, f.cat.cat, (f.item.pt!=null?f.item.pt:f.cat.pt));
  });
  if(d.nome) $("fName").value=d.nome;
