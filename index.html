@@ -1805,7 +1805,7 @@ const MENU=[
  {cat:"BEBIDAS FRIAS",tk:"c_frias",img:"img/cat-frias.webp",milk:true,pt:3,items:[{n:"Iced Latte",p:225,g:250},{n:"Café Instantâneo Gelado",p:275,g:300},{n:"Frappé Clássico",p:275,g:300},{n:"Frappé de Chocolate",p:325,g:350},{n:"Frappé de Caramelo",p:350,g:375},{n:"Iced Latte de Caramelo",p:350,g:375},{n:"Iced Mocha",p:350,g:375}]},
 
  {cat:"SUMOS NATURAIS",tk:"c_sumos",img:"img/cat-sumos.webp",pt:3,extras:[["Gengibre",50],["Hortelã",50]],
-  note:"Feitos na hora · tamanho único (16 oz)",items:[{n:"Sumo de Laranja",p:475},{n:"Sumo de Ananás",p:475},{n:"Sumo de Maracujá",p:475}]},
+  note:"Feitos na hora · tamanho único (473 ml)",items:[{n:"Sumo de Laranja",p:475},{n:"Sumo de Ananás",p:475},{n:"Sumo de Maracujá",p:475}]},
 
  {cat:"DONUTS &amp; MUFFINS",tk:"c_donuts",img:"img/cat-donuts.webp",pt:0.5,items:[{n:"Muffin de Laranja",p:125},{n:"Muffin de Chocolate",p:150},{n:"Donut de Chocolate",p:150},{n:"Donut de Doce de Leite",p:150}]},
 
@@ -1860,7 +1860,7 @@ function recalcularCombos(){
   c.esg = !c.indisp && c.partes.some(op=>op.every(n=>!pm(n)||esgotados.includes(n)));   // esgotado hoje -> aparece bloqueado
  });
 }
-/* 21-10-2026: MILKSHAKES — tamanho único 16 oz, com estes preços.
+/* 21-10-2026: MILKSHAKES — tamanho único 473 ml, com estes preços.
    Os milkshakes foram criados no /admin com dois tamanhos (M/G). Enquanto lá estiverem com dois tamanhos,
    vale esta tabela; quando forem gravados no /admin com um só preço (sem G), passa a valer o do /admin.
    O mesmo nas /vendas. */
@@ -1877,8 +1877,11 @@ function aplicarShakes16oz(ed){
   c.items.push(novo);
  });
  MENU.forEach(c=>c.items.forEach(i=>{ const v=SHAKES_16OZ[i.n]; if(v && i.g){ i.p=v; delete i.g; } }));
- if(c) c.note="Tamanho único (16 oz)";
+ if(c) c.note="Tamanho único (473 ml)";
  shakesBaunilha();
+ /* 22-10-2026: medidas sempre em ml (textos vindos do /admin com "oz" passam a ml: 1 oz = 29,57 ml) */
+ const ozMl=x=>typeof x==="string"?x.replace(/(\d+(?:[.,]\d+)?)\s?(?:fl\.?\s?)?oz\b/gi,(m,n)=>Math.round(parseFloat(n.replace(",","."))*29.5735)+" ml"):x;
+ MENU.forEach(k=>{ k.note=ozMl(k.note); k.items.forEach(i=>{ i.d=ozMl(i.d); }); });
 }
 /* 22-10-2026: TODOS OS MILKSHAKES LEVAM XAROPE DE BAUNILHA (sem custo).
    Descrição: "Batido de leite frio & morango & xarope de baunilha" (o "+" do /admin passa a "&"; "Batido" explica o que é).
@@ -2318,9 +2321,9 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
 /* 21-10-2026: traduções dos textos novos do menu (sumos, combos, em breve, milkshakes criados no /admin) */
 (function(){
  const X={
-  "Feitos na hora · tamanho único (16 oz)":["Freshly made · one size (16 oz)","Préparés à la minute · taille unique (16 oz)","Frisch zubereitet · eine Größe (16 oz)","Vers bereid · één maat (16 oz)"],
+  "Feitos na hora · tamanho único (473 ml)":["Freshly made · one size (473 ml)","Préparés à la minute · taille unique (473 ml)","Frisch zubereitet · eine Größe (473 ml)","Vers bereid · één maat (473 ml)"],
   "Xarope de baunilha":["Vanilla syrup","Sirop de vanille","Vanillesirup","Vanillesiroop"],
-  "Tamanho único (16 oz)":["One size (16 oz)","Taille unique (16 oz)","Eine Größe (16 oz)","Eén maat (16 oz)"],
+  "Tamanho único (473 ml)":["One size (473 ml)","Taille unique (473 ml)","Eine Größe (473 ml)","Eén maat (473 ml)"],
   "Sumo de Maracujá":["Passion Fruit Juice","Jus de Fruit de la Passion","Maracujasaft","Passievruchtsap"],
   "pão recheado de frango ou caprese + sumo de laranja":["chicken or caprese stuffed bread + orange juice","pain garni poulet ou caprese + jus d'orange","gefülltes Brot mit Hähnchen oder Caprese + Orangensaft","gevuld brood kip of caprese + sinaasappelsap"],
   "salada fria de frango + sumo de laranja":["chicken pasta salad + orange juice","salade de pâtes au poulet + jus d'orange","Nudelsalat mit Hähnchen + Orangensaft","pastasalade met kip + sinaasappelsap"],
