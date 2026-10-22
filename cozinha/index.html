@@ -166,6 +166,10 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped li .opt .dt.sem{border-color:var(--vermelho);color:var(--vermelho);text-transform:uppercase;}
 /* 16-10-2026: leite diferente do normal (aveia, coco, soja, amêndoa, sem lactose) muda a bebida: em destaque */
 .ped li .opt .dt.lt{background:#FFE7A8;border-color:#8A5A12;color:#4A3204;font-weight:800;text-transform:uppercase;letter-spacing:.4px;}
+/* 22-10-2026: leite diferente do normal ainda mais à vista (etiqueta roxa grande + faixa na linha); o normal discreto */
+.ped li .opt .dt.lt{background:#4A2545;border-color:#4A2545;color:#fff;font-size:21px;padding:5px 12px;box-shadow:0 0 0 3px #E6D2E1;}
+.ped li .opt .dt.ltn{border-color:#B9AFA6;color:#6E625A;font-size:14px;font-weight:600;background:#fff;}
+.ped li:has(.com-leite){border-left:6px solid #4A2545;padding-left:10px;}
 .ped li .opt .soacai{padding:3px 10px;border-radius:8px;}
 .ped li .opt .xtop{padding:2px 9px;border-radius:8px;}
 /* morada e andar: também são detalhes de quem prepara e entrega */
@@ -277,6 +281,7 @@ async function entrar(){
  $("loginBox").style.display="none";
  $("painel").style.display="block";
  _assinatura=""; desenhar();
+ aplicarMenuStk().then(()=>{ _assinatura=""; desenhar(); });   // 22-10: categorias com leite e produtos do /admin
  manterEcraAceso();
  botaoNotificacoes();
  garantirSubscricao();
@@ -357,19 +362,37 @@ function atrasado(slot){
 
 /* "2x Iced Latte (Grande, leite de aveia)" -> quantidade, nome grande, opções por baixo.
    O que não encaixar no padrão sai tal e qual, sem inventar. */
+/* 22-10-2026: LEITE — nas bebidas com leite à escolha diz-se SEMPRE qual vai: o leite diferente do normal
+   numa etiqueta grande e roxa (a linha fica com faixa roxa à esquerda), o normal numa etiqueta pequena.
+   Categorias com leite: a lista da Gestão (ord["__cat:leite"]) ou, sem ela, LEITE_PADRAO — as mesmas do site e das /vendas. */
+const LEITE_PADRAO = ["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS","SMOOTHIES/ MILKSHAKE/ BATIDOS"];
+const SEM_LEITE = ["Espresso","Espresso Duplo","Americano"];
+let catLeite = LEITE_PADRAO.slice();
+function levaLeite(nome){
+  const n = String(nome||"").trim();
+  if(SEM_LEITE.includes(n) || /^combo /i.test(n) || /^açaí$/i.test(n)) return false;
+  const norm = s => String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
+  const c = MENU_STK.find(c => c[1].some(i => i.n === n));
+  if(c) return catLeite.includes(norm(c[0]));
+  return /^milkshake/i.test(n) && catLeite.some(x => /MILKSHAKE/.test(x));
+}
 function artigo(txt){
   const m = String(txt).match(/^\s*(\d+)\s*x\s+([^(]+?)\s*(?:\((.+)\))?\s*$/);
   if(!m) return `<div class="art"><span class="nome">${esc(txt)}</span></div>`;
   const [, q, nome, opts] = m;
-  return `<div class="art"><span class="qt">${q}x</span><span class="nome">${esc(nome)}</span></div>`
-       + (opts ? `<div class="opt">${/^açaí$/i.test(nome.trim()) ? optAcai(opts) : detalhes(opts)}</div>` : "");
+  const lt = /(^|,\s*)leite\s(?!em p|condensado)/i.test(opts||"");
+  const normal = !lt && levaLeite(nome);
+  let o = opts ? (/^açaí$/i.test(nome.trim()) ? optAcai(opts) : detalhes(opts)) : "";
+  if(normal) o += '<span class="dt ltn">leite normal</span>';
+  return `<div class="art${lt?" com-leite":""}"><span class="qt">${q}x</span><span class="nome">${esc(nome)}</span></div>`
+       + (o ? `<div class="opt">${o}</div>` : "");
 }
 /* Detalhes do artigo ("Grande, leite aveia, sem tomate"): uma etiqueta por detalhe.
    GRANDE fica a cheio (muda o copo) e os "sem…" a vermelho (é o que não pode ir). */
 function detalhes(opts){
   return String(opts).split(/\s*,\s*/).filter(Boolean).map(o=>{
     if(/^grande$/i.test(o)) return '<span class="dt gr">GRANDE</span>';
-    if(/^leite\s(?!em p|condensado)/i.test(o)) return `<span class="dt lt">${esc(o)}</span>`;
+    if(/^leite\s(?!em p|condensado)/i.test(o)) return `<span class="dt lt">🥛 ${esc(o.replace(/^leite\s+/i,"leite de "))}</span>`;
     return `<span class="dt${/^sem\s/i.test(o)?" sem":""}">${esc(o)}</span>`;
   }).join("");
 }
@@ -690,6 +713,10 @@ async function aplicarMenuStk(){
       const c = MENU_STK.find(x => norm(x[0]) === norm(a.c));
       if(c && !c[1].some(i => i.n === a.n)) c[1].push({n: a.n, m: a.m});
     });
+    /* 22-10-2026: milkshakes de framboesa e groselha (no código, como no site e nas /vendas) */
+    { const sc = MENU_STK.find(x => /MILKSHAKE|SMOOTHIE|BATIDO/.test(norm(x[0])));
+      if(sc) [["Milkshake de Framboesa",400],["Milkshake de Groselha",400]].forEach(([n,m]) => { if(!sc[1].some(i => i.n === n)) sc[1].push({n, m}); }); }
+    if(Array.isArray(o["__cat:leite"])) catLeite = o["__cat:leite"].map(norm);
     const off = ed.off || [];
     if(off.length) MENU_STK.forEach(c => { c[1] = c[1].filter(i => !off.includes(i.n)); });
     const catOff = lst("__cat:off").map(norm);

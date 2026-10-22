@@ -55,6 +55,10 @@ h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
 .estado.cfg.on.hora .et{color:#8A5A12;}
 .estado.cfg.on.camp{border-color:#4A2545;background:#F3E8F0;}
 .estado.cfg.on.camp .et{color:#4A2545;}
+.leite-cats{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 0;}
+.leite-cats .lc{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;cursor:pointer;}
+.leite-cats .lc.on{border-color:#4A2545;background:#F3E8F0;color:#4A2545;font-weight:600;}
+li b.lt{display:inline-block;padding:1px 8px;border-radius:7px;background:#4A2545;color:#fff;font-weight:700;text-transform:uppercase;font-size:.92em;}
 .estado.cfg.on .ebtn{background:var(--vermelho);}
 .estado.cfg.marc{border-style:dashed;}
 .estado.cfg.marc.hora{border-color:#B5791F;background:#FFFBF0;}
@@ -325,6 +329,14 @@ body{padding-bottom:76px;}
       <div class="es" id="cfgSubCamp"></div>
     </div>
     <div class="ebts" id="cfgBtsCamp"></div>
+  </div>
+
+  <!-- 22-10-2026: campanha dos milkshakes — definida no código do site (SHAKE_CAMP); aqui só se mostra o estado -->
+  <div class="estado cfg camp" id="cfgBoxShk">
+    <div>
+      <div class="et" id="cfgTxtShk">Milkshakes · −20% · leve 3 pague 2</div>
+      <div class="es" id="cfgSubShk"></div>
+    </div>
   </div>
 
   <div class="cfg-rep" id="cfgRep" hidden></div>
@@ -755,8 +767,18 @@ const CFG_UI=[
   lig:"Ligar", bOff:"Desligar já",
   perg:"Ligar a campanha nova do açaí?\n\n2 açaís no carrinho: 675$ cada.\n3 ou mais: 600$ cada.\n(Preço do açaí com granola ou leite em pó; o só açaí e os extras pagam a diferença.)\n1 açaí: fica com os 5% do resto do pedido.\n\nSó nas encomendas do site para LEVANTAR COM HORA MARCADA. Ao balcão o preço continua o normal.\nEnquanto esta estiver ligada ou marcada, a campanha antiga (3 açaís = 1 grátis) não entra."}
 ];
+const SHK_DE="2026-10-22", SHK_ATE="2026-10-28";   // iguais a SHAKE_CAMP no index.html
+function desenharShk(){
+ const b=$("cfgBoxShk"); if(!b) return;
+ const dia=iso=>{ const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(iso); return Math.round(Date.UTC(+m[1],+m[2]-1,+m[3])/864e5-CFG_DIA0)+1; };
+ const h=diaCV(), de=dia(SHK_DE), ate=dia(SHK_ATE), est=h>ate?0:(h<de?2:1);
+ b.classList.toggle("on",est===1); b.classList.toggle("marc",est===2);
+ $("cfgSubShk").textContent=(est===1?"Ligada · até "+cfgCurto(ate):(est===2?"Marcada · "+cfgCurto(de)+" a "+cfgCurto(ate):"Terminou a "+cfgCurto(ate)))
+  +" · framboesa, morango e groselha · só no site (ao balcão não há). Leve 3 pague 2; 1 ou 2 com −20%. Não acumula com os 5% online. Datas no código do site.";
+}
 function desenharCfg(){
  setTimeout(desenharRepor,0);
+ desenharShk();
  CFG_UI.forEach((u,i)=>{
   const box=$("cfgBox"+u.id); if(!box) return;
   if(!editLido){ $("cfgTxt"+u.id).textContent="Sem ligação"; $("cfgSub"+u.id).textContent="Não foi possível ler o estado. Actualize a página."; $("cfgBts"+u.id).innerHTML=""; return; }
@@ -881,6 +903,9 @@ const normc=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
 const CAT_ORD="__cat:ordem", CAT_OFF="__cat:off", CAT_ADD="__cat:add";
 const CATS_BASE=MENU.map(c=>c[0]);
 const ITENS_BASE={}; MENU.forEach(([c,l])=>{ ITENS_BASE[normc(c)]=l; });
+/* 22-10-2026: milkshakes de framboesa e groselha estão no código do site, /vendas e /cozinha (SHAKES_NOVOS).
+   Aqui aparecem na categoria dos milkshakes como os produtos de base: o preço muda-se e o ✕ retira-os. */
+ITENS_BASE[normc("SMOOTHIES/ MILKSHAKE/ BATIDOS")]=[{n:"Milkshake de Framboesa",m:400,d:"Leite frio + framboesa"},{n:"Milkshake de Groselha",m:400,d:"Leite frio + groselha"}];
 /* ordem de origem do site (ORDEM_CAT do index.html), usada enquanto não se gravar outra */
 const ORDEM_SITE=["AÇAÍ & ÁGUA DE COCO","BEBIDAS FRIAS","MATCHA & COCO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
 function catLista(k){ return (edit.ord&&Array.isArray(edit.ord[k]))?edit.ord[k]:[]; }
@@ -939,9 +964,26 @@ function criarCat(){
  const sel=$("nCat"); if(sel){ const k=MENU.findIndex(x=>normc(x[0])===normc(n)); if(k>=0) sel.value=String(k); }
  alert("Categoria «"+n+"» criada.\n\nAcrescente-lhe produtos em «Acrescentar produto» (mais abaixo) e depois carregue em Guardar alterações. Sem produtos não aparece no site.");
 }
+/* 22-10-2026: LEITE À ESCOLHA — em que categorias o cliente escolhe o leite (normal incluído; aveia, coco, soja,
+   amêndoa e sem lactose +100 ECV). Guarda-se em ord["__cat:leite"] (lista de categorias); o site, as /vendas e a
+   /cozinha lêem a mesma lista. Sem lista gravada vale LEITE_PADRAO. Espresso, Espresso Duplo e Americano nunca têm. */
+const CAT_LEITE="__cat:leite", LEITE_PADRAO=["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS","SMOOTHIES/ MILKSHAKE/ BATIDOS"];
+function catsLeite(){ return (edit.ord&&Array.isArray(edit.ord[CAT_LEITE]))?edit.ord[CAT_LEITE].map(normc):LEITE_PADRAO.map(normc); }
+function setLeite(n){
+ const l=catsLeite(), k=normc(n);
+ edit.ord[CAT_LEITE]= l.includes(k) ? l.filter(x=>x!==k) : l.concat([k]);
+ marcar(); desenharMenu();
+}
+function htmlLeite(){
+ const l=catsLeite(), q=s=>JSON.stringify(s).replace(/"/g,"&quot;");
+ return `<div class="cat">LEITE À ESCOLHA <small style="font-weight:500;letter-spacing:0">· normal incluído · aveia, coco, soja, amêndoa, sem lactose +100 ECV</small></div>
+  <div class="leite-cats">${catsOrdenadas().filter(n=>!/AÇAÍ|SUMOS|DONUTS|MERENDA|TOSTAS|ALMOÇO/i.test(n)||l.includes(normc(n))).map(n=>
+   `<label class="lc${l.includes(normc(n))?" on":""}"><input type="checkbox" ${l.includes(normc(n))?"checked":""} onchange="setLeite(${q(n)})"> ${hEsc(n)}</label>`).join("")}</div>
+  <div class="vaz" style="margin-top:6px">Na cozinha o leite escolhido aparece numa etiqueta roxa grande; nas bebidas com leite normal aparece «leite normal».</div>`;
+}
 function htmlCats(){
  const l=catsOrdenadas(), q=s=>JSON.stringify(s).replace(/"/g,"&quot;");
- let h=`<div class="cat">CATEGORIAS · ORDEM NO SITE</div>
+ let h=htmlLeite()+`<div class="cat">CATEGORIAS · ORDEM NO SITE</div>
   <div class="ordbar"><button onclick="reporOrdemCats()">Repor ordem de origem</button></div>`;
  l.forEach((n,i)=>{
   const off=catOff(n), nova=catNova(n);
@@ -1081,6 +1123,7 @@ function desenharMenu(){
   const l=itensDaCat(ci);
   h+=`<div class="cat${catOff(cat)?" catoff":""}">${cat}${catOff(cat)?" · RETIRADA":""}</div>
    ${(!l.length&&catNova(cat))?'<div class="vaz">Sem produtos. Acrescente em «Acrescentar produto», no fim desta página.</div>':""}
+   ${/MILKSHAKE/i.test(cat)?'<div class="vaz">Tamanho único 16 oz. Enquanto um milkshake aqui tiver preço G, o site e as vendas usam 425 (morango, frutos silvestres), 500 (banana e morango) e 600 (tropical). Para mandar o preço daqui: apague o G e grave.</div>':""}
    <div class="ordbar">
     <button onclick="ordenarPreco(${ci},1)">Preço ↑</button>
     <button onclick="ordenarPreco(${ci},-1)">Preço ↓</button>
@@ -1347,7 +1390,7 @@ async function carregarPedidos(){
     · <span class="cod">${p.code||""}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
     ${p._futuro?' · <b style="color:#8A5A12">'+(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
    ${linhaFeito(p)}
-   <ul>${p.itens.map(i=>`<li>${i}</li>`).join("")}</ul>
+   <ul>${p.itens.map(i=>`<li>${hItem(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${p.zona}${p.morada?" — "+p.morada:""}</div>`:(p.morada?`<div class="mor">📍 ${p.morada}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${p.piso}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${p.taxaAndar} ECV</div>`:""}
    ${p.notas?`<div class="nt">Notas: ${p.notas}</div>`:""}
    <div class="tot">${p.total} ECV</div>
@@ -1372,6 +1415,8 @@ async function carregarPedidos(){
 const HIST_GUARDA=70, HIST_PAR=5;
 let hist={ped:[],dias:[],faltam:[],lido:""};
 const hEsc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* 22-10-2026: artigo do pedido com o leite (aveia, coco, soja…) em destaque, como na cozinha */
+function hItem(i){ return hEsc(i).replace(/(^|\(|,\s*)(leite\s(?!em p|condensado)[^,)]+)/gi,(m,a,b)=>a+'<b class="lt">🥛 '+b+'</b>'); }
 function hIso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function hDiaTxt(iso){ const [y,m,d]=iso.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("pt-PT",{weekday:"short",day:"2-digit",month:"2-digit"}); }
 function hLocal(dia){ try{ return JSON.parse(localStorage.getItem("ep_hist_"+dia)||"null"); }catch(e){ return null; } }
@@ -1470,7 +1515,7 @@ function hisDesenhar(){
       <span class="ht">${(+p.total||0).toLocaleString("pt-PT")}<small class="${cls}">${ESTX[p.status]||hEsc(p.status||"")}</small></span></summary>
       <div class="hb">
        ${p.tel?`<a href="tel:${hEsc(String(p.tel).replace(/\s/g,""))}">${hEsc(p.tel)}</a> · `:""}feito às ${hEsc(p.criado||"—")}${p.quando&&p.quando!=="hoje"?" · para "+hEsc(p.quando):""}
-       <ul>${(p.itens||[]).map(i=>`<li>${hEsc(i)}</li>`).join("")}</ul>
+       <ul>${(p.itens||[]).map(i=>`<li>${hItem(i)}</li>`).join("")}</ul>
        ${ent?`<div>📍 ${hEsc(p.zona||"")}${p.morada?" — "+hEsc(p.morada):""}</div>`:""}
        ${p.notas?`<div>Notas: ${hEsc(p.notas)}</div>`:""}
        <div>${comp}</div>

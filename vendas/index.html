@@ -593,7 +593,8 @@ const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Dup
 /* ---- 16-10-2026: opções iguais às do site (index.html: LEITES, milk/nm, extras, COMBOS) ----
    Os preços dos leites e dos extras estão aqui e no site; os dos combos vêm do /admin. */
 const LEITES=[["Normal",0],["Aveia",100],["Coco",100],["Soja",100],["Amêndoa",100],["Sem lactose",100]];
-const CAT_LEITE=["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS"];   // categorias com escolha de leite
+/* 22-10-2026: a lista vem da Gestão (ord["__cat:leite"]); sem ela, estas (os milkshakes passam a ter leite à escolha) */
+let CAT_LEITE=["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS","SMOOTHIES/ MILKSHAKE/ BATIDOS"];   // categorias com escolha de leite
 const SEM_LEITE=["Espresso","Espresso Duplo","Americano"];             // nestas não se escolhe leite
 const CAT_EXTRAS={"SUMOS NATURAIS":[["Gengibre",50],["Hortelã",50]]};
 /* partes = o que o cliente escolhe em cada combo; serve para a cozinha saber e para descontar o stock */
@@ -617,6 +618,8 @@ function precoComboAuto(partes,precoDe){
 }
 /* 21-10-2026: MILKSHAKES — tamanho único 16 oz (igual ao site). Vale enquanto no /admin estiverem com dois tamanhos;
    gravados lá com um só preço (sem G), passa a valer o do /admin. */
+/* 22-10-2026: sabores novos (iguais aos do site: SHAKES_NOVOS) — entram na categoria dos milkshakes criada no /admin */
+const SHAKES_NOVOS=[{n:"Milkshake de Framboesa",d:"Leite frio + framboesa",m:400},{n:"Milkshake de Groselha",d:"Leite frio + groselha",m:400}];
 const SHAKES_16OZ={"Milkshake de morango":425,"Milkshake de Frutos silvestres":425,"Milkshake de banana e morango":500,"Milkshake tropical":600};
 let comboEd={};       // preços (cp), retirados (coff), novos (cadd) e ordem (cord) dos combos, do /admin
 
@@ -715,7 +718,10 @@ async function aplicarEdicao(){
   const novo={n:a.n,m:a.m}; if(a.g) novo.g=a.g; if(a.d) novo.d=a.d;
   c[1].push(novo);
  });
+ { const sc=MENU.find(c=>/MILKSHAKE|SMOOTHIE|BATIDO/i.test(c[0]));
+   if(sc) SHAKES_NOVOS.forEach(a=>{ if(sc[1].some(i=>i.n===a.n)) return; const o=ed.p&&ed.p[a.n]; sc[1].push({n:a.n,d:a.d,m:(o&&o.m>0)?o.m:a.m}); }); }
  MENU.forEach(c=>c[1].forEach(i=>{ const v=SHAKES_16OZ[i.n]; if(v && i.g){ i.m=v; delete i.g; } }));   // milkshakes 16 oz
+ { const L=ed.ord&&ed.ord["__cat:leite"]; if(Array.isArray(L)) CAT_LEITE=L.map(x=>normCat(x)); }   // leite à escolha (Gestão)
  const off=ed.off||[];
  if(off.length) MENU.forEach(c=>{ c[1]=c[1].filter(i=>!off.includes(i.n)); });
  // retiradas no /admin e criadas ainda sem produtos saem dos separadores
@@ -735,7 +741,8 @@ function montarCombos(){
  const e=comboEd||{};
  let l=COMBOS_BASE.map(c=>Object.assign({},c));
  const pm=n=>{ for(const c of MENU){ if(c[0]==="COMBOS") continue; for(const i of c[1]) if(i.n===n) return +i.m||0; } return 0; };
- l.forEach(c=>{ if(!c.partes) return; const v=precoComboAuto(c.partes,pm); if(v>0) c.p=v; });
+ l.forEach(c=>{ if(!c.partes) return; const v=precoComboAuto(c.partes,pm); if(v>0) c.p=v; else c.fora=true; });
+ l=l.filter(c=>!c.fora);   // 22-10: um produto do combo saiu do menu (ex.: Sopa do Dia retirada) -> o combo não se vende
  Object.keys(e.cp||{}).forEach(n=>{ const c=l.find(x=>x.n===n); if(c && !c.partes && +e.cp[n]>0) c.p=+e.cp[n]; });
  const off=e.coff||[]; l=l.filter(c=>!off.includes(c.n));
  (e.cadd||[]).forEach(a=>{ if(a && a.n && !l.some(c=>c.n===a.n)) l.push({n:a.n, d:a.d||"", p:+a.p||0, partes:null}); });
