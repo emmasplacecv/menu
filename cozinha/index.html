@@ -75,6 +75,8 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped .tipo{font-size:10.5px;letter-spacing:1.2px;font-weight:700;padding:5px 10px;border-radius:20px;
  background:var(--dark);color:#F7F1E4;white-space:nowrap;}
 .ped .tipo.ent{background:var(--gold);color:var(--dark);}
+.ped .tipo.web{background:#4A2259;color:#F6EDE0;}
+.ped .top.sep{margin-top:12px;padding-top:12px;border-top:2px solid var(--line);}
 
 .ped .meta{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;color:var(--ink2);
  margin-top:5px;letter-spacing:-.2px;}
@@ -450,14 +452,13 @@ function desenhar(){
   const atr=(p.status!=="entregue"&&atrasado(p.slot));
   const porVer=precisaVisto(p);
   return `<div class="ped ${p.status}${atr?" atrasado":""}${porVer?" porVer":""}" onclick="marcarVisto('${p.id}')">
-   ${porVer?`<div class="porVer">👆 PEDIDO ONLINE NOVO · toque para avisar que viu</div>`:""}
+   ${porVer?`<div class="porVer">👆 PEDIDO NOVO DO WEBSITE · toque para avisar que viu</div>`:""}
    <div class="cli"><b>${esc(p.nome||"(sem nome)")}</b>${p.tel?`<a class="tel" href="tel:${esc(String(p.tel).replace(/\s/g,""))}">${esc(p.tel)}</a>`:""}</div>
    ${blocoNotas(p)}
    <ul>${(p.itens||[]).map(i=>`<li>${artigo(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${esc(p.zona)}${p.morada?" — "+esc(p.morada):""}</div>`:(p.morada?`<div class="mor">📍 ${esc(p.morada)}</div>`:"")}${p.piso>0?`<div class="andar">🏢 ${esc(p.piso)}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${esc(p.taxaAndar)} ECV</div>`:""}
-   <div class="origem${p.balcao?"":" online"}">${p.balcao?"Balcão":"Online"}</div>
-   <div class="top"><span class="hora">levantar <b>${p.slot||"—"}</b></span>
-    <span class="tipo ${ent?"ent":""}">${ent?"ENTREGA":"LEVANTAR"}</span></div>
+   <div class="top sep"><span class="hora">${ent?"sair":"levantar"} <b>${p.slot||"—"}</b></span>
+    <span class="tipo ${p.balcao?"":(ent?"ent":"web")}">${p.balcao?"BALCÃO":(ent?"WEBSITE · ENTREGA":"WEBSITE")}</span></div>
    <div class="meta">${p.code||""}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}${p.criado?" · pedido às "+p.criado:""}${!p.balcao&&vistoDe(p)?' · <span class="vistoOk">👀 visto às '+vistoDe(p)+'</span>':""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
    ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>

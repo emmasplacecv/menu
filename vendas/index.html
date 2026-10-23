@@ -536,7 +536,7 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
     <div class="hvfil" role="group" aria-label="Filtro">
       <button type="button" class="sel" data-f="" onclick="hvFiltro(this)">Todos</button>
       <button type="button" data-f="balcao" onclick="hvFiltro(this)">Balcão</button>
-      <button type="button" data-f="site" onclick="hvFiltro(this)">Site</button>
+      <button type="button" data-f="site" onclick="hvFiltro(this)">Website</button>
     </div>
     <div id="hvLista"><div class="vazio">Escolha um dia.</div></div>
     <div class="msg">Toque num pedido para ver os produtos e o comprovativo. Lista completa de vários dias, Excel e ZIP com todos os comprovativos: <b>Admin → Histórico</b>.</div>
@@ -1366,7 +1366,7 @@ async function carregarFecho(){
     <div class="kpi"><small>Vendido</small><b>${total} ECV</b></div>
     <div class="kpi"><small>Pedidos</small><b>${vendidos.length}</b></div>
     <div class="kpi"><small>Balcão</small><b>${nBalcao} · ${vBalcao} ECV</b></div>
-    <div class="kpi"><small>Site</small><b>${nOnline} · ${total-vBalcao} ECV</b></div>
+    <div class="kpi"><small>Website</small><b>${nOnline} · ${total-vBalcao} ECV</b></div>
    </div>`
   + caixaHtml(vendidos)
   + (linhas.length ? `<table class="fecho">
@@ -1423,12 +1423,12 @@ function hvDesenhar(){
  }
  const ok=l.filter(p=>p.status!=="cancelado"), soma=ok.reduce((s,p)=>s+(+p.total||0),0);
  const site=ok.filter(p=>!p.balcao).length;
- $("hvLista").innerHTML=`<div class="hvres"><span><b>${ok.length}</b> pedidos</span><span><b>${soma}</b> ECV</span><span><b>${site}</b> do site</span></div>`+
+ $("hvLista").innerHTML=`<div class="hvres"><span><b>${ok.length}</b> pedidos</span><span><b>${soma}</b> ECV</span><span><b>${site}</b> do website</span></div>`+
   l.map(p=>{
    const canc=p.status==="cancelado";
    const linhas=(Array.isArray(p.linhas)&&p.linhas.length)?p.linhas.map(x=>x.q+"x "+x.n):(p.itens||[]);
    const selo=p.balcao?(p.balcaoPago?'<span class="selo sim">✓ Pago'+(metDe(p)?' · '+esc(metTxt(metDe(p))):'')+'</span>':'<span class="selo nao">Por pagar</span>')
-                      :'<span class="selo site">Site</span>';
+                      :'<span class="selo site">Website</span>';
    const compUrl=PROMO_API+"/comprovativo?code="+encodeURIComponent(p.code||"")+"&key="+encodeURIComponent(KEY);
    const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
    return `<details class="hv${canc?" hvcanc":""}"><summary>

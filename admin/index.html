@@ -81,6 +81,8 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
 .ped .tipo{font-size:12px;letter-spacing:1.5px;font-weight:600;padding:3px 9px;border-radius:20px;
  background:var(--dark);color:#F7F1E4;}
 .ped .tipo.ent{background:var(--gold);color:var(--dark);}
+.ped .tipo.web{background:#4A2259;color:#F6EDE0;}
+.ped .tot .pg{font-weight:600;color:#3F6B33;} .ped .tot .npg{font-weight:600;color:#8C2F2F;}
 .ped .cli{font-size:14.5px;margin-top:6px;}
 .ped .cod{font-family:monospace;font-size:12.5px;color:var(--ink2);}
 .ped .feito{font-size:13.5px;color:var(--ink2);margin-top:5px;line-height:1.45;}
@@ -1362,6 +1364,16 @@ function desenharComprovativos(){
    o site PED-ddmm-XXX). Corrige as vendas de 19 e 20-10 que o servidor gravou como pedidos do site. */
 const ehBalcao=p=>!!(p&&(p.balcao||/^BAL-/.test(String(p.code||""))));
 const metBalcao={dinheiro:"dinheiro",vinti4:"Vinti4",transf:"transferência"};
+/* 23-10-2026: etiqueta do cartão = ORIGEM do pedido (Website ou Balcão); "levantar" deixou de aparecer
+   (é o normal). Entrega ao domicílio fica indicada: "WEBSITE · ENTREGA". */
+function origemPedido(p){ return p.balcao ? "BALCÃO" : (p.modo==="entrega" ? "WEBSITE · ENTREGA" : "WEBSITE"); }
+/* 23-10-2026: nas vendas do balcão as Vendas escrevem "Cliente à espera · PAGO (…)" no início da nota;
+   isso já está na etiqueta BALCÃO e no "PAGO" junto ao total, por isso sai daqui. Fica o resto da nota. */
+function notasLimpas(p){
+ let t=String(p.notas||"");
+ if(p.balcao) t=t.replace(/^(?:(MODIFICADO \(substitui [^)]*\))\s*·\s*)?Cliente à espera\s*·\s*(?:PAGO(?:\s*\([^)]*\))?|POR PAGAR)\s*(?:·\s*)?/,(m,mod)=>mod?mod+" · ":"").replace(/\s*·\s*$/,"");
+ return t.trim();
+}
 
 async function carregarPedidos(){
  try{
@@ -1404,17 +1416,16 @@ async function carregarPedidos(){
    acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Entregue":"Levantado"}</button>`;
   return `<div class="ped ${p.status}">
    <div class="top"><span class="hora">${p.slot||"—"}</span>
-    <span class="tipo ${ent?"ent":""}">${p.balcao?"BALCÃO":(ent?"ENTREGA":"LEVANTAR")}</span></div>
+    <span class="tipo ${p.balcao?"":(ent?"ent":"web")}">${origemPedido(p)}</span></div>
    <div class="cli"><b>${p.nome||"(sem nome)"}</b>${p.tel?` · <a href="tel:${p.tel.replace(/\s/g,"")}" style="color:var(--verde);font-weight:600;text-decoration:none">${p.tel}</a>`:""}
     · <span class="cod">${p.code||""}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
     ${p._futuro?' · <b style="color:#8A5A12">'+(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
    ${linhaFeito(p)}
    <ul>${p.itens.map(i=>`<li>${hItem(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${p.zona}${p.morada?" — "+p.morada:""}</div>`:(p.morada?`<div class="mor">📍 ${p.morada}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${p.piso}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${p.taxaAndar} ECV</div>`:""}
-   ${p.notas?`<div class="nt">Notas: ${p.notas}</div>`:""}
-   <div class="tot">${p.total} ECV</div>
-   ${p.balcao?`<div class="nt"><b style="color:${p.balcaoPago?"#3F6B33":"#8C2F2F"}">VENDA NO BALCÃO · ${p.balcaoPago?"PAGO"+(metBalcao[p.balcaoMetodo]?" ("+metBalcao[p.balcaoMetodo]+")":""):"POR PAGAR"}</b></div>`:
-     (p.code?`<div class="nt"><span data-comp="${String(p.code).replace(/"/g,"")}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a> <span style="opacity:.65">(abre em separador novo; dá erro se o cliente ainda não anexou)</span></div>`:"")}
+   ${notasLimpas(p)?`<div class="nt">Notas: ${notasLimpas(p)}</div>`:""}
+   <div class="tot">${p.total} ECV${p.balcao?(p.balcaoPago?` · <span class="pg">PAGO${metBalcao[p.balcaoMetodo]?" ("+metBalcao[p.balcaoMetodo]+")":""}</span>`:` · <span class="npg">POR PAGAR</span>`):""}</div>
+   ${!p.balcao&&p.code?`<div class="nt"><span data-comp="${String(p.code).replace(/"/g,"")}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a></div>`:""}
    <div class="estL"><div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>${linhaVisto(p)}</div>
    <div class="acts">${acts}<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')">🗑 Apagar</button></div>
   </div>`;
