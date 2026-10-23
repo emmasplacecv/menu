@@ -100,6 +100,10 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
 .bno{background:transparent;color:var(--vermelho);border:2px solid var(--vermelho)!important;}
 .bnx{background:var(--dark);color:#F7F1E4;}
 .est{font-size:12px;letter-spacing:1.5px;font-weight:600;color:var(--ink2);margin-top:9px;}
+.estL{display:flex;justify-content:space-between;align-items:baseline;gap:6px 10px;flex-wrap:wrap;margin-top:9px;}
+.estL .est{margin-top:0;}
+.vst{font-size:13px;font-weight:600;letter-spacing:0;}
+.vst.ok{color:#2E6B33;} .vst.esp{color:#8A5A12;} .vst.atr{color:#A32D2D;}
 .cat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:20px 0 6px;}
 .row{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--card);
  border:1px solid var(--line);border-radius:13px;margin-bottom:7px;}
@@ -1300,6 +1304,20 @@ function haQuanto(ms){
  return "há "+Math.floor(m/1440)+" dia(s)";
 }
 /* linha "Pedido feito: …" de cada cartão, e o aviso quando o prazo do comprovativo já passou */
+/* 23-10-2026: "Visto pela cozinha às HH:MM:SS" — só pedidos do site. Pedidos de antes desta
+   versão (sem confHora nem visto) não mostram nada. Amarelo até VISTO_ALERTA_MIN, depois vermelho. */
+const VISTO_ALERTA_MIN=2;
+function linhaVisto(p){
+ if(p.balcao) return "";
+ if(p.visto) return `<span class="vst ok">👀 Visto pela cozinha às ${hEsc(p.visto)}</span>`;
+ if(!p.confHora || p._futuro || !["confirmado","preparar","pronto"].includes(p.status)) return "";
+ const [h,m,sg]=String(p.confHora).split(":").map(Number);
+ const [y,mo,d]=String(p._dia||"").split("-").map(Number);
+ const desde=new Date(y,(mo||1)-1,d||1,h||0,m||0,sg||0).getTime();
+ const min=Math.max(0,Math.floor((Date.now()-desde)/60000));
+ if(min>=VISTO_ALERTA_MIN) return `<span class="vst atr">⚠️ Cozinha ainda não viu · há ${min} min</span>`;
+ return `<span class="vst esp">⏳ Cozinha ainda não viu</span>`;
+}
 function linhaFeito(p){
  const f=feitoEm(p); if(!f) return "";
  let h=`<div class="feito">Pedido feito: <b>${f.txt}</b>${f.ms?" · "+haQuanto(f.ms):""}</div>`;
@@ -1397,7 +1415,7 @@ async function carregarPedidos(){
    <div class="tot">${p.total} ECV</div>
    ${p.balcao?`<div class="nt"><b style="color:${p.balcaoPago?"#3F6B33":"#8C2F2F"}">VENDA NO BALCÃO · ${p.balcaoPago?"PAGO"+(metBalcao[p.balcaoMetodo]?" ("+metBalcao[p.balcaoMetodo]+")":""):"POR PAGAR"}</b></div>`:
      (p.code?`<div class="nt"><span data-comp="${String(p.code).replace(/"/g,"")}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a> <span style="opacity:.65">(abre em separador novo; dá erro se o cliente ainda não anexou)</span></div>`:"")}
-   <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
+   <div class="estL"><div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>${linhaVisto(p)}</div>
    <div class="acts">${acts}<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')">🗑 Apagar</button></div>
   </div>`;
  }).join("");

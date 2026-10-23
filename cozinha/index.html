@@ -61,6 +61,10 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped .cli{margin:0 0 10px;padding-bottom:10px;border-bottom:2px solid var(--line);}
 .ped .origem{margin-top:12px;padding-top:12px;border-top:2px solid var(--line);}
 .ped .origem.online{color:var(--ink2);}
+.ped .porVer{margin:-15px -16px 12px;padding:10px 16px;border-radius:14px 14px 0 0;background:#FBE3D6;color:#7A2E12;
+ font-size:14px;font-weight:700;letter-spacing:.3px;}
+.ped.porVer{border-color:#E08A5F;cursor:pointer;}
+.ped .vistoOk{color:#2E6B33;font-weight:700;}
 .ped .cli .tel{font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;
  color:var(--verde);text-decoration:none;}
 
@@ -276,6 +280,7 @@ async function entrar(){
   const d=await r.json();
   if(d.erro){ $("loginMsg").className="msg bad"; $("loginMsg").textContent=d.erro; return; }
   pedidos=d.pedidos||[];
+  if(d.versao) _versaoSrv=d.versao;
  }catch(e){ $("loginMsg").className="msg bad"; $("loginMsg").textContent="Sem ligação ao servidor."; return; }
  try{ localStorage.setItem("ep_cozinha_key", KEY); }catch(e){}
  $("loginBox").style.display="none";
@@ -322,12 +327,14 @@ async function carregar(){
   const d=await r.json();
   if(!d.erro){
    pedidos=d.pedidos||[];
+   if(d.versao) _versaoSrv=d.versao;
    if(d._offline) falhas=Math.max(falhas,2);          // veio da cópia deste aparelho (sem internet)
    else { _ultimaOk=Date.now(); falhas=0; }
    verificarNovos(pedidos.filter(p => !p.balcao));   // 19-10-2026: vendas do balcão só ficam registadas, sem som nem vibração
    /* só redesenha quando alguma coisa mudou — assim o ecrã não salta
       nem perde um toque a meio de cada 3 segundos */
-   const nova=pedidos.map(p=>p.id+":"+p.status+":"+p.slot+":"+(p.balcaoPago?1:0)+":"+(p.notas||"")).join("|");
+   reenviarVistos();
+   const nova=pedidos.map(p=>p.id+":"+p.status+":"+p.slot+":"+(p.balcaoPago?1:0)+":"+(p.notas||"")+":"+(vistoDe(p)||"")).join("|");
    if(nova!==_assinatura){ _assinatura=nova; desenhar(); }
   }
  }catch(e){ falhas++; }
@@ -441,7 +448,9 @@ function desenhar(){
   else if(p.status==="pronto") acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Saiu":"Levantado"}</button>`;
   acts += `<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')" title="Apagar pedido">🗑</button>`;
   const atr=(p.status!=="entregue"&&atrasado(p.slot));
-  return `<div class="ped ${p.status}${atr?" atrasado":""}">
+  const porVer=precisaVisto(p);
+  return `<div class="ped ${p.status}${atr?" atrasado":""}${porVer?" porVer":""}" onclick="marcarVisto('${p.id}')">
+   ${porVer?`<div class="porVer">👆 PEDIDO ONLINE NOVO · toque para avisar que viu</div>`:""}
    <div class="cli"><b>${esc(p.nome||"(sem nome)")}</b>${p.tel?`<a class="tel" href="tel:${esc(String(p.tel).replace(/\s/g,""))}">${esc(p.tel)}</a>`:""}</div>
    ${blocoNotas(p)}
    <ul>${(p.itens||[]).map(i=>`<li>${artigo(i)}</li>`).join("")}</ul>
@@ -449,7 +458,7 @@ function desenhar(){
    <div class="origem${p.balcao?"":" online"}">${p.balcao?"Balcão":"Online"}</div>
    <div class="top"><span class="hora">levantar <b>${p.slot||"—"}</b></span>
     <span class="tipo ${ent?"ent":""}">${ent?"ENTREGA":"LEVANTAR"}</span></div>
-   <div class="meta">${p.code||""}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}${p.criado?" · pedido às "+p.criado:""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
+   <div class="meta">${p.code||""}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}${p.criado?" · pedido às "+p.criado:""}${!p.balcao&&vistoDe(p)?' · <span class="vistoOk">👀 visto às '+vistoDe(p)+'</span>':""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
    ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
    <div class="acts">${acts}</div>
@@ -469,11 +478,58 @@ async function apagar(id,code){
 
 async function mudar(id,st){
  try{
-  const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st,{method:"POST"});
+  /* 23-10-2026: mudar o estado também conta como "visto" (visto=1; servidor antigo ignora) */
+  const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st+"&visto=1",{method:"POST"});
   const d=await r.json();
   if(d.erro){ alert(d.erro); return; }
  }catch(e){ alert("Não foi possível guardar. Verifique a ligação."); return; }
  carregar();
+}
+
+/* ================= VISTO PELA COZINHA (23-10-2026) =================
+   Só pedidos do site (no balcão quem vende é quem prepara). Tocar em qualquer parte do cartão
+   avisa a Gestão e as Vendas: "Visto pela cozinha às HH:MM:SS". Fica a primeira hora.
+   Sem internet, fica guardado neste aparelho e é enviado no carregamento seguinte.
+   Com o servidor antigo (versão < 2026-10-23) não se envia nada. */
+let _versaoSrv="";
+const VISTO_LS="ep_vistos_pend";
+let _vistoPend={};   // id -> "HH:MM:SS" (tocado aqui, ainda por confirmar no servidor)
+try{ _vistoPend=JSON.parse(localStorage.getItem(VISTO_LS)||"{}")||{}; }catch(e){ _vistoPend={}; }
+function guardarPend(){ try{ localStorage.setItem(VISTO_LS, JSON.stringify(_vistoPend)); }catch(e){} }
+function servidorTemVisto(){ return String(_versaoSrv||"") >= "2026-10-23"; }
+function vistoDe(p){ return p.visto || _vistoPend[p.id] || ""; }
+function precisaVisto(p){
+  return servidorTemVisto() && !p.balcao && !/^BAL-/.test(String(p.code||"")) && !p._offline && !!p.confHora &&
+         !vistoDe(p) && (p.status==="confirmado"||p.status==="preparar"||p.status==="pronto");
+}
+function horaAgora(){ const d=new Date(), z=n=>String(n).padStart(2,"0"); return z(d.getHours())+":"+z(d.getMinutes())+":"+z(d.getSeconds()); }
+const _vistoEnvio={};
+async function enviarVisto(id){
+  if(_vistoEnvio[id]) return;
+  _vistoEnvio[id]=1;
+  try{
+    const r=await fetch(PROMO_API+"/order-visto?key="+encodeURIComponent(KEY)+"&id="+encodeURIComponent(id),{method:"POST"});
+    const d=await r.json();
+    if(d && d.ok){ delete _vistoPend[id]; guardarPend(); return; }
+    if(d && d.erro==="Pedido não encontrado."){ delete _vistoPend[id]; guardarPend(); }
+  }catch(e){}   // sem rede: fica pendente
+  delete _vistoEnvio[id];
+}
+function marcarVisto(id){
+  const p=pedidos.find(x=>x.id===id);
+  if(!p || !precisaVisto(p)) return;
+  _vistoPend[id]=horaAgora(); guardarPend();
+  _assinatura=""; desenhar();
+  enviarVisto(id);
+}
+function reenviarVistos(){
+  if(!servidorTemVisto()) return;
+  Object.keys(_vistoPend).forEach(id=>{
+    const p=pedidos.find(x=>x.id===id);
+    if(!p){ delete _vistoPend[id]; guardarPend(); return; }   // já não está na lista de hoje
+    if(p.visto){ delete _vistoPend[id]; guardarPend(); return; }
+    enviarVisto(id);
+  });
 }
 
 /* ================= APP: alerta, vibração, ecrã aceso ================= */

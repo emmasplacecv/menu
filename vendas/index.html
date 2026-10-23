@@ -1404,6 +1404,13 @@ async function hvCarregar(){
  }catch(e){ _hv=null; $("hvLista").innerHTML='<div class="vazio">Não foi possível carregar. Verifique a internet e tente outra vez.</div>'; return; }
  hvDesenhar();
 }
+/* 23-10-2026: pedidos do site — "Visto pela cozinha às HH:MM:SS" (só existe com o servidor de 23-10) */
+function hvVisto(p){
+ if(p.balcao) return "";
+ if(p.visto) return '<br><b style="color:#2E6B33">👀 Visto pela cozinha às '+esc(p.visto)+'</b>';
+ if(p.confHora && ["confirmado","preparar","pronto"].includes(p.status)) return '<br><b style="color:#8A5A12">⏳ Cozinha ainda não viu</b>';
+ return "";
+}
 function hvDesenhar(){
  if(!_hv) return;
  const l=_hv.filter(p=>!_hvF || (_hvF==="balcao"?p.balcao:!p.balcao))
@@ -1426,7 +1433,7 @@ function hvDesenhar(){
    const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
    return `<details class="hv${canc?" hvcanc":""}"><summary>
      <span class="hh">${esc(p.slot||p.criado||"—")}</span>
-     <span class="hn"><b>${esc(p.nome||"(sem nome)")}</b><small>${esc(p.code||"")}${p.balcao?"":' · <span class="hvclip">📎 comprovativo</span>'} · ${esc(HV_EST[p.status]||p.status||"")}</small></span>
+     <span class="hn"><b>${esc(p.nome||"(sem nome)")}</b><small>${esc(p.code||"")}${p.balcao?"":' · <span class="hvclip">📎 comprovativo</span>'} · ${esc(HV_EST[p.status]||p.status||"")}${hvVisto(p)}</small></span>
      <span class="hvv">${(+p.total||0)}</span>${selo}</summary>
      <div class="hb">
       <ul>${linhas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
