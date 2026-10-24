@@ -1,0 +1,7 @@
+# Emma's Place — as páginas públicas podem ser rastreadas.
+# Nota: o robots.txt NÃO protege dados privados. Os painéis internos (/admin, /cozinha, /vendas)
+# ficam fora das pesquisas com <meta name="robots" content="noindex"> e são protegidos por chave de acesso.
+User-agent: *
+Allow: /
+
+Sitemap: https://emmasplace.cv/sitemap.xml
