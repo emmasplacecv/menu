@@ -126,6 +126,7 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
 .mrow{display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--card);
  border:1px solid var(--line);border-radius:13px;margin-bottom:7px;}
 .mrow.rem{opacity:.5;background:#F6E9E6;border-color:#D9B4AC;}
+.mrow.falta{background:#FBEFEC;border-color:#D9B4AC;}
 .mrow .n{flex:1;font-size:15px;line-height:1.25;}
 .mrow .n small{display:block;font-size:12px;color:var(--ink2);}
 .mrow input{width:62px;padding:8px 6px;border:2px solid var(--line);border-radius:10px;
@@ -1068,6 +1069,12 @@ function precoComboAuto(nome){
  for(const op of pt){ const v=op.map(precoProdAgora).filter(x=>x>0); if(!v.length) return 0; soma+=Math.max(...v); }
  return Math.floor(soma*0.95/5)*5;
 }
+/* 25-10-2026: produtos em falta num combo (todas as opções de uma parte retiradas do menu).
+   Com falta, o combo NÃO aparece no site nem nas Vendas — a Gestão tem de o dizer. */
+function faltaCombo(nome){
+ const pt=COMBO_PARTES[nome]; if(!pt) return [];
+ return pt.filter(op=>!op.some(n=>precoProdAgora(n)>0)).map(op=>op.join(" / "));   // "A / B" = qualquer um serve
+}
 function precoCombo(nome,base){ const a=precoComboAuto(nome); if(a>0) return a; return (edit.cp[nome]!=null)?edit.cp[nome]:base; }
 function listaCombos(){
  let l=COMBOS_BASE.map(c=>({n:c.n,d:c.d,p:c.p,full:c.full,novo:false}));
@@ -1161,7 +1168,8 @@ function desenharMenu(){
   });
  });
  const l=listaCombos();
- h+=`<div class="cat">COMBOS</div>
+ const nVis=l.filter(c=>!edit.coff.includes(c.n) && (c.novo || !faltaCombo(c.n).length)).length;
+ h+=`<div class="cat">COMBOS <small style="font-weight:600;letter-spacing:0;${nVis<l.length?"color:#8C2F2F":""}">· ${nVis} de ${l.length} à venda no site</small></div>
   <div class="ordbar">
    <button onclick="ordenarComboPreco(1)">Preço ↑</button>
    <button onclick="ordenarComboPreco(-1)">Preço ↓</button>
@@ -1169,18 +1177,18 @@ function desenharMenu(){
    <button onclick="reporOrdemCombo()">Repor</button>
   </div>`;
  l.forEach((c,i)=>{
-  const rem=edit.coff.includes(c.n), pr=precoCombo(c.n,c.p);
-  h+=`<div class="mrow${rem?" rem":""}${c.novo?" novo":""}">
+  const rem=edit.coff.includes(c.n), pr=precoCombo(c.n,c.p), falta=c.novo?[]:faltaCombo(c.n);
+  h+=`<div class="mrow${rem?" rem":""}${!rem&&falta.length?" falta":""}${c.novo?" novo":""}">
    <div class="setas">
     <button onclick="moverCombo(${i},-1)" ${i===0?"disabled":""} aria-label="Subir">▲</button>
     <button onclick="moverCombo(${i},1)" ${i===l.length-1?"disabled":""} aria-label="Descer">▼</button>
    </div>
-   <div class="n">${c.n}<small>${c.d}</small></div>
+   <div class="n">${c.n}<small>${c.d}</small>${falta.length?`<small style="color:#8C2F2F;font-weight:600;opacity:1">Não aparece no site nem nas Vendas. Falta no menu: ${falta.join(" e ")}</small>`:""}</div>
    ${c.novo
      ? `<input value="${c.p}" inputmode="numeric" onchange="setNovoCombo(${c.k},this.value)">
         <button class="x" onclick="apagarNovoCombo(${c.k})" title="Apagar">✕</button>`
      : (COMBO_PARTES[c.n]
-        ? `<span class="auto" title="Soma dos produtos −5%. Muda-se mudando o preço dos produtos." style="min-width:64px;text-align:right;font-weight:600">${pr}<small style="display:block;font-weight:400;font-size:11px;opacity:.7">auto −5%</small></span>`
+        ? `<span class="auto" title="Soma dos produtos −5%. Muda-se mudando o preço dos produtos." style="min-width:64px;text-align:right;font-weight:600">${falta.length?"—":pr}<small style="display:block;font-weight:400;font-size:11px;opacity:.7">auto −5%</small></span>`
         : `<input value="${pr}" inputmode="numeric" onchange="setPrecoCombo(${q(c.n)},this.value)">`)+`
         <button class="x ${rem?"on":""}" onclick="setRemCombo(${q(c.n)})" title="Retirar do menu">✕</button>`}
   </div>`;
