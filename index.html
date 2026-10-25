@@ -28,12 +28,12 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"CafeOrCoffeeShop","name":"Emma's Place | Coffee & More",
 "image":"https://emmasplace.cv/img/logo.webp","servesCuisine":["Café","Pequeno-almoço","Almoço"],
-"priceRange":"85–700 ECV",
+"priceRange":"85–1050 ECV",
 "address":{"@type":"PostalAddress","streetAddress":"Av. Amílcar Cabral, Plateau (frente BAI/IMPAR)","addressLocality":"Praia","addressCountry":"CV"},
 "openingHoursSpecification":[
 {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"08:00","closes":"17:00"},
 {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:00","closes":"15:00"}],
-"hasMenu":{"@type":"Menu","url":"menu-emmas-place.pdf"}}
+"hasMenu":{"@type":"Menu","url":"https://emmasplace.cv/#menu"}}
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Jost:wght@300;400;500;600&family=Caveat:wght@600&display=swap');
@@ -1521,7 +1521,7 @@ textarea.fld{min-height:74px;resize:vertical;}
 <!-- DEPOIS DO MENU: como funciona, mais pedidos -->
 <section class="como" aria-label="Como encomendar">
   <div class="fluxo" data-i18n="fluxo"></div>
-  <a class="pdflink" href="menu-emmas-place.pdf" download data-i18n="pdf"></a>
+  <a class="pdflink" href="menu-emmas-place.pdf" download data-i18n="pdf" onclick="menuPDF(event)"></a>
 </section>
 
 <section class="brand-story" id="sobre">
@@ -4766,7 +4766,38 @@ function pulsar(){
 })();
 
 carregarEstado();
-carregarMenuEdit().then(carregarEsgotados);
+const _menuPronto=carregarMenuEdit();          /* o PDF do menu espera por isto (preços e produtos do /admin) */
+_menuPronto.then(carregarEsgotados);
+
+/* ---------- 25-10-2026: MENU EM PDF, GERADO NO MOMENTO ----------
+   "Descarregar menu (PDF)" faz o PDF ali mesmo, com o menu que o site está a mostrar (preços, produtos e combos
+   do /admin, no idioma escolhido) — ver pdf/menu-pdf.js. Antes era o ficheiro fixo menu-emmas-place.pdf,
+   que ficava desactualizado a cada mudança no /admin (o de 16-08 ainda tinha poke bowls, telefone e preços antigos).
+   O ficheiro fixo continua na raiz só como reserva: se o gerador falhar (sem rede, browser antigo), abre-se esse. */
+(function(){ const N={pt:"A preparar o PDF…",en:"Preparing the PDF…",fr:"Préparation du PDF…",de:"PDF wird erstellt…",nl:"PDF wordt gemaakt…"};
+ for(const l in N) if(I18N[l]) I18N[l].pdfPrep=N[l]; })();
+let _pdfOcupado=false;
+function carregarScript(src){
+ return new Promise((ok,falha)=>{ const s=document.createElement("script"); s.src=src; s.onload=ok; s.onerror=()=>falha(new Error(src)); document.head.appendChild(s); });
+}
+async function menuPDF(ev){
+ if(ev) ev.preventDefault();
+ if(_pdfOcupado) return;
+ const a=ev&&ev.currentTarget, antes=a?a.innerHTML:"";
+ _pdfOcupado=true; mtr("menu_pdf");
+ if(a) a.textContent=t("pdfPrep");
+ try{
+  await Promise.race([_menuPronto, new Promise(r=>setTimeout(r,8000))]);
+  if(!window.jspdf) await carregarScript("pdf/jspdf.umd.min.js?v=4.2.1");
+  if(!window.gerarMenuPDF) await carregarScript("pdf/menu-pdf.js?v=1");
+  await window.gerarMenuPDF();
+ }catch(e){
+  mtr("menu_pdf_falhou");
+  location.href="menu-emmas-place.pdf";
+ }finally{
+  _pdfOcupado=false; if(a) a.innerHTML=antes;
+ }
+}
 </script>
 </body>
 </html>
