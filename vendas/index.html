@@ -95,6 +95,9 @@ h1{font-size:19px;letter-spacing:.5px;}
 .vpr div.on span::before{content:"✓ ";}
 .vtops{display:flex;flex-wrap:wrap;gap:8px;}
 .vtops .tp{padding:11px 14px;border-radius:30px;border:2px solid var(--line);background:#fff;font-family:inherit;font-size:15px;color:var(--ink);cursor:pointer;}
+/* 03-11-2026: extra esgotado hoje — bloqueado */
+.vtops .tp.esg,.vtops .tp:disabled{opacity:.5;cursor:not-allowed;background:#F6E4E1;border-color:#E6C6BF;color:#8A3A2C;}
+.vav{margin:0 0 6px;padding:9px 12px;background:#FDF3E6;border-bottom:1px solid #E8D3AE;color:#7A5214;font-size:12.5px;line-height:1.4;font-weight:600;}
 .vtops .tp.on{background:var(--verde2);border-color:var(--verde2);color:#F7F1E4;font-weight:600;}
 .vtops .tp.on::before{content:"✓ ";}
 .vtops .tp small{font-size:12px;font-weight:700;color:#4A2545;}
@@ -358,8 +361,27 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
  color:var(--ink);font-family:inherit;font-weight:600;font-size:15px;line-height:1.1;text-align:left;cursor:pointer;}
 .pg-met button i{font-style:normal;font-size:20px;flex:none;}
 .pg-met button.on{border-color:#2E6B32;background:#2E6B32;color:#fff;}
+.pg-met button.dep{grid-column:1/-1;}   /* com 5 formas de pagamento, "Paga depois" fica sozinho na última linha */
 .pg-met button.dep.on{border-color:var(--vermelho);background:var(--vermelho);}
 .pagar.falta .pg-met button:not(.on){border-color:#D7B98A;}
+/* pagamento dividido: as duas parcelas (03-11-2026) */
+.divp{margin-top:10px;padding:11px 12px;border-radius:12px;background:#F2EEE4;}
+.divgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.divgrid label{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.divgrid span{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--ink2);}
+.divgrid input{width:100%;box-sizing:border-box;padding:11px 12px;border:1.5px solid var(--line);border-radius:11px;
+ background:#fff;color:var(--ink);font-family:inherit;font-size:21px;font-weight:700;text-align:right;
+ font-variant-numeric:tabular-nums;-moz-appearance:textfield;}
+.divgrid input:focus{outline:none;border-color:var(--ink);}
+.divgrid input::-webkit-outer-spin-button,.divgrid input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.divch{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+.divch button{padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);
+ font-family:inherit;font-weight:600;font-size:13px;line-height:1;cursor:pointer;}
+.divres{margin-top:9px;font-size:13.5px;line-height:1.4;font-weight:600;}
+.divres.neutro{color:var(--ink2);font-weight:500;}
+.divres.bom{color:#2E6B32;}
+.divres.mau{color:var(--vermelho);}
+.caixa .cx.cxinfo{color:var(--ink2);font-size:12.5px;}
 .troco{margin-top:10px;padding:10px 12px;border-radius:12px;background:#F2EEE4;}
 .troco .chips{display:flex;gap:6px;flex-wrap:wrap;}
 .troco .chips button{padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-family:inherit;font-weight:600;font-size:14px;line-height:1;cursor:pointer;}
@@ -628,17 +650,60 @@ let balcoes=[novoBalcao(),novoBalcao(),novoBalcao(),novoBalcao()];
 let pagoEnviado={};   // estado de pagamento dos pedidos já enviados (só neste aparelho)
 let metEnviado={};    // forma de pagamento dos enviados: code -> {m, h} (cópia neste aparelho; o servidor novo também guarda)
 const MET={dinheiro:{t:"Dinheiro",i:"💵"}, vinti4:{t:"Vinti4 / cartão",c:"Vinti4",i:"💳"},
- transf:{t:"Transferência",i:"📲"}, depois:{t:"Paga depois",i:"⏳"}};
+ transf:{t:"Transferência",i:"📲"}, dividido:{t:"Dividido",c:"Dividido",i:"🧾"}, depois:{t:"Paga depois",i:"⏳"}};
 function metTxt(m){ return (m&&MET[m]) ? (MET[m].c||MET[m].t) : ""; }
+/* ---------- PAGAMENTO DIVIDIDO (03-11-2026) ----------
+   Parte em dinheiro + parte no POS (Vinti4). Guardam-se SEMPRE os dois valores:
+     · pedidos feitos no balcão → vão escritos na nota, "PAGO (Dinheiro 500 + POS 275)"
+       (campo de 300 caracteres que o servidor já guarda — não é preciso mexer no Cloudflare);
+     · cobranças feitas mais tarde → vão no met, "dividido:500-275", e também neste aparelho.
+   O par só se aceita se 500+275 der exactamente o total do pedido: assim, se o texto chegar
+   cortado, o sistema diz "repartição não registada" em vez de somar um valor errado à caixa. */
+function divTxt(din,pos){ return "Dinheiro "+din+" + POS "+pos; }
+function metDescB(b){ return b.met==="dividido" ? divTxt(b.din,b.pos) : metTxt(b.met); }
+function divDe(p){
+ if(!p) return null;
+ const t=+p.total||0;
+ const l=metEnviado[p.code];
+ if(l && l.m==="dividido" && l.din!=null && l.pos!=null) return {din:+l.din, pos:+l.pos};
+ const r=/PAGO \(Dinheiro (\d+) \+ POS (\d+)\)/.exec(p.notas||"");
+ if(r) return {din:+r[1], pos:+r[2]};
+ const m=/^dividido:(\d+)-(\d+)$/.exec(String(p.balcaoMetodo||""));
+ if(m && (+m[1])+(+m[2])===t) return {din:+m[1], pos:+m[2]};
+ return null;
+}
 function metDe(p){
  if(!p) return "";
- if(p.balcaoMetodo && MET[p.balcaoMetodo]) return p.balcaoMetodo;
+ const bm=String(p.balcaoMetodo||"");
+ if(/^dividido/.test(bm)) return "dividido";
+ if(bm && MET[bm]) return bm;
  const l=metEnviado[p.code]; if(l&&l.m) return l.m;
- const r=/PAGO \(([^)]+)\)/.exec(p.notas||""); if(r){ const k=Object.keys(MET).find(k=>metTxt(k)===r[1]); if(k) return k; }
+ const r=/PAGO \(([^)]+)\)/.exec(p.notas||"");
+ if(r){
+  if(/^Dinheiro \d+ \+ POS \d+$/.test(r[1])) return "dividido";
+  const k=Object.keys(MET).find(k=>metTxt(k)===r[1]); if(k) return k;
+ }
  return "";
 }
-function novoBalcao(){ return {nome:"",itens:[],pago:false,met:null,recebido:null,notas:"",edita:null}; }
+/* texto para mostrar no ecrã: no dividido mostra as duas parcelas */
+function metTxtP(p){
+ const m=metDe(p);
+ if(m!=="dividido") return metTxt(m);
+ const d=divDe(p);
+ return d ? divTxt(d.din,d.pos) : "Dividido (repartição não registada)";
+}
+function novoBalcao(){ return {nome:"",itens:[],pago:false,met:null,recebido:null,notas:"",edita:null,din:null,pos:null}; }
 let esgotados=[], stock={};
+/* ============================================================
+   EXTRAS ESGOTADOS DO DIA (03-11-2026)
+   A cozinha marca TEM / ACABOU a cada extra (toppings, fruta, leites, xaropes, gengibre…).
+   Guardam-se na MESMA lista do dia que os produtos (/soldout), com a chave
+   "@x:<tipo>:<nome>" — repõem-se sozinhos à meia-noite, como os produtos.
+   tipos: acai (incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes)
+   ============================================================ */
+const EX_PRE="@x:";
+const exK=(tipo,nome)=>EX_PRE+tipo+":"+nome;
+const exOff=(tipo,nome)=>esgotados.includes(exK(tipo,nome));
 const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO","COMBOS"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -830,8 +895,71 @@ function setMetodo(m){
  const b=balcoes[activo];
  b.met = (b.met===m && !b.edita) ? null : m;
  b.pago = !!b.met && b.met!=="depois";
- if(b.met!=="dinheiro") b.recebido=null;
+ if(b.met!=="dinheiro" && b.met!=="dividido") b.recebido=null;
+ if(b.met!=="dividido"){ b.din=null; b.pos=null; }
  guardar(); desenharTabs(); desenharPedido();
+}
+/* ---------- as duas parcelas do pagamento dividido ----------
+   Escreve-se uma, a outra preenche-se sozinha. Só deixa enviar quando as duas
+   são maiores que zero e somam exactamente o total — se o total mudar depois
+   (produto acrescentado), a soma deixa de bater e o botão bloqueia outra vez. */
+function divNum(s){ const v=String(s==null?"":s).trim(); if(v==="") return null; const x=Math.round(Number(v.replace(",","."))); return isFinite(x)?x:null; }
+function divOK(b,t){
+ if(b.met!=="dividido") return true;
+ return b.din!=null && b.pos!=null && b.din>0 && b.pos>0 && (b.din+b.pos)===t;
+}
+function divFalha(b,t){
+ if(b.din==null && b.pos==null) return {cor:"neutro", txt:"Escreve quanto paga em dinheiro — o resto vai para o POS."};
+ if(b.din==null || b.pos==null)  return {cor:"mau", txt:"Falta uma das parcelas."};
+ if(b.din<0 || b.pos<0)          return {cor:"mau", txt:"Nenhuma parcela pode ser negativa."};
+ if(b.din===0 || b.pos===0)      return {cor:"mau", txt:"Uma das parcelas é 0 — escolhe só "+(b.din===0?"Vinti4":"Dinheiro")+" em vez de Dividido."};
+ const s=b.din+b.pos;
+ if(s!==t) return {cor:"mau", txt:`${b.din} + ${b.pos} = ${s} ECV · ${s<t?"faltam "+(t-s):"são "+(s-t)+" a mais"} para os ${t} do total.`};
+ return {cor:"bom", txt:`💵 ${b.din} + 💳 ${b.pos} = ${t} ECV ✓`};
+}
+function htmlDiv(b,t){
+ return `<div class="divp">
+  <div class="divgrid">
+   <label><span>💵 Dinheiro</span><input id="divDin" type="number" inputmode="numeric" min="0" step="5" placeholder="0"
+     value="${b.din==null?"":b.din}" oninput="divInput('din')" aria-label="Valor pago em dinheiro"></label>
+   <label><span>💳 POS / Vinti4</span><input id="divPos" type="number" inputmode="numeric" min="0" step="5" placeholder="0"
+     value="${b.pos==null?"":b.pos}" oninput="divInput('pos')" aria-label="Valor pago no POS"></label>
+  </div>
+  <div class="divch">${[100,500,1000,2000].filter(v=>v<t).map(v=>
+    `<button type="button" onclick="divPor(${v})">💵 ${v}</button>`).join("")}
+   <button type="button" onclick="divPor(${Math.round(t/2/5)*5})">metade</button></div>
+  <div class="divres" id="divRes"></div></div>
+  <div id="pgTrocoDiv"></div>`;
+}
+function divPor(v){
+ const b=balcoes[activo], t=totalBalcao();
+ b.din=Math.max(0,v); b.pos=Math.max(0,t-b.din); b.recebido=null;
+ guardar(); desenharPedido();
+}
+function divInput(qual){
+ const b=balcoes[activo], t=totalBalcao(), eD=$("divDin"), eP=$("divPos");
+ if(!eD||!eP) return;
+ if(qual==="din"){
+  b.din=divNum(eD.value);
+  b.pos=(b.din==null)?null:Math.max(0,t-b.din);
+  if(document.activeElement!==eP) eP.value=(b.pos==null?"":b.pos);
+ }else{
+  b.pos=divNum(eP.value);
+  b.din=(b.pos==null)?null:Math.max(0,t-b.pos);
+  if(document.activeElement!==eD) eD.value=(b.din==null?"":b.din);
+ }
+ if(b.recebido!=null && (b.din==null || b.recebido<b.din)) b.recebido=null;
+ guardar(); divPinta();        /* não redesenha a caixa toda: o dedo está dentro do campo */
+}
+/* actualiza só o que muda com as parcelas: a conta, o troco e o botão de enviar */
+function divPinta(){
+ const b=balcoes[activo], t=totalBalcao(), r=$("divRes");
+ if(!r) return;
+ const f=divFalha(b,t);
+ r.className="divres "+f.cor; r.innerHTML=f.txt;
+ const tr=$("pgTrocoDiv");
+ if(tr) tr.innerHTML = (b.din>0 && !b.edita) ? htmlTroco(b.din,b.recebido,"setRecebido") : "";
+ pintarEnviar();
 }
 function setRecebido(v){ balcoes[activo].recebido=v; guardar(); desenharPedido(); }
 function setPago(v){ setMetodo(v?"dinheiro":"depois"); }          // compatibilidade
@@ -1028,7 +1156,7 @@ function comboDisponivel(cb){ return !cb.partes || cb.partes.every(p=>opcoesPart
 let opc=null;
 function abrirTamanho(ci,ii){
  const i=MENU[ci][1][ii];
- opc={ci,ii,i,leite:"Normal",ex:[],esc:[],baun:true};
+ opc={ci,ii,i,leite:"Normal",ex:[],esc:[],baun:!exOff("sem","Xarope de baunilha")};
  if(i.cb && i.cb.partes) opc.esc=i.cb.partes.map(p=>opcoesParte(p).find(disponivel)||null);
  $("tNome").textContent=i.n;
  desenharOpcoesProd();
@@ -1055,18 +1183,23 @@ function desenharOpcoesProd(){
     l.map((n,j)=>{ const ok=disponivel(n); return bt(n, o.esc[k]===n, (varias&&ok)?`opEsc(${k},${j})`:"", ok?"":"esgotado", !ok, !varias); }).join("")+`</div></div>`;
   });
  }
+ /* 03-11-2026: extras que a cozinha marcou como acabados ficam bloqueados aqui também */
  if(temLeite(o.ci,i)){
   h+=`<div class="op-grp"><div class="vgrp"><span>Leite</span><em>normal incluído</em></div><div class="vtops">`+
-   LEITES.map(([n,v],j)=>bt(n, o.leite===n, `opLeite(${j})`, v?"+"+v:"")).join("")+`</div></div>`;
+   LEITES.map(([n,v],j)=>{ const fo=j>0&&exOff("leite",n);
+    return bt(n, !fo&&o.leite===n, fo?"":`opLeite(${j})`, fo?"acabou":(v?"+"+v:""), fo); }).join("")+`</div></div>`;
  }
  if(temBaun(i)){   // 22-10-2026: todos os milkshakes levam xarope de baunilha (sem custo); tocar retira
-  h+=`<div class="op-grp"><div class="vgrp"><span>Xarope de baunilha</span><em>incluído · toque para retirar</em></div><div class="vtops">`+
-   bt(o.baun?"Com baunilha":"SEM baunilha", o.baun, "opBaun()", "")+`</div></div>`;
+  const fo=exOff("sem","Xarope de baunilha");
+  if(fo) o.baun=false;
+  h+=`<div class="op-grp"><div class="vgrp"><span>Xarope de baunilha</span><em>${fo?"acabou hoje — vai sem":"incluído · toque para retirar"}</em></div><div class="vtops">`+
+   bt(fo?"SEM baunilha":(o.baun?"Com baunilha":"SEM baunilha"), !fo&&o.baun, fo?"":"opBaun()", fo?"acabou":"", fo)+`</div></div>`;
  }
  const ex=extrasDe(o.ci);
  if(ex){
   h+=`<div class="op-grp"><div class="vgrp"><span>Extras</span><em class="pago">+${ex[0][1]} ECV cada</em></div><div class="vtops">`+
-   ex.map(([n,v],j)=>bt(n, o.ex.includes(n), `opExtra(${j})`, "+"+v)).join("")+`</div></div>`;
+   ex.map(([n,v],j)=>{ const fo=exOff("extra",n);
+    return bt(n, !fo&&o.ex.includes(n), fo?"":`opExtra(${j})`, fo?"acabou":"+"+v, fo); }).join("")+`</div></div>`;
  }
  if(i.g) h+=`<div class="vgrp" style="margin:0 0 8px"><span>Tamanho — toque para juntar ao pedido</span></div>`;
  $("tCorpo").innerHTML=h;
@@ -1104,8 +1237,11 @@ function escolherTamanho(sz){
  o.ex.forEach(n=>det.push(n.toLowerCase()));
  if(temBaun(i) && !o.baun) det.push("sem xarope de baunilha");
  const preco=precoOpc(sz);
+ const xk=[].concat(
+  (temLeite(o.ci,i)&&o.leite!=="Normal")?[exK("leite",o.leite)]:[],
+  o.ex.map(n=>exK("extra",n)));
  fecharTamanho();
- meter(i.n+(det.length?" ("+det.join(", ")+")":""), i.n, preco);
+ meter(i.n+(det.length?" ("+det.join(", ")+")":""), i.n, preco, null, xk);
 }
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && opc) fecharTamanho(); });
 /* no pedido, o médio diz "Médio" por baixo do nome */
@@ -1115,10 +1251,11 @@ function tamanhoTxt(x){
  return /\((?:[^)]*,\s*)?Grande\b/.test(x.nome) ? "" : "Médio · ";
 }
 /* mete uma linha no balcão activo (base = nome do stock) */
-function meter(nome,base,preco,stk){
+function meter(nome,base,preco,stk,xk){
  const b=balcoes[activo];
  const ex=b.itens.find(x=>x.nome===nome);
- if(ex) ex.q++; else b.itens.push(Object.assign({nome,base,preco,q:1}, stk?{stk}:{}));
+ /* xk = chaves dos extras que esta linha leva, para avisar se algum acabar antes de enviar */
+ if(ex) ex.q++; else b.itens.push(Object.assign({nome,base,preco,q:1}, stk?{stk}:{}, (xk&&xk.length)?{xk}:{}));
  try{ if(navigator.vibrate) navigator.vibrate(12); }catch(e){}
  guardar(); desenharTabs(); desenharPedido(); desenharProdutos(); desenharStock();
 }
@@ -1128,7 +1265,14 @@ function meter(nome,base,preco,stk){
    Abre com granola e leite em pó marcados. Os preços mudam-se no /admin (separador Menu);
    os da linha do Açaí, em MENU, são só os de reserva. */
 let acai=null;
-function vNivel(i,top){ return top.some(s=>i.base.includes(s)) ? "m" : "sp"; }
+/* REGRA DO AÇAÍ com a granola E o leite em pó esgotados (03-11-2026): o copo passa a levar
+   só açaí, que é o nível caro (i.sp) — mas a falta é nossa, não do cliente, por isso
+   mantém-se o preço de baixo (i.m, 950). Com só um dos dois em falta, o cliente escolhe o outro. */
+const vSemBase=i=>!!i.base && i.base.length>0 && i.base.every(s=>exOff("acai",s));
+function vNivel(i,top){
+ if(vSemBase(i)) return "m";
+ return top.some(s=>i.base.includes(s)) ? "m" : "sp";
+}
 function vPrecoDe(i,top,xt){ return i[vNivel(i,top)] + (xt?xt.length:0)*i.xp; }
 /* texto que segue para a cozinha — igual ao do site */
 function vDetalhe(i,top,xt){
@@ -1136,11 +1280,17 @@ function vDetalhe(i,top,xt){
  return o.concat(i.xt.filter(s=>xt.includes(s)).map(s=>"topping de "+s.toLowerCase())).join(", ");
 }
 function abrirAcai(i){
- acai={i,top:i.base.slice(),xt:[]};
- const tp=(s,l)=>`<button type="button" class="tp${l==="xt"?" xt":""}${acai[l].includes(s)?" on":""}" data-l="${l}" data-s="${esc(s)}" onclick="vTop(this)">${esc(s)}${l==="xt"?` <small>+${i.xp}</small>`:""}</button>`;
+ acai={i,top:i.base.filter(s=>!exOff("acai",s)),xt:[]};      /* não abre marcado com o que acabou */
+ const tipoDe=l=>(l==="xt"?"acaix":"acai");
+ const tp=(s,l)=>{ const fo=exOff(tipoDe(l),s);
+  return `<button type="button" class="tp${l==="xt"?" xt":""}${(!fo&&acai[l].includes(s))?" on":""}${fo?" esg":""}"`+
+   ` data-l="${l}" data-s="${esc(s)}"${fo?" disabled":' onclick="vTop(this)"'}>${esc(s)}`+
+   (fo?` <small>acabou</small>`:(l==="xt"?` <small>+${i.xp}</small>`:""))+`</button>`; };
  const g=(nome,tag,lista,l)=>`<div class="vgrp"><span>${nome}</span><em${l==="xt"?' class="pago"':""}>${tag}</em></div>`+lista.map(s=>tp(s,l)).join("");
  $("vMl").textContent="copo "+i.ml+" ml";
- $("vPr").innerHTML=[["m","com granola e/ou leite em pó"],["sp","sem granola nem leite em pó"]]
+ const sem=vSemBase(i);
+ $("vPr").innerHTML=(sem?`<div class="vav">Granola e leite em pó esgotados — fica a ${i.m} ECV, sem agravamento.</div>`:"")+
+  (sem?[["m","só açaí · ao preço de baixo (falta nossa)"]]:[["m","com granola e/ou leite em pó"],["sp","sem granola nem leite em pó"]])
    .map(([n,txt])=>`<div data-n="${n}"><span>${txt}</span><b>${i[n]}</b></div>`).join("");
  $("vTops").innerHTML=g("Clássicos","incluído",i.base,"top")+g("Fruta","incluída",i.fr,"top")+g("Toppings","incluído",i.tp,"top")
    +g("Toppings extra","+"+i.xp+" ECV cada",i.xt,"xt");
@@ -1163,7 +1313,8 @@ function vTop(el){
 }
 function confirmarAcai(){
  const i=acai.i;
- meter(i.n+" ("+vDetalhe(i,acai.top,acai.xt)+")", i.n, vPrecoDe(i,acai.top,acai.xt));
+ const xk=acai.top.map(n=>exK("acai",n)).concat(acai.xt.map(n=>exK("acaix",n)));
+ meter(i.n+" ("+vDetalhe(i,acai.top,acai.xt)+")", i.n, vPrecoDe(i,acai.top,acai.xt), null, xk);
  fecharAcai();
 }
 function mudarQtd(k,d){
@@ -1187,12 +1338,15 @@ function desenharPedido(){
  const pago=b.pago===true;
  $("pgMet").innerHTML=Object.keys(MET).map(k=>
   `<button type="button" class="${k==="depois"?"dep":""}${b.met===k?" on":""}" aria-pressed="${b.met===k}" onclick="setMetodo('${k}')"><i>${MET[k].i}</i>${MET[k].t}</button>`).join("");
- const rs=$("pgResumo");
- rs.textContent = !b.itens.length ? "" : (!b.met ? "escolha antes de enviar" : (pago ? "✓ Pago · "+metTxt(b.met) : "Fica por cobrar"));
- rs.style.color = !b.met ? "var(--ink2)" : (pago ? "#2E6B32" : "var(--vermelho)");
  $("pagar").classList.toggle("falta", !!b.itens.length && !b.met);
  $("pagar").style.display = b.itens.length ? "" : "none";
- $("pgTroco").innerHTML = (b.met==="dinheiro" && b.itens.length && !b.edita) ? htmlTroco(totalBalcao(), b.recebido, "setRecebido") : "";
+ const tB=totalBalcao();
+ if(b.met==="dividido" && b.itens.length){
+  $("pgTroco").innerHTML=htmlDiv(b,tB);
+  divPinta();                      /* enche a conta e o troco logo no primeiro desenho */
+ }else{
+  $("pgTroco").innerHTML = (b.met==="dinheiro" && b.itens.length && !b.edita) ? htmlTroco(tB, b.recebido, "setRecebido") : "";
+ }
  const ed=b.edita;
  if(ed){
   const t=totalBalcao(), dif=t-(ed.total||0);
@@ -1202,15 +1356,31 @@ function desenharPedido(){
   $("editBan").innerHTML=`<div class="editban"><b>A modificar o pedido ${esc(ed.code)}</b>
    Até carregar em «Fechar e reenviar», a cozinha continua com o pedido antigo.${dtx}</div>`;
  } else $("editBan").innerHTML="";
- const bt=$("btnEnviar");
- bt.disabled = !b.itens.length || !b.met;
- bt.textContent = ed ? "Fechar e reenviar à cozinha"
-   : (!b.itens.length ? "Enviar para a cozinha" : (!b.met ? "Escolha como paga ↑" : (pago ? "✓ Pago · Enviar à cozinha" : "Enviar à cozinha · cobrar depois")));
- bt.classList.toggle("edita",!!ed);
- bt.classList.toggle("pago", !ed && pago);
- bt.classList.toggle("depois", !ed && b.met==="depois");
  $("btnLimpar").textContent = ed ? "Cancelar modificação (fica o pedido antigo)" : "Eliminar este pedido";
  $("fNotas").value=b.notas||"";
+ pintarEnviar();
+}
+/* resumo do pagamento + botão de enviar. Chamado também a cada tecla nas parcelas
+   do dividido, por isso não toca em mais nada do ecrã. */
+function pintarEnviar(){
+ const b=balcoes[activo], ed=b.edita, pago=b.pago===true, t=totalBalcao();
+ const div=(b.met==="dividido"), divok=divOK(b,t);
+ const rs=$("pgResumo");
+ if(rs){
+  rs.textContent = !b.itens.length ? "" : (!b.met ? "escolha antes de enviar"
+    : (div ? (divok ? "✓ Pago · "+divTxt(b.din,b.pos) : "reparta o pagamento ↓")
+           : (pago ? "✓ Pago · "+metTxt(b.met) : "Fica por cobrar")));
+  rs.style.color = !b.met ? "var(--ink2)" : ((div && !divok) ? "var(--vermelho)" : (pago ? "#2E6B32" : "var(--vermelho)"));
+ }
+ const bt=$("btnEnviar"); if(!bt) return;
+ bt.disabled = !b.itens.length || !b.met || !divok;
+ bt.textContent = ed ? (divok ? "Fechar e reenviar à cozinha" : "Reparta o pagamento ↑")
+   : (!b.itens.length ? "Enviar para a cozinha" : (!b.met ? "Escolha como paga ↑"
+     : (div ? (divok ? "✓ Pago · "+divTxt(b.din,b.pos)+" · Enviar à cozinha" : "Reparta o pagamento ↑")
+            : (pago ? "✓ Pago · Enviar à cozinha" : "Enviar à cozinha · cobrar depois"))));
+ bt.classList.toggle("edita",!!ed);
+ bt.classList.toggle("pago", !ed && pago && divok);
+ bt.classList.toggle("depois", !ed && b.met==="depois");
 }
 function tirarLinha(k){
  const b=balcoes[activo]; if(!b.itens[k]) return;
@@ -1270,6 +1440,24 @@ function horaMais(min){
 async function enviar(){
  const b=balcoes[activo];
  if(!b.itens.length) return;
+ if(!divOK(b,totalBalcao())){                      /* as duas parcelas têm de somar o total */
+  const m=$("envMsg"); m.className="msg bad"; m.textContent=divFalha(b,totalBalcao()).txt;
+  divPinta(); return;
+ }
+ /* 03-11-2026: algum extra deste pedido acabou entretanto? Avisa antes de ir para a cozinha. */
+ {
+  await carregarEsgotados();
+  const fora=[];
+  b.itens.forEach(x=>{ const f=(x.xk||[]).filter(k=>esgotados.includes(k)).map(k=>k.split(":").slice(2).join(":"));
+   if(f.length) fora.push(x.nome+" — "+f.join(", ")); });
+  if(fora.length){
+   desenharProdutos();
+   alert("Acabou entretanto:\n\n• "+fora.join("\n• ")+
+         "\n\nCorrija estas linhas (apague e volte a escolher) antes de enviar.");
+   const m=$("envMsg"); m.className="msg bad"; m.textContent="Há extras que acabaram — corrija as linhas marcadas.";
+   return;
+  }
+ }
  const btn=$("btnEnviar"); btn.disabled=true;
  esquecerAnular();
  const msg=$("envMsg"); msg.className="msg"; msg.textContent="A enviar…";
@@ -1290,7 +1478,7 @@ async function enviar(){
   stock: b.itens.reduce((o,x)=>{ const m=stkLinha(x); Object.keys(m).forEach(n=>{ o[n]=(o[n]||0)+m[n]*x.q; }); return o; },{}),
   linhas: b.itens.map(x=>({n:x.nome, q:x.q, p:x.preco})),
   total: totalBalcao(),
-  notas: (b.edita ? "MODIFICADO (substitui "+b.edita.code+") · " : "") + "Cliente à espera · " + (b.pago?"PAGO ("+metTxt(b.met)+")":"POR PAGAR")
+  notas: (b.edita ? "MODIFICADO (substitui "+b.edita.code+") · " : "") + "Cliente à espera · " + (b.pago?"PAGO ("+metDescB(b)+")":"POR PAGAR")
          + (b.notas ? " · " + b.notas : ""),
   morada:"", pago:false, balcao:true, balcaoPago:b.pago, balcaoMetodo:(b.pago?b.met:"")
  };
@@ -1305,12 +1493,12 @@ async function enviar(){
   btn.disabled=false; return;
  }
  msg.className="msg ok";
- msg.textContent=(semNet?"📴 Sem internet — guardado neste aparelho (segue sozinho quando a internet voltar) · ":"Enviado para a cozinha · ")+code+" · levantamento "+slot+(b.pago?" · PAGO ("+metTxt(b.met)+")":" · POR COBRAR — fica na lista vermelha «Por cobrar».");
+ msg.textContent=(semNet?"📴 Sem internet — guardado neste aparelho (segue sozinho quando a internet voltar) · ":"Enviado para a cozinha · ")+code+" · levantamento "+slot+(b.pago?" · PAGO ("+metDescB(b)+")":" · POR COBRAR — fica na lista vermelha «Por cobrar».");
  pagoEnviado[code]=b.pago;
- if(b.pago) metEnviado[code]={m:b.met,h:horaMais(0)};
+ if(b.pago) metEnviado[code]={m:b.met,h:horaMais(0),din:(b.met==="dividido"?b.din:null),pos:(b.met==="dividido"?b.pos:null)};
  if(b.edita){
   const velho=await retirarAntigo(b.edita);
-  msg.textContent="Reenviado · "+code+" substitui "+b.edita.code+" · levantamento "+slot+(b.pago?" · PAGO ("+metTxt(b.met)+")":" · POR COBRAR");
+  msg.textContent="Reenviado · "+code+" substitui "+b.edita.code+" · levantamento "+slot+(b.pago?" · PAGO ("+metDescB(b)+")":" · POR COBRAR");
   if(!velho){ msg.className="msg bad"; msg.textContent+=" — ATENÇÃO: não consegui retirar o pedido antigo "+b.edita.code+". Apague-o na cozinha ou no /admin."; }
   else if(velho==="cancelado") msg.textContent+=" · o antigo ficou cancelado (confirme o stock).";
   delete pagoEnviado[b.edita.code]; delete metEnviado[b.edita.code];
@@ -1427,7 +1615,7 @@ function hvDesenhar(){
   l.map(p=>{
    const canc=p.status==="cancelado";
    const linhas=(Array.isArray(p.linhas)&&p.linhas.length)?p.linhas.map(x=>x.q+"x "+x.n):(p.itens||[]);
-   const selo=p.balcao?(p.balcaoPago?'<span class="selo sim">✓ Pago'+(metDe(p)?' · '+esc(metTxt(metDe(p))):'')+'</span>':'<span class="selo nao">Por pagar</span>')
+   const selo=p.balcao?(p.balcaoPago?'<span class="selo sim">✓ Pago'+(metDe(p)?' · '+esc(metTxtP(p)):'')+'</span>':'<span class="selo nao">Por pagar</span>')
                       :'<span class="selo site">Website</span>';
    const compUrl=PROMO_API+"/comprovativo?code="+encodeURIComponent(p.code||"")+"&key="+encodeURIComponent(KEY);
    const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
@@ -1448,14 +1636,30 @@ function hvDesenhar(){
 /* caixa do balcão: quanto entrou por cada forma de pagamento e quanto falta cobrar */
 function caixaHtml(vendidos){
  const bal=vendidos.filter(p=>p.balcao); if(!bal.length) return "";
- const por={}; let falta=0, nf=0;
+ /* Pagamento dividido: cada parcela entra na sua linha — a parte em dinheiro na gaveta,
+    a do POS no talão do Vinti4 — para a caixa fechar com o que lá está de facto.
+    Se as parcelas de um pedido não somarem o total dele, isso aparece à parte: nunca
+    se arredonda em silêncio uma diferença para dentro de uma das linhas. */
+ const por={}; let falta=0, nf=0, nDiv=0, divDif=0, divSem=0, nDivSem=0;
  bal.forEach(p=>{
   const pg=(p.balcaoPago===true)||(pagoEnviado[p.code]===true);
   if(!pg){ falta+=(+p.total||0); nf++; return; }
-  const m=metDe(p)||"sem"; por[m]=(por[m]||0)+(+p.total||0);
+  const m=metDe(p)||"sem";
+  if(m==="dividido"){
+   const d=divDe(p);
+   if(!d){ divSem+=(+p.total||0); nDivSem++; return; }
+   por.dinheiro=(por.dinheiro||0)+d.din;
+   por.vinti4  =(por.vinti4||0)  +d.pos;
+   nDiv++; divDif+=(+p.total||0)-(d.din+d.pos);
+   return;
+  }
+  por[m]=(por[m]||0)+(+p.total||0);
  });
  return `<div class="caixa"><div class="cx-t">Caixa do balcão</div>`+
   ["dinheiro","vinti4","transf"].map(k=>`<div class="cx"><span>${MET[k].i} ${MET[k].t}</span><b>${por[k]||0} ECV</b></div>`).join("")+
+  (nDiv?`<div class="cx cxinfo"><span>${MET.dividido.i} Dividido (${nDiv}) — já contado acima</span><b></b></div>`:"")+
+  (divDif?`<div class="cx nao"><span>⚠ Dividido: parcelas não fecham com o total</span><b>${divDif>0?"−":"+"}${Math.abs(divDif)} ECV</b></div>`:"")+
+  (nDivSem?`<div class="cx nao"><span>⚠ Dividido sem repartição registada (${nDivSem})</span><b>${divSem} ECV</b></div>`:"")+
   (por.sem?`<div class="cx"><span>Pago (forma não registada)</span><b>${por.sem} ECV</b></div>`:"")+
   `<div class="cx${falta?" nao":""}"><span>${falta?"⚠ ":""}Por cobrar${nf?" ("+nf+")":""}</span><b>${falta} ECV</b></div></div>`;
 }
@@ -1536,7 +1740,7 @@ function desenharHist(){
    <div class="cab" role="button" tabindex="0" aria-expanded="${ab}">
     <span class="lk" aria-hidden="true">🔒</span>
     <span class="q"><b>${esc(p.nome||"")}</b><small>${esc(p.code)}${p.criado?" · "+esc(p.criado):""}${canc?"":` <span class="kst ${esc(p.status||"")}">${esc(EST_TXT[p.status]||p.status||"")}</span>`}${emEdicao.has(p.code)?" · ✎ em edição":""}${p._offline?' · <b style="color:var(--vermelho)">📴 por enviar</b>':""}</small></span>
-    <span class="v"><b>${p.total||0}</b><small>${canc?"CANCELADO":(pg?"✓ PAGO"+(m?" · "+esc(metTxt(m)).toUpperCase():""):"POR COBRAR")}</small></span>
+    <span class="v"><b>${p.total||0}</b><small>${canc?"CANCELADO":(pg?"✓ PAGO"+(m?" · "+esc(metTxtP(p)).toUpperCase():""):"POR COBRAR")}</small></span>
    </div>
    ${(!pg&&!canc)?`<button type="button" class="cobrar2" onclick="abrirCobrar('${esc(p.code)}')">Cobrar ${p.total||0} ECV</button>`:""}
    ${ab?`<div class="det"><ul>${linhas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
@@ -1590,7 +1794,7 @@ function abrirOpcoes(code){
  const p=(pedidos||[]).find(x=>x.code===code); if(!p) return;
  const pg=pagoEnviado[code]===true, canc=p.status==="cancelado", m=metDe(p), c=esc(code);
  $("opSheet").innerHTML=`<h3>${esc(p.nome||"")} · ${p.total||0} ECV</h3>
-  <div class="sub">${c} · ${canc?"cancelado":(pg?"pago"+(m?" ("+esc(metTxt(m))+")":""):"por cobrar")} · cozinha: ${esc(EST_TXT[p.status]||p.status||"")}</div>
+  <div class="sub">${c} · ${canc?"cancelado":(pg?"pago"+(m?" ("+esc(metTxtP(p))+")":""):"por cobrar")} · cozinha: ${esc(EST_TXT[p.status]||p.status||"")}</div>
   <div class="acc">
    ${canc?"":`<button type="button" class="ed" onclick="fecharOpcoes();modificar('${c}')">✎ Editar pedido<small>Abre no carrinho. A cozinha só recebe a mudança quando carregar em «Fechar e reenviar».</small></button>`}
    ${canc?"":(pg?`<button type="button" class="dz" onclick="fecharOpcoes();desfazerPago('${c}')">↩ Afinal não pagou<small>Volta para «Por cobrar».</small></button>`
@@ -1608,23 +1812,62 @@ function desfazerPago(code){
 let _cob=null;
 function abrirCobrar(code){
  const p=(pedidos||[]).find(x=>x.code===code); if(!p) return;
- _cob={code, nome:p.nome||"", total:+p.total||0, met:null, rec:null};
+ _cob={code, nome:p.nome||"", total:+p.total||0, met:null, rec:null, din:null, pos:null};
  desenharCobrar(); $("cobBg").classList.add("on");
 }
-function cobMet(m){ if(!_cob) return; _cob.met=m; if(m!=="dinheiro") _cob.rec=null; desenharCobrar(); }
+function cobMet(m){ if(!_cob) return; _cob.met=m;
+ if(m!=="dinheiro" && m!=="dividido") _cob.rec=null;
+ if(m!=="dividido"){ _cob.din=null; _cob.pos=null; }
+ desenharCobrar(); }
 function cobRec(v){ if(!_cob) return; _cob.rec=v; desenharCobrar(); }
+function cobDivPor(v){ const c=_cob; if(!c) return; c.din=Math.max(0,v); c.pos=Math.max(0,c.total-c.din); c.rec=null; desenharCobrar(); }
+function cobDivInput(qual){
+ const c=_cob; if(!c) return; const eD=$("cobDin"), eP=$("cobPos"); if(!eD||!eP) return;
+ if(qual==="din"){ c.din=divNum(eD.value); c.pos=(c.din==null)?null:Math.max(0,c.total-c.din);
+                   if(document.activeElement!==eP) eP.value=(c.pos==null?"":c.pos); }
+ else{ c.pos=divNum(eP.value); c.din=(c.pos==null)?null:Math.max(0,c.total-c.pos);
+       if(document.activeElement!==eD) eD.value=(c.din==null?"":c.din); }
+ if(c.rec!=null && (c.din==null || c.rec<c.din)) c.rec=null;
+ cobPinta();
+}
+function cobPinta(){
+ const c=_cob; if(!c) return;
+ const f=divFalha(c,c.total), ok=divOK(c,c.total);
+ const r=$("cobRes"); if(r){ r.className="divres "+f.cor; r.innerHTML=f.txt; }
+ const tr=$("cobTroco"); if(tr) tr.innerHTML=(c.din>0)?htmlTroco(c.din,c.rec,"cobRec"):"";
+ const bt=$("cobOk");
+ if(bt){ bt.disabled=!ok; bt.textContent=ok?("✓ Recebi "+divTxt(c.din,c.pos)):"Reparta o pagamento ↑"; }
+}
 function desenharCobrar(){
  const c=_cob; if(!c) return;
+ const div=(c.met==="dividido"), ok=divOK(c,c.total);
  $("cobSheet").innerHTML=`<h3>Cobrar · ${esc(c.nome)}</h3><div class="sub">${esc(c.code)}</div>
   <div class="big">${c.total} ECV</div>
-  <div class="pg-met">${["dinheiro","vinti4","transf"].map(k=>
+  <div class="pg-met">${["dinheiro","vinti4","transf","dividido"].map(k=>
    `<button type="button" class="${c.met===k?"on":""}" onclick="cobMet('${k}')"><i>${MET[k].i}</i>${MET[k].t}</button>`).join("")}</div>
-  ${c.met==="dinheiro"?htmlTroco(c.total,c.rec,"cobRec"):""}
-  <button type="button" class="ok" ${c.met?"":"disabled"} onclick="confirmarCobrar()">${c.met?"✓ Recebi "+c.total+" ECV · "+esc(metTxt(c.met)):"Escolha como pagou"}</button>
+  ${div?`<div class="divp">
+    <div class="divgrid">
+     <label><span>💵 Dinheiro</span><input id="cobDin" type="number" inputmode="numeric" min="0" step="5" placeholder="0"
+       value="${c.din==null?"":c.din}" oninput="cobDivInput('din')" aria-label="Valor pago em dinheiro"></label>
+     <label><span>💳 POS / Vinti4</span><input id="cobPos" type="number" inputmode="numeric" min="0" step="5" placeholder="0"
+       value="${c.pos==null?"":c.pos}" oninput="cobDivInput('pos')" aria-label="Valor pago no POS"></label>
+    </div>
+    <div class="divch">${[100,500,1000,2000].filter(v=>v<c.total).map(v=>
+      `<button type="button" onclick="cobDivPor(${v})">💵 ${v}</button>`).join("")}
+     <button type="button" onclick="cobDivPor(${Math.round(c.total/2/5)*5})">metade</button></div>
+    <div class="divres" id="cobRes"></div></div><div id="cobTroco"></div>`
+   :(c.met==="dinheiro"?htmlTroco(c.total,c.rec,"cobRec"):"")}
+  <button type="button" class="ok" id="cobOk" ${(c.met&&ok)?"":"disabled"} onclick="confirmarCobrar()">${
+    !c.met ? "Escolha como pagou"
+    : (div ? (ok?"✓ Recebi "+divTxt(c.din,c.pos):"Reparta o pagamento ↑")
+           : "✓ Recebi "+c.total+" ECV · "+esc(metTxt(c.met)))}</button>
   <button type="button" class="fx" onclick="fecharCobrar()">Cancelar</button>`;
+ if(div) cobPinta();
 }
 function fecharCobrar(){ $("cobBg").classList.remove("on"); _cob=null; }
-function confirmarCobrar(){ const c=_cob; if(!c||!c.met) return; fecharCobrar(); marcarPago(c.code,true,c.met); }
+function confirmarCobrar(){ const c=_cob; if(!c||!c.met) return;
+ if(!divOK(c,c.total)){ cobPinta(); return; }
+ fecharCobrar(); marcarPago(c.code,true,c.met,c.din,c.pos); }
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ fecharCobrar(); fecharOpcoes(); } });
 function vistoPronto(id){ if(_prontosNovos.delete(id)) desenharHist(); }
 function abrirEnviado(code,id){
@@ -1654,7 +1897,9 @@ function modificar(code){
  const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
  const nome=/^Cliente \d+$/.test(p.nome||"")?"":(p.nome||"");
  const vazio=balcoes.findIndex(b=>!b.itens.length&&!b.edita);
- const novo={nome, itens, pago, met:(pago?(metDe(p)||"dinheiro"):"depois"), recebido:null, notas:nt, edita:{code:p.code, id:p.id, total:+p.total||0, pago}};
+ const mt=pago?(metDe(p)||"dinheiro"):"depois", dv=(mt==="dividido")?divDe(p):null;
+ const novo={nome, itens, pago, met:mt, recebido:null, notas:nt, din:(dv?dv.din:null), pos:(dv?dv.pos:null),
+             edita:{code:p.code, id:p.id, total:+p.total||0, pago}};
  if(vazio>=0){ balcoes[vazio]=novo; activo=vazio; } else { balcoes.push(novo); activo=balcoes.length-1; }
  guardar(); desenharTudo(); desenharHist();
  setTimeout(()=>{ try{ $("linhas").scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){} },50);
@@ -1667,16 +1912,21 @@ async function retirarAntigo(ed){
  if(ed.id && await tenta("/order-status"+k+"&st=cancelado")) return "cancelado";
  return null;
 }
-async function marcarPago(code,on,met){
+async function marcarPago(code,on,met,din,pos){
  const p=(pedidos||[]).find(x=>x.code===code);
+ const div=(met==="dividido");
+ /* no dividido vão os dois valores no met ("dividido:500-275"): é o único campo que o
+    /order-pago guarda. O par só é aceite se somar o total, por isso um texto cortado
+    nunca entra na caixa como valor errado — aparece "repartição não registada". */
+ const metS = on ? (div ? ("dividido:"+(+din||0)+"-"+(+pos||0)) : met) : "";
  pagoEnviado[code]=on;
- if(on) metEnviado[code]={m:met,h:horaMais(0)}; else delete metEnviado[code];
- if(p){ p.balcaoPago=on; p.balcaoMetodo=on?met:""; }
+ if(on) metEnviado[code]={m:met,h:horaMais(0),din:(div?+din:null),pos:(div?+pos:null)}; else delete metEnviado[code];
+ if(p){ p.balcaoPago=on; p.balcaoMetodo=metS; }
  guardar(); desenharHist(); try{ carregarFecho(); }catch(e){}
  if(!p) return;
  try{
   const r=await fetch(PROMO_API+"/order-pago?key="+encodeURIComponent(KEY)+
-   "&id="+encodeURIComponent(p.id)+"&on="+(on?"1":"0")+"&met="+encodeURIComponent(on?met:""),{method:"POST"});
+   "&id="+encodeURIComponent(p.id)+"&on="+(on?"1":"0")+"&met="+encodeURIComponent(metS),{method:"POST"});
   const d=await r.json();
   if(d.erro) throw new Error(d.erro);
  }catch(e){

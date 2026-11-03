@@ -98,6 +98,8 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
  font-size:13.5px;color:#6E4B2F;line-height:1.5;margin:12px 0;}
 .sbeb{margin:28px 0 0;padding:10px 12px;border-radius:12px;background:var(--dark);color:#F7F1E4;font-size:13px;font-weight:600;letter-spacing:.5px;}
 .scat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:18px 0 7px;}
+/* 03-11-2026: separador da lista dos extras */
+.exsep{margin:34px 0 0;padding:11px 12px;border-radius:12px;background:#4A2545;color:#F7F1E4;font-size:13px;font-weight:600;letter-spacing:.5px;}
 .buscabox{position:relative;margin-bottom:11px;}
 .buscabox input{width:100%;padding:12px 38px 12px 14px;border:1px solid var(--line);border-radius:11px;
  background:#fff;font:400 15px/1.3 inherit;color:var(--ink);}
@@ -110,6 +112,8 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .srow.zero{background:#F6E9E6;border-color:#D9B4AC;}
 .srow .sn{flex:1;font-size:16px;line-height:1.25;font-weight:500;}
 .srow.zero .sn{color:var(--vermelho);text-decoration:line-through;}
+/* 03-11-2026: as notas por baixo do nome explicam, não são o produto — não se riscam */
+.srow.zero .sn .semstk{text-decoration:none;}
 .srow .sq{min-width:52px;text-align:center;
  font-size:27px;font-weight:800;color:var(--verde);}
 .srow.zero .sq{color:var(--vermelho);}
@@ -241,6 +245,13 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
       <button onclick="limparBuscaStk()" aria-label="Limpar pesquisa">×</button>
     </div>
     <div id="stockLista"></div>
+    <div class="exsep">Extras — só TEM / ACABOU</div>
+    <div class="avisoStk">
+      Toppings, fruta, leites, xaropes e extras dos sumos. Em <b>ACABOU</b>, o extra fica
+      <b>bloqueado no site e nas Vendas</b> e ninguém o pode escolher. Volta sozinho ao
+      <b>TEM</b> à meia-noite, como os produtos.
+    </div>
+    <div id="extrasLista"></div>
   </div>
 </div>
 
@@ -420,13 +431,26 @@ function optAcai(opts){
 /* Nota do pedido, em destaque. Nos pedidos do balcão a nota vem como
    "Cliente à espera · PAGO|POR PAGAR · texto": as duas primeiras partes passam a etiquetas
    e só o texto escrito por quem atendeu fica na caixa da nota. */
+/* ---------- PAGAMENTO DIVIDIDO (03-11-2026) ----------
+   Parte em dinheiro + parte no POS. As /vendas escrevem as duas parcelas na nota
+   ("PAGO (Dinheiro 500 + POS 275)"); nas cobranças feitas mais tarde ficam no
+   balcaoMetodo ("dividido:500-275"), e aí só se aceitam se somarem o total. */
+function divEtq(p, rotulo){
+  const n=/\(Dinheiro (\d+) \+ POS (\d+)\)/.exec(String(rotulo||""));
+  if(n) return " · DINHEIRO "+n[1]+" + POS "+n[2];
+  const bm=String(p.balcaoMetodo||"");
+  const m=/^dividido:(\d+)-(\d+)$/.exec(bm);
+  if(m && (+m[1])+(+m[2])===(+p.total||0)) return " · DINHEIRO "+m[1]+" + POS "+m[2];
+  if(/^dividido/.test(bm)) return " · DIVIDIDO";
+  return "";
+}
 function blocoNotas(p){
   let txt=String(p.notas||"").trim(), etqs="";
   /* 15-10-2026: aceita também "PAGO (Dinheiro)" e "MODIFICADO (substitui …) · " — antes caía tudo na caixa da nota */
   const m=p.balcao ? txt.match(/^(?:MODIFICADO \(substitui [^)]*\)\s*·\s*)?Cliente à espera\s*·\s*(PAGO(?:\s*\([^)]*\))?|POR PAGAR)\s*(?:·\s*([\s\S]*))?$/) : null;
   if(m){
     const pago=(p.balcaoPago!==undefined && p.balcaoPago!==null) ? !!p.balcaoPago : (m[1].indexOf("PAGO")===0);
-    etqs=`<div class="etqs"><span class="etq">CLIENTE À ESPERA</span><span class="etq ${pago?"pg":"npg"}">${pago?"PAGO":"POR PAGAR"}</span></div>`;
+    etqs=`<div class="etqs"><span class="etq">CLIENTE À ESPERA</span><span class="etq ${pago?"pg":"npg"}">${pago?"PAGO":"POR PAGAR"}${pago?divEtq(p,m[1]):""}</span></div>`;
     txt=(m[2]||"").trim();
   }
   return etqs + (txt ? `<div class="nota"><small>NOTA DO PEDIDO</small><div>${esc(txt)}</div></div>` : "");
@@ -710,6 +734,66 @@ function desenharStock(){
   });
   if(!achou) h = '<div class="vazio">Nenhum produto encontrado.</div>';
   document.getElementById("stockLista").innerHTML = h;
+  desenharExtras();
+}
+
+/* ============================================================
+   EXTRAS DO DIA — TEM / ACABOU (03-11-2026)
+   Guardam-se na MESMA lista do dia que os produtos esgotados (/soldout), com a chave
+   "@x:<tipo>:<nome>". Por isso apagam-se sozinhos à meia-noite, como os produtos, e
+   o servidor não precisou de nenhuma função nova.
+   O site e as /vendas lêem as mesmas chaves e bloqueiam o extra.
+   >>> QUANDO SE ACRESCENTA UM EXTRA NOVO AO MENU, acrescenta-se aqui também (e no site
+       e nas /vendas, que geram a chave a partir dos seus próprios dados). <<<
+   tipos: acai (vai incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes) */
+const EX_PRE = "@x:";
+const exK = (tipo, nome) => EX_PRE + tipo + ":" + nome;
+const EX_GRUPOS = [
+  { t: "AÇAÍ — o que leva (incluído)", tipo: "acai",
+    l: ["Granola", "Leite em pó", "Leite condensado", "Banana", "Morango", "Frutos vermelhos", "Kiwi"] },
+  { t: "AÇAÍ — toppings extra (+50)", tipo: "acaix", l: ["Caramelo", "Chocolate", "Morango"] },
+  { t: "LEITE À ESCOLHA (+100)", tipo: "leite", l: ["Aveia", "Coco", "Soja", "Amêndoa", "Sem lactose"] },
+  { t: "EXTRAS DOS SUMOS (+50)", tipo: "extra", l: ["Gengibre", "Hortelã"] },
+  { t: "XAROPES", tipo: "sem", l: ["Xarope de baunilha"] }
+];
+function desenharExtras(){
+  const alvo = document.getElementById("extrasLista");
+  if(!alvo) return;
+  let h = "", achou = false;
+  EX_GRUPOS.forEach(g => {
+    const l = g.l.filter(n => !buscaStk || normalizar(n).includes(buscaStk));
+    if(!l.length) return;
+    achou = true;
+    h += `<div class="scat">${g.t}</div>`;
+    l.forEach(n => {
+      const marcado = fora.includes(exK(g.tipo, n));
+      /* a granola e o leite em pó mandam no preço do açaí: avisa-se aqui para ninguém
+         marcar os dois sem saber o que isso faz ao preço */
+      const peso = (g.tipo === "acai" && (n === "Granola" || n === "Leite em pó"))
+        ? '<div class="semstk">se acabarem os dois, o açaí fica a 950 ECV (sem agravamento)</div>' : "";
+      h += `<div class="srow beb${marcado ? " zero" : ""}">
+        <div class="sn">${esc(n)}<div class="semstk">${marcado
+          ? '<span style="color:var(--vermelho);font-weight:700">acabou — bloqueado no site e nas Vendas</span>'
+          : "disponível"}</div>${peso}</div>
+        <button class="stog ${marcado ? "no" : "on"}" onclick="alternarExtra('${g.tipo}','${esc(n).replace(/'/g,"\\'")}')">${marcado ? "ACABOU" : "TEM"}</button>
+      </div>`;
+    });
+  });
+  alvo.innerHTML = achou ? h : '<div class="vazio">Nenhum extra encontrado.</div>';
+}
+async function alternarExtra(tipo, nome){
+  const chave = exK(tipo, nome);
+  const marcado = fora.includes(chave);
+  try{
+    const r = await fetch(PROMO_API + "/soldout-set?key=" + encodeURIComponent(KEY) +
+                          "&item=" + encodeURIComponent(chave) + "&on=" + (marcado ? "0" : "1"),
+                          {method:"POST"});
+    const d = await r.json();
+    if(d.erro){ alert(d.erro); return; }
+    fora = (d.itens || []).map(nomeAtual);
+    try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){}
+    desenharStock();
+  }catch(e){ alert("Não foi possível guardar."); }
 }
 
 /* ---------- 15-10-2026: DEFINIR A QUANTIDADE DE HOJE ----------

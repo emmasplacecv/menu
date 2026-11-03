@@ -107,6 +107,11 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
 .vst{font-size:13px;font-weight:600;letter-spacing:0;}
 .vst.ok{color:#2E6B33;} .vst.esp{color:#8A5A12;} .vst.atr{color:#A32D2D;}
 .cat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:20px 0 6px;}
+/* 03-11-2026: lista dos extras, no fim dos produtos */
+.exsep{margin:34px 0 0;padding:11px 13px;border-radius:12px;background:#4A2545;color:#F7F1E4;font-size:13px;font-weight:600;letter-spacing:.5px;}
+.exnota{margin:9px 0 2px;font-size:12.5px;line-height:1.5;color:var(--ink2);}
+.row .n small{display:block;margin-top:2px;font-size:11.5px;font-weight:500;color:var(--ink2);letter-spacing:0;text-transform:none;}
+.row.off .n small{color:var(--ink2);text-decoration:none;}
 .row{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--card);
  border:1px solid var(--line);border-radius:13px;margin-bottom:7px;}
 .row .n{flex:1;font-size:15.5px;line-height:1.3;}
@@ -434,6 +439,10 @@ body{padding-bottom:76px;}
       Não precisa de desmarcar ao fim do dia.
     </div>
     <div id="lista"></div>
+    <div class="exsep">Extras — toppings, fruta, leites, xaropes</div>
+    <div class="exnota">Em <b>ACABOU</b>, o extra fica bloqueado no site e nas Vendas e ninguém o pode escolher.
+      Volta sozinho ao <b>TEM</b> à meia-noite, como os produtos. A cozinha marca os mesmos extras no separador Stock.</div>
+    <div id="listaEx"></div>
   </div>
 </div>
 
@@ -533,6 +542,49 @@ function desenhar(){
    </div>`;
   }).join("")
  ).join("");
+ desenharEx();
+}
+
+/* ============================================================
+   EXTRAS ESGOTADOS DO DIA (03-11-2026)
+   Mesma lista do dia que os produtos (/soldout), com a chave "@x:<tipo>:<nome>" —
+   por isso repõem-se sozinhos à meia-noite, como os produtos, e o servidor não mudou.
+   O site e as /vendas lêem as mesmas chaves e bloqueiam o extra; a cozinha marca-os
+   no separador Stock. >>> Extra novo no menu: acrescentar aqui, na cozinha e nas /vendas. <<<
+   tipos: acai (incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes)
+   ============================================================ */
+const EX_PRE="@x:";
+const exK=(tipo,nome)=>EX_PRE+tipo+":"+nome;
+const EX_GRUPOS=[
+ {t:"AÇAÍ — o que leva (incluído)",tipo:"acai",
+  l:["Granola","Leite em pó","Leite condensado","Banana","Morango","Frutos vermelhos","Kiwi"]},
+ {t:"AÇAÍ — toppings extra (+50)",tipo:"acaix",l:["Caramelo","Chocolate","Morango"]},
+ {t:"LEITE À ESCOLHA (+100)",tipo:"leite",l:["Aveia","Coco","Soja","Amêndoa","Sem lactose"]},
+ {t:"EXTRAS DOS SUMOS (+50)",tipo:"extra",l:["Gengibre","Hortelã"]},
+ {t:"XAROPES",tipo:"sem",l:["Xarope de baunilha"]}
+];
+function desenharEx(){
+ const alvo=$("listaEx"); if(!alvo) return;
+ alvo.innerHTML=EX_GRUPOS.map(g=>
+  `<div class="cat">${g.t}</div>`+
+  g.l.map(n=>{
+   const off=fora.includes(exK(g.tipo,n));
+   /* a granola e o leite em pó mandam no preço do açaí: diz-se aqui o que acontece */
+   const nota=(g.tipo==="acai" && (n==="Granola"||n==="Leite em pó"))
+    ? `<small>se acabarem os dois, o açaí fica a 950 ECV (sem agravamento)</small>` : "";
+   return `<div class="row${off?" off":""}">
+     <div class="n">${hEsc(n)}${nota}</div>
+     <button class="sw ${off?"no":"on"}" onclick="alternarEx('${g.tipo}','${hEsc(n).replace(/'/g,"\\'")}')">${off?"ACABOU":"TEM"}</button>
+   </div>`;
+  }).join("")
+ ).join("");
+}
+async function alternarEx(tipo,nome){
+ const chave=exK(tipo,nome), off=fora.includes(chave);
+ const r=await pedir("/soldout-set?item="+encodeURIComponent(chave)+"&on="+(off?"0":"1"));
+ if(!r || r.erro){ alert((r&&r.erro)||"Não foi possível guardar. Tente outra vez."); return; }
+ fora=(r.itens||[]).map(nomeAtual);
+ desenhar();
 }
 
 /* ---------- ABERTO / FECHADO ---------- */
@@ -1371,7 +1423,24 @@ function desenharComprovativos(){
 /* 20-10-2026: venda do balcão = marca "balcao" OU código BAL-… (as Vendas criam sempre BAL-ddmm-XXX,
    o site PED-ddmm-XXX). Corrige as vendas de 19 e 20-10 que o servidor gravou como pedidos do site. */
 const ehBalcao=p=>!!(p&&(p.balcao||/^BAL-/.test(String(p.code||""))));
-const metBalcao={dinheiro:"dinheiro",vinti4:"Vinti4",transf:"transferência"};
+const metBalcao={dinheiro:"dinheiro",vinti4:"Vinti4",transf:"transferência",dividido:"Dividido"};
+/* ---------- PAGAMENTO DIVIDIDO (03-11-2026) ----------
+   As /vendas guardam as duas parcelas na nota do pedido — "PAGO (Dinheiro 500 + POS 275)" —
+   e, nas cobranças feitas mais tarde, no próprio balcaoMetodo ("dividido:500-275").
+   O par só é aceite se somar o total do pedido: um texto cortado mostra "Dividido" sem
+   parcelas, em vez de um valor errado. */
+function metPedido(p){
+ if(!p) return "";
+ const bm=String(p.balcaoMetodo||"");
+ if(/^dividido/.test(bm)){
+  const n=/PAGO \(Dinheiro (\d+) \+ POS (\d+)\)/.exec(p.notas||"");
+  if(n) return "Dinheiro "+n[1]+" + POS "+n[2];
+  const m=/^dividido:(\d+)-(\d+)$/.exec(bm);
+  if(m && (+m[1])+(+m[2])===(+p.total||0)) return "Dinheiro "+m[1]+" + POS "+m[2];
+  return "Dividido";
+ }
+ return metBalcao[bm] || bm;
+}
 /* 23-10-2026: etiqueta do cartão = ORIGEM do pedido (Website ou Balcão); "levantar" deixou de aparecer
    (é o normal). Entrega ao domicílio fica indicada: "WEBSITE · ENTREGA". */
 function origemPedido(p){ return p.balcao ? "BALCÃO" : (p.modo==="entrega" ? "WEBSITE · ENTREGA" : "WEBSITE"); }
@@ -1432,7 +1501,7 @@ async function carregarPedidos(){
    <ul>${p.itens.map(i=>`<li>${hItem(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${p.zona}${p.morada?" — "+p.morada:""}</div>`:(p.morada?`<div class="mor">📍 ${p.morada}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${p.piso}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${p.taxaAndar} ECV</div>`:""}
    ${notasLimpas(p)?`<div class="nt">Notas: ${notasLimpas(p)}</div>`:""}
-   <div class="tot">${p.total} ECV${p.balcao?(p.balcaoPago?` · <span class="pg">PAGO${metBalcao[p.balcaoMetodo]?" ("+metBalcao[p.balcaoMetodo]+")":""}</span>`:` · <span class="npg">POR PAGAR</span>`):""}</div>
+   <div class="tot">${p.total} ECV${p.balcao?(p.balcaoPago?` · <span class="pg">PAGO${metPedido(p)?" ("+hEsc(metPedido(p))+")":""}</span>`:` · <span class="npg">POR PAGAR</span>`):""}</div>
    ${!p.balcao&&p.code?`<div class="nt"><span data-comp="${String(p.code).replace(/"/g,"")}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a></div>`:""}
    <div class="estL"><div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>${linhaVisto(p)}</div>
    <div class="acts">${acts}<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')">🗑 Apagar</button></div>
@@ -1545,7 +1614,7 @@ function hisDesenhar(){
   return `<div class="hdia"><span>${hEsc(hDiaTxt(dia))}</span><span>${ps.length} · ${tv.toLocaleString("pt-PT")} ECV</span></div>`+
    ps.map(p=>{
     const e=hEstado(p), cls=e==="feito"?"hst-ok":"hst-"+e, ent=p.modo==="entrega";
-    const comp = p.balcao ? `<b>Balcão · ${p.balcaoPago?"pago"+(p.balcaoMetodo?" ("+hEsc({dinheiro:"dinheiro",vinti4:"Vinti4",transf:"transferência"}[p.balcaoMetodo]||p.balcaoMetodo)+")":""):"por pagar"}</b>`
+    const comp = p.balcao ? `<b>Balcão · ${p.balcaoPago?"pago"+(metPedido(p)?" ("+hEsc(metPedido(p))+")":""):"por pagar"}</b>`
       : (p.code ? `<a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener">Ver comprovativo</a>`+
                   ` · <a href="#" onclick="hisUmComp('${hEsc(p.code)}','${p._dia}');return false">Descarregar</a>` : "");
     return `<details class="hrow ${p.status||""}"><summary>
@@ -1674,7 +1743,7 @@ async function alternar(ci,ii){
 }
 
 async function limparTudo(){
- if(!confirm("Repor todos os produtos como disponíveis?")) return;
+ if(!confirm("Repor todos os produtos E todos os extras como disponíveis?")) return;
  const r = await pedir("/soldout-set?limpar=1");
  if(!r || r.erro){ alert((r&&r.erro)||"Não foi possível."); return; }
  fora = (r.itens || []).map(nomeAtual);

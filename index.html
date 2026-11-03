@@ -481,6 +481,11 @@ textarea.fld{min-height:74px;resize:vertical;}
 .acai-pr div.on b{color:#F7F1E4;}
 .acai-pr div.on span::before{content:"✓ ";}
 /* cabeçalho de cada passo */
+/* extras esgotados hoje (03-11-2026): bloqueados, com "acabou hoje" por baixo */
+.chip.esg{opacity:.55;cursor:not-allowed;background:#F6E4E1;border-color:#E6C6BF;color:#8A3A2C;text-decoration:none;}
+.chip.esg .esgx{display:block;margin-top:2px;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:#B4472F;text-transform:uppercase;}
+.acaiav{margin:8px 0 2px;padding:9px 12px;border-radius:12px;background:#FDF3E6;border:1px solid #E8D3AE;
+ color:#7A5214;font-size:12.8px;line-height:1.45;font-weight:500;}
 .acai-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 7px;}
 .acai-h .lbl{display:flex;align-items:center;gap:8px;margin:0;}
 .acai-h .lbl i{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:50%;background:var(--dark);color:#F7F1E4;
@@ -2883,12 +2888,99 @@ function build(){
  if(typeof _capaPronta!=="undefined" && _capaPronta){ desenharCapa(false); capaCampanha(); }   // o açaí pode ter esgotado: o banner dele sai
 }
 
+/* ============================================================
+   EXTRAS ESGOTADOS DO DIA (03-11-2026)
+   A cozinha marca TEM / ACABOU a cada extra: toppings e fruta do açaí, leites à escolha,
+   gengibre e hortelã dos sumos, xarope de baunilha. Vive na MESMA lista do dia que os
+   produtos (/soldout), com a chave "@x:<tipo>:<nome>" — por isso repõe-se sozinha à
+   meia-noite exactamente como os produtos, e não foi preciso mexer no servidor.
+   tipos: acai (vai incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes)
+   ============================================================ */
+const EX_PRE="@x:";
+const exK=(tipo,nome)=>EX_PRE+tipo+":"+nome;
+const exOff=(tipo,nome)=>esgotados.includes(exK(tipo,nome));
+const exNome=k=>String(k).split(":").slice(2).join(":");
+const EX_TX={
+ acabou:{pt:"acabou hoje",en:"sold out today",fr:"épuisé aujourd'hui",de:"heute aus",nl:"vandaag uitverkocht"},
+ semBase:{pt:"Granola e leite em pó esgotados hoje — fica ao preço de {p} ECV, sem agravamento.",
+  en:"Granola and milk powder are sold out today — price stays at {p} ECV, no surcharge.",
+  fr:"Granola et lait en poudre épuisés aujourd'hui — le prix reste à {p} ECV, sans supplément.",
+  de:"Granola und Milchpulver sind heute aus — der Preis bleibt bei {p} ECV, ohne Aufschlag.",
+  nl:"Granola en melkpoeder zijn vandaag uitverkocht — de prijs blijft {p} ECV, zonder toeslag."},
+ soAcai:{pt:"só açaí — ao preço de baixo",en:"açaí only — at the lower price",fr:"açaí seul — au prix inférieur",
+  de:"nur Açaí — zum niedrigeren Preis",nl:"alleen açaí — tegen de lagere prijs"},
+ aviso:{pt:"Entretanto acabou o que segue. Retirámos do seu pedido e o preço foi corrigido:",
+  en:"The following ran out in the meantime. We removed it from your order and corrected the price:",
+  fr:"Ce qui suit vient de s'épuiser. Nous l'avons retiré de votre commande et corrigé le prix :",
+  de:"Folgendes ist inzwischen ausgegangen. Wir haben es aus Ihrer Bestellung entfernt und den Preis korrigiert:",
+  nl:"Het volgende is inmiddels uitverkocht. We hebben het uit uw bestelling gehaald en de prijs aangepast:"}
+};
+function ext(k,p){ const o=EX_TX[k]||{}; return String(o[LANG]||o.pt||"").replace("{p}",p==null?"":p); }
+/* chaves dos extras que um produto do carrinho leva — para avisar se algum acabou depois de escolhido */
+function exDoItem(it){
+ const m=it.meta||{}, k=[];
+ if(m.milk && m.milk!=="Normal") k.push(exK("leite",m.milk));
+ (m.extras||[]).forEach(n=>k.push(exK("extra",n)));
+ (m.top||[]).forEach(n=>k.push(exK("acai",n)));
+ (m.xt||[]).forEach(n=>k.push(exK("acaix",n)));
+ return k;
+}
+function exForaNoCarrinho(){
+ const r=[];
+ cart.forEach(it=>{ const f=exDoItem(it).filter(x=>esgotados.includes(x)).map(exNome);
+  if(f.length) r.push({nome:it.name, extras:f}); });
+ return r;
+}
+/* tira do carrinho os extras que acabaram e recalcula o preço de cada linha afectada.
+   Devolve a lista do que mudou, para se dizer ao cliente antes de enviar. */
+function exLimparCarrinho(){
+ const mudou=[];
+ cart.forEach(it=>{
+  const m=it.meta||{}, f=[];
+  if(m.milk && m.milk!=="Normal" && exOff("leite",m.milk)){ f.push(m.milk); m.milk="Normal"; }
+  if(m.extras&&m.extras.length){ const fica=m.extras.filter(n=>!exOff("extra",n));
+   m.extras.filter(n=>exOff("extra",n)).forEach(n=>f.push(n)); m.extras=fica; }
+  if(m.top){ const fica=m.top.filter(n=>!exOff("acai",n));
+   m.top.filter(n=>exOff("acai",n)).forEach(n=>f.push(n)); m.top=fica; }
+  if(m.xt){ const fica=m.xt.filter(n=>!exOff("acaix",n));
+   m.xt.filter(n=>exOff("acaix",n)).forEach(n=>f.push(n)); m.xt=fica; }
+  if(!f.length) return;
+  const fm=findMenuItem(it.name);
+  if(fm){
+   const i=fm.item;
+   if(i.top) it.price=precoAcaiDe(i,m.top||[],m.xt||[]);
+   else{
+    let p=(m.size==="G"&&i.g)?i.g:i.p;
+    if(m.milk&&m.milk!=="Normal"){ const L=LEITES.find(l=>l[0]===m.milk); if(L) p+=L[1]; }
+    (m.extras||[]).forEach(n=>{ const e=(fm.cat.extras||[]).find(x=>x[0]===n); if(e) p+=e[1]; });
+    it.price=p;
+   }
+   if(i.top) it.opts=optsAcai(i,m.top||[],m.xt||[]);
+   else{
+    const o=[];
+    if(m.size) o.push(m.size==="G"?"Grande":"Médio");
+    if(m.milk&&m.milk!=="Normal") o.push("leite "+m.milk.toLowerCase());
+    (m.extras||[]).forEach(n=>o.push(n.toLowerCase()));
+    (m.sem||[]).forEach(s=>o.push("sem "+s.toLowerCase()));
+    it.opts=o;
+   }
+  }
+  mudou.push({nome:it.name, extras:f});
+ });
+ if(mudou.length){ cart.forEach(it=>{ it.key=it.name+"|"+it.opts.join(","); }); refresh(); renderCart(); }
+ return mudou;
+}
+
 /* ---------- ESCOLHA DE OPÇÕES ---------- */
 let cur=null;
 function pick(ci,ii){
  const c=MENU[ci], i=c.items[ii];
  mtrTag("produto_visto",i.n); mtr("ver_produto");
- cur={cat:c,item:i,size:i.g?"M":null,milk:"Normal",extras:[],sem:[],top:(i.top?i.base.slice():[]),xt:[]};
+ /* abre já sem o que acabou hoje: a granola/leite em pó esgotados não vêm marcados,
+    e um xarope esgotado entra logo como "sem" (o cliente não o pode escolher) */
+ cur={cat:c,item:i,size:i.g?"M":null,milk:"Normal",extras:[],
+      sem:(i.sem?i.sem.filter(s=>exOff("sem",s)):[]),
+      top:(i.top?i.base.filter(s=>!exOff("acai",s)):[]),xt:[]};
  $("optAdd").textContent=t("adicionar");
  $("optSheet").classList.toggle("acai",!!i.top);
  const topo=$("optTop"), nomeEl=$("optName"), descEl=$("optDesc");   // desfaz o topo com foto do açaí
@@ -2900,13 +2992,21 @@ function pick(ci,ii){
  if(i.g) h+=`<div class="lbl">${t("tamanho")}</div><div class="chips" id="szC">
    <button class="chip sel" onclick="setSize('M',this)">${t("medio")} · ${i.p}</button>
    <button class="chip" onclick="setSize('G',this)">${t("grande")} · ${i.g}</button></div>`;
+ /* um extra que a cozinha marcou como acabado fica bloqueado, com "acabou hoje" */
+ const esg=`<small class="esgx">${ext("acabou")}</small>`;
  if(c.milk && !i.nm) h+=`<div class="lbl">${t("leite")}</div><div class="chips" id="mkC">`+
-   LEITES.map((m,k)=>`<button class="chip${k===0?" sel":""}" onclick="setMilk('${m[0]}',this)">${td(m[0])}${m[1]?` +${m[1]}`:""}</button>`).join("")+`</div>`;
+   LEITES.map((m,k)=>{ const fo=k>0&&exOff("leite",m[0]);
+    return `<button class="chip tl${k===0?" sel":""}${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="setMilk('${m[0]}',this)"`}>${td(m[0])}${m[1]?` +${m[1]}`:""}${fo?esg:""}</button>`;
+   }).join("")+`</div>`;
  if(c.extras) h+=`<div class="lbl">${t("extras")}</div><div class="chips">`+
-   c.extras.map(e=>`<button class="chip" onclick="tglEx('${e[0]}',${e[1]},this)">${td(e[0])} +${e[1]}</button>`).join("")+`</div>`;
+   c.extras.map(e=>{ const fo=exOff("extra",e[0]);
+    return `<button class="chip tl${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="tglEx('${e[0]}',${e[1]},this)"`}>${td(e[0])} +${e[1]}${fo?esg:""}</button>`;
+   }).join("")+`</div>`;
  /* ingredientes que o cliente pode retirar (não há acrescentar) */
  if(i.sem) h+=`<div class="lbl">${t("personalizar")}</div><div class="optsem">`+
-   i.sem.map(s=>`<button class="chip sel" onclick="tglSem('${s.replace(/'/g,"\\'")}',this)">${td(s)}</button>`).join("")+
+   i.sem.map(s=>{ const fo=exOff("sem",s);
+    return `<button class="chip tl${fo?" out esg":" sel"}" ${fo?'disabled aria-disabled="true"':`onclick="tglSem('${s.replace(/'/g,"\\'")}',this)"`}>${td(s)}${fo?esg:""}</button>`;
+   }).join("")+
    `</div><div class="semnota">${i._baun?t("baunNota"):t("semnota")}</div>`;
  if(i.top) h+=acaiHTML(i);
  $("optBody").innerHTML=h;
@@ -2929,7 +3029,15 @@ function tglSem(n,el){
    Abre com granola e leite em pó marcados; fruta e restantes toppings o cliente acrescenta. */
 /* chaves com que o /admin guarda os três preços do açaí (iguais no /admin e no /vendas) */
 const ACAI_K={p:"Açaí · com granola e/ou leite em pó",sp:"Açaí · sem granola nem leite em pó",xp:"Açaí · topping extra"};
-function nivelAcai(i,top){ return top.some(s=>i.base.includes(s)) ? "p" : "sp"; }
+/* REGRA DO AÇAÍ quando a granola E o leite em pó acabam os dois (03-11-2026):
+   o copo passa a levar só açaí, que é o nível caro (i.sp). Mas a falta é nossa, não do
+   cliente — por isso mantém-se o preço de i.p (950) e diz-se porquê na folha do açaí.
+   Com só um dos dois esgotado não há nada a fazer: o cliente escolhe o outro e fica em i.p. */
+function acaiBaseToda(i){ return !!i.base && i.base.length>0 && i.base.every(s=>exOff("acai",s)); }
+function nivelAcai(i,top){
+ if(acaiBaseToda(i)) return "p";
+ return top.some(s=>i.base.includes(s)) ? "p" : "sp";
+}
 function precoAcaiDe(i,top,xt){ return i[nivelAcai(i,top)] + (xt?xt.length:0)*i.xp; }
 /* o que segue para a cozinha, sempre em português e pela ordem do menu (o mesmo açaí junta-se no carrinho) */
 function optsAcai(i,top,xt){
@@ -2940,15 +3048,23 @@ function acaiHTML(i){
  const q=s=>s.replace(/'/g,"\\'");
  const estrela='<svg class="estrela" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="#FFC400" stroke="#C98A00" stroke-width="1.3" stroke-linejoin="round"/></svg>';
  /* escolha incluída no preço. sub = texto pequeno por baixo ("incluído"); a recomendada (i.rec) leva estrela e "recomendamos" */
- const chip=(s,sub)=>{ const on=cur.top.includes(s), rec=(s===i.rec);
-  return `<button type="button" class="chip${on?" sel":""}${rec?" rec":""}${sub?" tl":""}" aria-pressed="${on}" onclick="tglTop('${q(s)}',this)">${td(s)}`+
-   (rec?`${estrela}<small class="rec">${t("acaiRec")}</small>`:"")+(sub?`<small class="inc">${sub}</small>`:"")+`</button>`; };
- const extra=s=>`<button type="button" class="chip xt tl" aria-pressed="false" onclick="tglXt('${q(s)}',this)">${td(s)}<small>+${i.xp} ECV</small></button>`;
+ const esg=`<small class="esgx">${ext("acabou")}</small>`;
+ const chip=(s,sub)=>{ const on=cur.top.includes(s), rec=(s===i.rec), fo=exOff("acai",s);
+  return `<button type="button" class="chip${on?" sel":""}${rec&&!fo?" rec":""}${(sub||fo)?" tl":""}${fo?" esg":""}" aria-pressed="${on}"`+
+   (fo?' disabled aria-disabled="true"':` onclick="tglTop('${q(s)}',this)"`)+`>${td(s)}`+
+   (fo?esg:(rec?`${estrela}<small class="rec">${t("acaiRec")}</small>`:"")+(sub?`<small class="inc">${sub}</small>`:""))+`</button>`; };
+ const extra=s=>{ const fo=exOff("acaix",s);
+  return `<button type="button" class="chip xt tl${fo?" esg":""}" aria-pressed="false"`+
+   (fo?' disabled aria-disabled="true"':` onclick="tglXt('${q(s)}',this)"`)+
+   `>${td(s)}${fo?esg:`<small>+${i.xp} ECV</small>`}</button>`; };
  const grupo=(n,k,tag,chips)=>`<div class="acai-h"><div class="lbl"><i>${n}</i>${t(k)}</div>${tag?`<em>${tag}</em>`:""}</div>
    <div class="opttop g2">${chips}</div>`;
  const inc=t("acaiInc");
- return (escMostra()?`<div class="campopt">${et("escOpt")}</div>`:(campMostra()?`<div class="campopt">${ct("campOpt")}${campDiaTxt()?" "+ct("campPara"):""}</div>`:`<div class="campopt">${et("acaiOpt")}</div>`))+`<div class="acai-pr" id="acaiPr">`+
-   ["p","sp"].map(n=>`<div data-n="${n}"><span>${t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
+ /* granola E leite em pó esgotados: só se mostra (e só se cobra) o preço de baixo */
+ const semBase=acaiBaseToda(i);
+ return (escMostra()?`<div class="campopt">${et("escOpt")}</div>`:(campMostra()?`<div class="campopt">${ct("campOpt")}${campDiaTxt()?" "+ct("campPara"):""}</div>`:`<div class="campopt">${et("acaiOpt")}</div>`))+
+   (semBase?`<div class="acaiav">${ext("semBase",i.p)}</div>`:"")+`<div class="acai-pr" id="acaiPr">`+
+   (semBase?["p"]:["p","sp"]).map(n=>`<div data-n="${n}"><span>${semBase?ext("soAcai"):t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
    grupo(1,"acaiG1",inc,i.base.map(s=>chip(s)).join(""))+
    grupo(2,"acaiG2",inc,i.fr.map(s=>chip(s)).join(""))+
    grupo(3,"acaiG3","",i.tp.map(s=>chip(s,t("acaiIncC"))).join("")+i.xt.map(extra).join(""));
@@ -3686,6 +3802,21 @@ async function sendWA(){
  const precisa=pagaAntes();
  if(precisa&&!banco){avisar("avbanco");return;}
  enviando=true;
+ /* 03-11-2026: algum extra escolhido acabou entretanto? O cliente tem de o ver antes de enviar
+    (e antes de transferir): retira-se do pedido, corrige-se o preço e pede-se confirmação. */
+ {
+  const t0=total(), sig0=cart.map(i=>i.key+"x"+i.q).join("|");
+  await carregarEsgotados();              /* lê a lista do dia outra vez: produtos e extras */
+  const mudou=exLimparCarrinho();
+  if(mudou.length || cart.map(i=>i.key+"x"+i.q).join("|")!==sig0){
+   enviando=false;
+   if(!cart.length){ avisar("avvazio"); return; }
+   if(mudou.length)
+    alert(ext("aviso")+"\n\n"+mudou.map(m=>"• "+m.nome+" — "+m.extras.map(x=>x+" ("+ext("acabou")+")").join(", ")).join("\n")+
+          (total()!==t0 ? "\n\n"+t("seupedido")+": "+total()+" ECV" : ""));
+   openCart(); return;
+  }
+ }
  /* última verificação das opções do dia: se a campanha acabou entretanto (ou passou a ser só hora
     marcada), o cliente vê o total certo antes de transferir */
  {
