@@ -1713,10 +1713,18 @@ document.querySelectorAll(".estado.cfg:not(.camp)").forEach(box=>{
  cab.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); alt(); } });
 });
 
+/* 03-11-2026: as acções levam SEMPRE o dia em que o pedido está guardado (p._dia).
+   A Gestão mostra hoje + 2 dias seguintes; sem &dia= o servidor procurava só nos de hoje
+   e um pedido para amanhã dava "Pedido não encontrado." (Comprovativo recebido, Cancelar, Apagar…).
+   Também resolve o caso de uma acção feita depois da meia-noite com a lista do dia anterior. */
+function diaDoPedido(id){
+ const p=(pedidos||[]).find(x=>x.id===id);
+ return (p && p._dia) ? "&dia="+encodeURIComponent(p._dia) : "";
+}
 async function apagar(id,code){
  if(!confirm("Apagar definitivamente o pedido "+(code||"")+" ?\n\nDesaparece da lista e do fecho do dia. O stock que tinha descontado é devolvido. Não dá para recuperar.")) return;
  try{
-  const r=await fetch(PROMO_API+"/order-del?key="+encodeURIComponent(KEY)+"&id="+id,{method:"POST"});
+  const r=await fetch(PROMO_API+"/order-del?key="+encodeURIComponent(KEY)+"&id="+id+diaDoPedido(id),{method:"POST"});
   const d=await r.json();
   if(d.erro){ alert(d.erro); return; }
  }catch(e){ alert("Não foi possível apagar."); return; }
@@ -1726,7 +1734,7 @@ async function apagar(id,code){
 async function mudar(id,st){
  if(st==="cancelado" && !confirm("Cancelar este pedido?")) return;
  try{
-  const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st,{method:"POST"});
+  const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st+diaDoPedido(id),{method:"POST"});
   const d=await r.json();
   if(d.erro){ alert(d.erro); return; }
  }catch(e){ alert("Não foi possível guardar."); return; }
