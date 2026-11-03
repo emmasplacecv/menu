@@ -1369,13 +1369,26 @@ function haQuanto(ms){
 /* 23-10-2026: "Visto pela cozinha às HH:MM:SS" — só pedidos do site. Pedidos de antes desta
    versão (sem confHora nem visto) não mostram nada. Amarelo até VISTO_ALERTA_MIN, depois vermelho. */
 const VISTO_ALERTA_MIN=2;
+/* 03-11-2026: horário (minutos desde as 00h00) — igual ao do site. */
+const HORARIO_GES={1:[480,1020],2:[480,1020],3:[480,1020],4:[480,1020],5:[480,1020],6:[540,900]};
 function linhaVisto(p){
  if(p.balcao) return "";
  if(p.visto) return `<span class="vst ok">👀 Visto pela cozinha às ${hEsc(p.visto)}</span>`;
- if(!p.confHora || p._futuro || !["confirmado","preparar","pronto"].includes(p.status)) return "";
+ if(!p.confHora || !["confirmado","preparar","pronto"].includes(p.status)) return "";
+ /* 03-11-2026: pedido para amanhã (ou depois) já confirmado — a Cozinha já o tem na lista,
+    tapado até alguém o abrir. Sem contagem de minutos: a cozinha pode estar fechada. */
+ if(p._futuro) return `<span class="vst esp">✅ Já está na cozinha · ⏳ ainda não viu</span>`;
  const [h,m,sg]=String(p.confHora).split(":").map(Number);
  const [y,mo,d]=String(p._dia||"").split("-").map(Number);
- const desde=new Date(y,(mo||1)-1,d||1,h||0,m||0,sg||0).getTime();
+ let desde=new Date(y,(mo||1)-1,d||1,h||0,m||0,sg||0).getTime();
+ /* confHora só tem a hora. Se dá um instante ainda por vir, foi confirmado num dia anterior
+    (pedido fora de horas). Os minutos de atraso contam a partir da abertura de hoje — antes
+    disso a cozinha estava fechada e não é atraso. */
+ const hz=HORARIO_GES[new Date().getDay()];
+ const abre=hz ? new Date(new Date().setHours(Math.floor(hz[0]/60),hz[0]%60,0,0)).getTime() : null;
+ if(desde>Date.now()) desde=abre||Date.now();
+ if(abre && desde<abre) desde=abre;
+ if(abre && Date.now()<abre) return `<span class="vst esp">⏳ Cozinha ainda não viu · ainda não abriu</span>`;
  const min=Math.max(0,Math.floor((Date.now()-desde)/60000));
  if(min>=VISTO_ALERTA_MIN) return `<span class="vst atr">⚠️ Cozinha ainda não viu · há ${min} min</span>`;
  return `<span class="vst esp">⏳ Cozinha ainda não viu</span>`;

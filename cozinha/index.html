@@ -72,6 +72,13 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped.capa:active{transform:scale(.985);}
 .ped.capa .sino{font-size:42px;line-height:1;margin-bottom:10px;animation:capaSino 1.6s ease-in-out infinite;}
 .ped.capa .t1{font-size:13px;letter-spacing:2.4px;font-weight:700;color:#F2C9AE;}
+.ped.capa .t0{margin-top:7px;padding:4px 12px;border-radius:999px;background:#F2C9AE;color:#4A2259;font-size:12px;font-weight:800;letter-spacing:1.6px;}
+/* 03-11-2026: pedidos dos dias seguintes */
+.diasep{grid-column:1/-1;margin:14px 0 2px;padding:9px 13px;border-radius:12px;background:var(--dark);color:#F7F1E4;
+ font-size:12.5px;font-weight:700;letter-spacing:1.6px;}
+.diasep:first-child{margin-top:0;}
+.diasep.fut{background:#8A5A12;}
+.ped .hora b.pdia{margin-left:6px;padding:3px 8px;border-radius:7px;background:#F6E7C9;color:#8A5A12;font-size:11.5px;letter-spacing:1px;}
 .ped.capa .t2{font-size:34px;font-weight:800;letter-spacing:-.6px;margin:6px 0 16px;}
 .ped.capa .bt{padding:14px 28px;border-radius:999px;background:#F7F1E4;color:#4A2259;font-size:17px;font-weight:800;letter-spacing:.3px;}
 @keyframes capaPulso{0%,100%{box-shadow:0 0 0 0 rgba(224,138,95,.55);}50%{box-shadow:0 0 0 9px rgba(224,138,95,0);}}
@@ -308,6 +315,7 @@ async function entrar(){
   pedidos=d.pedidos||[];
   if(d.versao) _versaoSrv=d.versao;
  }catch(e){ $("loginMsg").className="msg bad"; $("loginMsg").textContent="Sem ligação ao servidor."; return; }
+ await carregarFuturos(true); pedidos=comFuturos(pedidos);
  try{ localStorage.setItem("ep_cozinha_key", KEY); }catch(e){}
  $("loginBox").style.display="none";
  $("painel").style.display="block";
@@ -333,6 +341,61 @@ async function entrar(){
 }
 
 let _assinatura="", _ultimaOk=0, falhas=0, _aCarregar=false;
+
+/* ============================================================
+   PEDIDOS PARA OS DIAS SEGUINTES (03-11-2026)
+   Um pedido feito fora de horas fica guardado no dia do levantamento (amanhã, ou segunda
+   se for sábado à noite). Antes a Cozinha só lia os de hoje: mesmo com a transferência
+   confirmada na Gestão, o pedido só aparecia depois da meia-noite.
+   Agora lê também os 2 dias seguintes (os mesmos que a Gestão mostra). O servidor só manda
+   à Cozinha os confirmados, por isso o pedido aparece logo que a Gestão carrega em
+   «Comprovativo recebido» e fica na lista até ser preparado.
+   Os de hoje continuam de 3 em 3 s; os dos dias seguintes de FUT_CADA_S em FUT_CADA_S s
+   (não precisam de mais e poupa pedidos ao servidor).
+   ============================================================ */
+const DIAS_FUT=[1,2], FUT_CADA_S=10;
+let _fut={}, _futT=0;                         // dia ISO -> pedidos desse dia
+function isoDia(k){ const d=new Date(Date.now()+k*86400000);
+ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+async function carregarFuturos(forcar){
+ if(!forcar && Date.now()-_futT < FUT_CADA_S*1000) return;
+ _futT=Date.now();
+ const dias=DIAS_FUT.map(isoDia);
+ Object.keys(_fut).forEach(d=>{ if(!dias.includes(d)) delete _fut[d]; });   // passou a meia-noite
+ await Promise.all(dias.map(async dia=>{
+  try{
+   const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY)+"&dia="+dia,{cache:"no-store"});
+   const d=await r.json();
+   if(d && !d.erro && Array.isArray(d.pedidos))
+    _fut[dia]=d.pedidos.map(p=>Object.assign(p,{_dia:dia,_futuro:true}));
+  }catch(e){}                                   // sem rede: fica a lista anterior desse dia
+ }));
+}
+function comFuturos(hoje){
+ const ids=new Set((hoje||[]).map(p=>p.id));
+ const fut=[];
+ DIAS_FUT.map(isoDia).forEach(d=>(_fut[d]||[]).forEach(p=>{ if(!ids.has(p.id)) fut.push(p); }));
+ return (hoje||[]).concat(fut);
+}
+/* acções num pedido dos dias seguintes levam o dia (sem ele o servidor procura só nos de hoje) */
+function diaQ(id){
+ const p=(pedidos||[]).find(x=>x.id===id);
+ return (p && p._futuro && p._dia) ? "&dia="+encodeURIComponent(p._dia) : "";
+}
+function rotuloDia(iso){
+ const [y,m,d]=String(iso).split("-").map(Number), dt=new Date(y,m-1,d);
+ const txt=dt.toLocaleDateString("pt-PT",{weekday:"long",day:"2-digit",month:"long"}).toUpperCase();
+ return iso===isoDia(1) ? "AMANHÃ · "+txt : txt;
+}
+function curtoDia(iso){
+ if(iso===isoDia(1)) return "AMANHÃ";
+ const [y,m,d]=String(iso).split("-").map(Number);
+ return new Date(y,m-1,d).toLocaleDateString("pt-PT",{weekday:"long"}).toUpperCase();
+}
+/* horário (minutos desde as 00h00) — igual ao do site. Fora dele o alarme não repete. */
+const HORARIO_COZ={1:[480,1020],2:[480,1020],3:[480,1020],4:[480,1020],5:[480,1020],6:[540,900]};
+function cozinhaAberta(){ const n=new Date(), h=HORARIO_COZ[n.getDay()], m=n.getHours()*60+n.getMinutes();
+ return !!h && m>=h[0] && m<h[1]; }
 /* Sessão guardada neste aparelho — actualizar a página não obriga a
    escrever a chave outra vez. O botão "Sair" apaga-a. */
 try{
@@ -353,7 +416,8 @@ async function carregar(){
   const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY),{cache:"no-store"});
   const d=await r.json();
   if(!d.erro){
-   pedidos=d.pedidos||[];
+   await carregarFuturos();
+   pedidos=comFuturos(d.pedidos||[]);
    if(d.versao) _versaoSrv=d.versao;
    if(d._offline) falhas=Math.max(falhas,2);          // veio da cópia deste aparelho (sem internet)
    else { _ultimaOk=Date.now(); falhas=0; }
@@ -479,22 +543,34 @@ function desenhar(){
  /* fila única: balcão e online misturados, por hora de levantamento;
     em empate manda quem pediu primeiro */
  l = l.slice().sort((a,b)=>
+  (a._futuro?a._dia:"0").localeCompare(b._futuro?b._dia:"0") ||      // hoje primeiro, depois amanhã…
   (a.slot||"99:99").localeCompare(b.slot||"99:99") ||
   (a.criado||"99:99").localeCompare(b.criado||"99:99"));
+ /* separador por dia — só quando há pedidos de mais de um dia, para não encher o ecrã */
+ const variosDias = l.some(p=>p._futuro);
+ let grupo = null;
  $("lista").innerHTML=l.map(p=>{
+  const g = p._futuro ? p._dia : "hoje";
+  const sep = (variosDias && g!==grupo) ? `<div class="diasep${p._futuro?" fut":""}">${p._futuro?rotuloDia(p._dia):"HOJE"}</div>` : "";
+  grupo = g;
+  return sep + cartaoPed(p);
+ }).join("");
+}
+function cartaoPed(p){ {
   const ent=p.modo==="entrega";
   let acts="";
   if(p.status==="confirmado") acts=`<button class="bnx" onclick="mudar('${p.id}','preparar')">Começar</button>`;
   else if(p.status==="preparar") acts=`<button class="bok" onclick="mudar('${p.id}','pronto')">Pronto</button>`;
   else if(p.status==="pronto") acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Saiu":"Levantado"}</button>`;
   acts += `<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')" title="Apagar pedido">🗑</button>`;
-  const atr=(p.status!=="entregue"&&atrasado(p.slot));
+  const atr=(!p._futuro && p.status!=="entregue" && atrasado(p.slot));
   const porVer=precisaVisto(p);
   /* 03-11-2026: por ver → só a capa. O quadrado inteiro é o botão; nada do pedido aparece. */
   if(porVer) return `<div class="ped capa" role="button" tabindex="0" aria-label="Pedido novo do website — ver pedido"
      onclick="marcarVisto('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();marcarVisto('${p.id}')}">
     <div class="sino">🔔</div>
     <div class="t1">PEDIDO NOVO · ${ent?"WEBSITE · ENTREGA":"WEBSITE"}</div>
+    ${p._futuro?`<div class="t0">PARA ${curtoDia(p._dia)}</div>`:""}
     <div class="t2">Ver pedido</div>
     <div class="bt">👆 Toque para abrir</div>
    </div>`;
@@ -503,34 +579,34 @@ function desenhar(){
    ${blocoNotas(p)}
    <ul>${(p.itens||[]).map(i=>`<li>${artigo(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${esc(p.zona)}${p.morada?" — "+esc(p.morada):""}</div>`:(p.morada?`<div class="mor">📍 ${esc(p.morada)}</div>`:"")}${p.piso>0?`<div class="andar">🏢 ${esc(p.piso)}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${esc(p.taxaAndar)} ECV</div>`:""}
-   <div class="top sep"><span class="hora">${ent?"sair":"levantar"} <b>${p.slot||"—"}</b></span>
+   <div class="top sep"><span class="hora">${ent?"sair":"levantar"} <b>${p.slot||"—"}</b>${p._futuro?` <b class="pdia">${curtoDia(p._dia)}</b>`:""}</span>
     <span class="tipo ${p.balcao?"":(ent?"ent":"web")}">${p.balcao?"BALCÃO":(ent?"WEBSITE · ENTREGA":"WEBSITE")}</span></div>
-   <div class="meta">${p.code||""}${p.quando&&p.quando!=="hoje"?" · <b>"+p.quando+"</b>":""}${p.criado?" · pedido às "+p.criado:""}${!p.balcao&&vistoDe(p)?' · <span class="vistoOk">👀 visto às '+vistoDe(p)+'</span>':""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
+   <div class="meta">${p.code||""}${p.criado?" · pedido às "+p.criado:""}${!p.balcao&&vistoDe(p)?' · <span class="vistoOk">👀 visto às '+vistoDe(p)+'</span>':""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
    ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
    <div class="acts">${acts}</div>
   </div>`;
- }).join("");
+ }
 }
 
 async function apagar(id,code){
  if(!confirm("Apagar o pedido "+(code||"")+" ?\n\nDesaparece da lista e o stock que tinha descontado é devolvido. Não há forma de recuperar.")) return;
  try{
-  const r=await fetch(PROMO_API+"/order-del?key="+encodeURIComponent(KEY)+"&id="+id,{method:"POST"});
+  const r=await fetch(PROMO_API+"/order-del?key="+encodeURIComponent(KEY)+"&id="+id+diaQ(id),{method:"POST"});
   const d=await r.json();
   if(d.erro){ alert(d.erro); return; }
  }catch(e){ alert("Não foi possível apagar. Verifique a ligação."); return; }
- _assinatura=""; carregar();
+ _assinatura=""; _futT=0; carregar();
 }
 
 async function mudar(id,st){
  try{
   /* 23-10-2026: mudar o estado também conta como "visto" (visto=1; servidor antigo ignora) */
-  const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st+"&visto=1",{method:"POST"});
+  const r=await fetch(PROMO_API+"/order-status?key="+encodeURIComponent(KEY)+"&id="+id+"&st="+st+"&visto=1"+diaQ(id),{method:"POST"});
   const d=await r.json();
   if(d.erro){ alert(d.erro); return; }
  }catch(e){ alert("Não foi possível guardar. Verifique a ligação."); return; }
- carregar();
+ _futT=0; carregar();                 // relê já os dias seguintes, sem esperar os 10 s
 }
 
 /* ================= VISTO PELA COZINHA (23-10-2026) =================
@@ -563,7 +639,7 @@ async function enviarVisto(id){
   if(_vistoEnvio[id]) return;
   _vistoEnvio[id]=1;
   try{
-    const r=await fetch(PROMO_API+"/order-visto?key="+encodeURIComponent(KEY)+"&id="+encodeURIComponent(id),{method:"POST"});
+    const r=await fetch(PROMO_API+"/order-visto?key="+encodeURIComponent(KEY)+"&id="+encodeURIComponent(id)+diaQ(id),{method:"POST"});
     const d=await r.json();
     if(d && d.ok){ delete _vistoPend[id]; guardarPend(); return; }
     if(d && d.erro==="Pedido não encontrado."){ delete _vistoPend[id]; guardarPend(); }
@@ -646,7 +722,9 @@ function alertaRepete(){
   document.title = n ? ("(" + n + ") Pedido novo · " + _tituloBase) : _tituloBase;
   if(n && !_alertaT) _alertaT = setInterval(() => {
     if(!porVerAgora()){ clearInterval(_alertaT); _alertaT = null; alertaRepete(); return; }
-    if(document.visibilityState === "visible") tocarAlerta();
+    /* 03-11-2026: fora de horas a capa fica, mas não toca de 10 em 10 s a noite toda —
+       toca uma vez quando o pedido chega e volta a repetir quando a cozinha abrir */
+    if(document.visibilityState === "visible" && cozinhaAberta()) tocarAlerta();
   }, ALERTA_REPETE_S * 1000);
   if(!n && _alertaT){ clearInterval(_alertaT); _alertaT = null; }
 }
