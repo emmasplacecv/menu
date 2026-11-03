@@ -64,6 +64,19 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped .porVer{margin:-15px -16px 12px;padding:10px 16px;border-radius:14px 14px 0 0;background:#FBE3D6;color:#7A2E12;
  font-size:14px;font-weight:700;letter-spacing:.3px;}
 .ped.porVer{border-color:#E08A5F;cursor:pointer;}
+/* 03-11-2026: capa do pedido por ver — o quadrado inteiro é o botão */
+.ped.capa{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+ min-height:230px;padding:22px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;
+ background:linear-gradient(160deg,#5A2A6B 0%,#4A2259 60%,#3C1B49 100%);color:#F7F1E4;
+ border:3px solid #E08A5F;animation:capaPulso 1.6s ease-in-out infinite;}
+.ped.capa:active{transform:scale(.985);}
+.ped.capa .sino{font-size:42px;line-height:1;margin-bottom:10px;animation:capaSino 1.6s ease-in-out infinite;}
+.ped.capa .t1{font-size:13px;letter-spacing:2.4px;font-weight:700;color:#F2C9AE;}
+.ped.capa .t2{font-size:34px;font-weight:800;letter-spacing:-.6px;margin:6px 0 16px;}
+.ped.capa .bt{padding:14px 28px;border-radius:999px;background:#F7F1E4;color:#4A2259;font-size:17px;font-weight:800;letter-spacing:.3px;}
+@keyframes capaPulso{0%,100%{box-shadow:0 0 0 0 rgba(224,138,95,.55);}50%{box-shadow:0 0 0 9px rgba(224,138,95,0);}}
+@keyframes capaSino{0%,100%{transform:rotate(0);}10%{transform:rotate(14deg);}20%{transform:rotate(-12deg);}30%{transform:rotate(8deg);}40%{transform:rotate(0);}}
+@media (prefers-reduced-motion:reduce){.ped.capa,.ped.capa .sino{animation:none;}}
 .ped .vistoOk{color:#2E6B33;font-weight:700;}
 .ped .cli .tel{font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;
  color:var(--verde);text-decoration:none;}
@@ -299,6 +312,7 @@ async function entrar(){
  $("loginBox").style.display="none";
  $("painel").style.display="block";
  _assinatura=""; desenhar();
+ alertaRepete();              // 03-11-2026: pedidos por ver ao abrir a app → título e alarme logo, sem esperar 3 s
  aplicarMenuStk().then(()=>{ _assinatura=""; desenhar(); });   // 22-10: categorias com leite e produtos do /admin
  manterEcraAceso();
  botaoNotificacoes();
@@ -349,6 +363,7 @@ async function carregar(){
    reenviarVistos();
    const nova=pedidos.map(p=>p.id+":"+p.status+":"+p.slot+":"+(p.balcaoPago?1:0)+":"+(p.notas||"")+":"+(vistoDe(p)||"")).join("|");
    if(nova!==_assinatura){ _assinatura=nova; desenhar(); }
+   alertaRepete();
   }
  }catch(e){ falhas++; }
  _aCarregar=false;
@@ -475,8 +490,15 @@ function desenhar(){
   acts += `<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')" title="Apagar pedido">🗑</button>`;
   const atr=(p.status!=="entregue"&&atrasado(p.slot));
   const porVer=precisaVisto(p);
-  return `<div class="ped ${p.status}${atr?" atrasado":""}${porVer?" porVer":""}" onclick="marcarVisto('${p.id}')">
-   ${porVer?`<div class="porVer">👆 PEDIDO NOVO DO WEBSITE · toque para avisar que viu</div>`:""}
+  /* 03-11-2026: por ver → só a capa. O quadrado inteiro é o botão; nada do pedido aparece. */
+  if(porVer) return `<div class="ped capa" role="button" tabindex="0" aria-label="Pedido novo do website — ver pedido"
+     onclick="marcarVisto('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();marcarVisto('${p.id}')}">
+    <div class="sino">🔔</div>
+    <div class="t1">PEDIDO NOVO · ${ent?"WEBSITE · ENTREGA":"WEBSITE"}</div>
+    <div class="t2">Ver pedido</div>
+    <div class="bt">👆 Toque para abrir</div>
+   </div>`;
+  return `<div class="ped ${p.status}${atr?" atrasado":""}" onclick="marcarVisto('${p.id}')">
    <div class="cli"><b>${esc(p.nome||"(sem nome)")}</b>${p.tel?`<a class="tel" href="tel:${esc(String(p.tel).replace(/\s/g,""))}">${esc(p.tel)}</a>`:""}</div>
    ${blocoNotas(p)}
    <ul>${(p.itens||[]).map(i=>`<li>${artigo(i)}</li>`).join("")}</ul>
@@ -523,9 +545,17 @@ try{ _vistoPend=JSON.parse(localStorage.getItem(VISTO_LS)||"{}")||{}; }catch(e){
 function guardarPend(){ try{ localStorage.setItem(VISTO_LS, JSON.stringify(_vistoPend)); }catch(e){} }
 function servidorTemVisto(){ return String(_versaoSrv||"") >= "2026-10-23"; }
 function vistoDe(p){ return p.visto || _vistoPend[p.id] || ""; }
+/* 03-11-2026: o pedido novo do website chega TAPADO — o quadrado inteiro é o botão «Ver pedido».
+   Só se vê nome, produtos e notas depois do toque, e é esse toque que grava a hora que a Gestão mostra
+   ("👀 Visto pela cozinha às …"). Assim ninguém lê o pedido sem ficar registado.
+   Servidor de 23-10 ou mais novo: tapa os pedidos com confHora ainda por ver (como antes).
+   Servidor antigo (não grava o "visto"): tapa só os pedidos novos (confirmado); o toque fica guardado
+   neste aparelho e a Gestão não mostra a hora até o Worker ser actualizado. */
 function precisaVisto(p){
-  return servidorTemVisto() && !p.balcao && !/^BAL-/.test(String(p.code||"")) && !p._offline && !!p.confHora &&
-         !vistoDe(p) && (p.status==="confirmado"||p.status==="preparar"||p.status==="pronto");
+  if(p.balcao || /^BAL-/.test(String(p.code||"")) || p._offline || vistoDe(p)) return false;
+  if(servidorTemVisto())
+    return !!p.confHora && (p.status==="confirmado"||p.status==="preparar"||p.status==="pronto");
+  return p.status==="confirmado";
 }
 function horaAgora(){ const d=new Date(), z=n=>String(n).padStart(2,"0"); return z(d.getHours())+":"+z(d.getMinutes())+":"+z(d.getSeconds()); }
 const _vistoEnvio={};
@@ -545,10 +575,15 @@ function marcarVisto(id){
   if(!p || !precisaVisto(p)) return;
   _vistoPend[id]=horaAgora(); guardarPend();
   _assinatura=""; desenhar();
-  enviarVisto(id);
+  if(servidorTemVisto()) enviarVisto(id);
+  alertaRepete();                      // pára o alarme se já não houver nenhum por ver
 }
 function reenviarVistos(){
-  if(!servidorTemVisto()) return;
+  if(!servidorTemVisto()){
+    /* servidor antigo: o toque só vive aqui — esquece os pedidos que já saíram da lista de hoje */
+    Object.keys(_vistoPend).forEach(id=>{ if(!pedidos.some(x=>x.id===id)){ delete _vistoPend[id]; guardarPend(); } });
+    return;
+  }
   Object.keys(_vistoPend).forEach(id=>{
     const p=pedidos.find(x=>x.id===id);
     if(!p){ delete _vistoPend[id]; guardarPend(); return; }   // já não está na lista de hoje
@@ -596,6 +631,24 @@ function verificarNovos(lista){
     setTimeout(() => { document.title = t; }, 8000);
   }
   return novos;
+}
+
+/* 03-11-2026: ALARME ATÉ VER — enquanto houver um pedido tapado, toca e vibra de ALERTA_REPETE_S em
+   ALERTA_REPETE_S segundos, com a app aberta. Pára sozinho quando todos forem abertos.
+   Com o telemóvel bloqueado o browser congela os temporizadores: aí chega só a notificação do servidor
+   (uma vez). Por isso a cozinha deve ficar com a app aberta e o ecrã aceso (manterEcraAceso). */
+const ALERTA_REPETE_S = 10;
+let _alertaT = null, _tituloBase = null;
+function porVerAgora(){ return (pedidos||[]).filter(precisaVisto).length; }
+function alertaRepete(){
+  const n = porVerAgora();
+  if(_tituloBase === null) _tituloBase = document.title.replace(/^\(\d+\)\s*/, "");
+  document.title = n ? ("(" + n + ") Pedido novo · " + _tituloBase) : _tituloBase;
+  if(n && !_alertaT) _alertaT = setInterval(() => {
+    if(!porVerAgora()){ clearInterval(_alertaT); _alertaT = null; alertaRepete(); return; }
+    if(document.visibilityState === "visible") tocarAlerta();
+  }, ALERTA_REPETE_S * 1000);
+  if(!n && _alertaT){ clearInterval(_alertaT); _alertaT = null; }
 }
 
 /* Botão de som + desbloqueio do áudio (os browsers exigem um toque) */
