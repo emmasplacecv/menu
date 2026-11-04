@@ -1,0 +1,10 @@
+# GitHub Pages: ficheiros internos que não devem aparecer no site emmasplace.cv
+exclude:
+  - CLAUDE.md
+  - ROADMAP.md
+  - README.md
+  - docs/
+  - tests/
+  - package.json
+  - package-lock.json
+  - node_modules/
