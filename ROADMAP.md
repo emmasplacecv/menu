@@ -41,7 +41,7 @@ Cada linha diz quem decide ou quem faz: **Dono** = decisão do negócio · **Wor
    ou pedir a escolha ao cliente. → *Dono*
 7. Retenção dos pedidos no servidor: confirmar quantos dias o Worker guarda. A cópia mensal (PR 5) deve ser feita **todos os meses**. → *Dono*
 8. Chave dos painéis no endereço (`?key=`): fica nos registos da Cloudflare. Passar para um cabeçalho `Authorization`
-   e ter uma chave por painel (Vendas não precisa de mexer em preços). → *Worker*
+   e confirmar que a chave de cada painel só abre o que precisa (as Vendas não precisam de mexer em preços). → *Worker*
 9. Comprovativos (`POST /comprovativo`): limitar tamanho e tipo de ficheiro no servidor. → *Worker*
 10. Repositório público: qualquer pessoa lê o código e a documentação. Avaliar repositório privado
     (o GitHub Pages em repositório privado exige plano pago). → *Dono*
