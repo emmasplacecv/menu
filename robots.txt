@@ -1,0 +1,7 @@
+# Emma's Place — as páginas públicas podem ser lidas pelos motores de pesquisa.
+# Os painéis internos (/admin, /vendas, /cozinha, /relatorios) ficam fora do Google com <meta name="robots" content="noindex">
+# e são protegidos por chave. (Não se bloqueiam aqui: o Google tem de os poder ler para ver o "noindex".)
+User-agent: *
+Allow: /
+
+Sitemap: https://emmasplace.cv/sitemap.xml
