@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2E2018">
+<link rel="icon" href="/admin/icon-192.png">
+<title>Relatórios — Emma's Place</title>
+<!-- 04-11-2026: RELATÓRIOS DO MÊS — só lê do servidor (nunca muda nada).
+     1) CSV para a contabilista: um pedido por linha, sem nome nem telefone do cliente, e resumo por dia.
+     2) Cópia de segurança: todos os pedidos do mês tal como estão no servidor (JSON), com os dados dos clientes.
+     3) Vendas por produto e por hora (no ecrã e em CSV).
+     Usa a chave da Gestão (se já tiver entrado na Gestão neste aparelho, não pede outra vez).
+     Dias que o servidor já não tem são completados com a cópia que a Gestão guarda neste aparelho (ep_hist_…). -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Jost:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--cream:#F3ECDD;--card:#FBF7EE;--line:#E5D9C2;--ink:#3B2314;--ink2:#7A5A3C;
+ --gold:#C89B6D;--dark:#2E2018;--vermelho:#8C2F2F;--verde:#2E6B32;}
+body{background:var(--cream);color:var(--ink);font-family:'Jost',system-ui,sans-serif;padding-bottom:60px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:720px;margin:0 auto;padding:22px 15px;}
+h1{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:1px;}
+h2{font-family:'Playfair Display',serif;font-size:19px;margin:22px 0 8px;}
+.sub{font-size:14px;color:var(--ink2);font-weight:300;margin-top:4px;line-height:1.5;}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:18px;}
+.lbl{font-size:13px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin-bottom:8px;}
+.fld{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;font-family:inherit;font-size:16px;color:var(--ink);}
+.fld:focus{outline:none;border-color:var(--gold);}
+.btn{width:100%;padding:14px;border-radius:40px;background:var(--dark);color:#F7F1E4;border:none;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px;}
+.btn.sec{background:transparent;color:var(--dark);border:2px solid var(--dark);}
+.btn:disabled{opacity:.45;}
+.msg{font-size:14px;margin-top:10px;min-height:18px;line-height:1.45;}
+.msg.bad{color:var(--vermelho);} .msg.good{color:var(--verde);font-weight:600;}
+.aviso{background:#FFF6E2;border:1px solid var(--gold);border-radius:12px;padding:11px 13px;font-size:13.5px;line-height:1.45;margin-top:12px;}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;}
+.kpi small{display:block;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);}
+.kpi b{font-size:20px;}
+.tw{overflow-x:auto;margin-top:6px;}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:12px;overflow:hidden;}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;}
+th{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);background:var(--card);}
+td.n,th.n{text-align:right;}
+tr.tot td{font-weight:700;background:var(--card);}
+.bar{display:inline-block;height:9px;border-radius:5px;background:var(--gold);vertical-align:middle;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media (max-width:480px){ .row2{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Relatórios</h1>
+<div class="sub">Vendas do mês para a contabilista, cópia de segurança dos pedidos e vendas por produto e hora. Só lê, não muda nada.</div>
+
+<div class="box" id="loginBox">
+  <div class="lbl">CHAVE DA GESTÃO</div>
+  <input class="fld" id="fKey" type="password" placeholder="Escreva a chave da Gestão" autocomplete="off">
+  <button class="btn" id="btnEntrar" onclick="entrar()">Entrar</button>
+  <div class="msg" id="loginMsg"></div>
+</div>
+
+<div id="painel" style="display:none">
+  <div class="box">
+    <div class="lbl">MÊS</div>
+    <input class="fld" id="fMes" type="month">
+    <button class="btn" id="btnLer" onclick="lerMes()">Ver o mês</button>
+    <div class="msg" id="lerMsg"></div>
+  </div>
+
+  <div id="res" style="display:none">
+    <div class="kpis" id="kpis"></div>
+    <div id="avisos"></div>
+
+    <div class="box">
+      <div class="lbl">DESCARREGAR</div>
+      <div class="row2">
+        <button class="btn" onclick="baixarContabilista()">CSV para a contabilista</button>
+        <button class="btn" onclick="baixarResumoDias()">CSV resumo por dia</button>
+        <button class="btn sec" onclick="baixarProdutoHora()">CSV produto × hora</button>
+        <button class="btn sec" onclick="baixarCopia()">Cópia de segurança (JSON)</button>
+      </div>
+      <div class="aviso">O <b>CSV para a contabilista</b> não leva nome, telefone nem morada dos clientes.
+        A <b>cópia de segurança</b> leva tudo: guarde-a num sítio só seu (não envie por WhatsApp).
+        Os comprovativos (fotos e PDF) descarregam-se na Gestão &gt; Histórico &gt; «Guardar cópia completa».</div>
+    </div>
+
+    <h2>Por dia</h2><div class="tw" id="tDias"></div>
+    <h2>Por produto</h2><div class="tw" id="tProd"></div>
+    <h2>Por hora</h2><div class="tw" id="tHora"></div>
+  </div>
+</div>
+</div>
+
+<script>
+const PROMO_API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let KEY="", MES="", dados=[];      // dados = [{dia, pedidos:[…], fonte:"servidor"|"aparelho"|"falhou"}]
+
+/* ---------- entrar (a mesma chave e a mesma verificação da Gestão) ---------- */
+async function entrar(){
+ KEY=$("fKey").value.trim();
+ if(!KEY){ $("loginMsg").className="msg bad"; $("loginMsg").textContent="Escreva a chave."; return; }
+ $("loginMsg").className="msg"; $("loginMsg").textContent="A verificar…";
+ let d=null;
+ try{ const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY)+"&dia="+isoDia(new Date())); d=await r.json(); }catch(e){}
+ if(!d || d.erro || !Array.isArray(d.pedidos)){
+  $("loginMsg").className="msg bad"; $("loginMsg").textContent=(d&&d.erro)||"Não foi possível ligar ao servidor."; return;
+ }
+ $("loginBox").style.display="none"; $("painel").style.display="block";
+ const h=new Date(); $("fMes").value=h.getFullYear()+"-"+String(h.getMonth()+1).padStart(2,"0");
+}
+try{ const k=localStorage.getItem("ep_admin_key"); if(k){ $("fKey").value=k; entrar(); } }catch(e){}
+
+/* ---------- datas ---------- */
+function isoDia(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function diasDoMes(mes){
+ const [y,m]=mes.split("-").map(Number), out=[], hoje=isoDia(new Date());
+ for(let d=1; d<=new Date(y,m,0).getDate(); d++){ const s=y+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0"); if(s<=hoje) out.push(s); }
+ return out;
+}
+function dataPT(iso){ const [y,m,d]=iso.split("-"); return d+"/"+m+"/"+y; }
+
+/* ---------- ler o mês: dia a dia, 4 de cada vez ---------- */
+function copiaAparelho(dia){ try{ return JSON.parse(localStorage.getItem("ep_hist_"+dia)||"null"); }catch(e){ return null; } }
+async function lerDia(dia){
+ const local=copiaAparelho(dia)||[];
+ try{
+  const r=await fetch(PROMO_API+"/orders?key="+encodeURIComponent(KEY)+"&dia="+dia,{cache:"no-store"});
+  const d=await r.json();
+  if(d.erro || !Array.isArray(d.pedidos)) throw 0;
+  const tem=new Set(d.pedidos.map(p=>p.id||p.code));
+  const so=local.filter(p=>!tem.has(p.id||p.code));       // o servidor já não tem: fica a cópia do aparelho
+  return {dia, pedidos:d.pedidos.concat(so.map(p=>Object.assign({},p,{_soAparelho:true}))), fonte:so.length?"misto":"servidor"};
+ }catch(e){
+  return {dia, pedidos:local.map(p=>Object.assign({},p,{_soAparelho:true})), fonte:local.length?"aparelho":"falhou"};
+ }
+}
+async function lerMes(){
+ MES=$("fMes").value; if(!MES) return;
+ const dias=diasDoMes(MES);
+ $("btnLer").disabled=true; $("res").style.display="none";
+ const out=[]; let feitos=0;
+ for(let i=0;i<dias.length;i+=4){
+  const lote=await Promise.all(dias.slice(i,i+4).map(lerDia));
+  out.push(...lote); feitos+=lote.length;
+  $("lerMsg").className="msg"; $("lerMsg").textContent="A ler… "+feitos+" de "+dias.length+" dias";
+ }
+ dados=out; $("btnLer").disabled=false;
+ $("lerMsg").textContent=dias.length ? "" : "Este mês ainda não começou.";
+ if(dias.length) desenhar();
+}
+
+/* ---------- regras de contagem ---------- */
+const vendido=p=>p.status!=="cancelado";
+const ehBalcao=p=>!!(p&&(p.balcao||/^BAL-/.test(String(p.code||""))));
+function horaDe(p){ const m=/^(\d{1,2}):(\d{2})/.exec(String(p.feitoAs||p.criado||p.slot||"")); return m?+m[1]:null; }
+function pagamento(p){
+ if(ehBalcao(p)){
+  if(!p.balcaoPago) return "por cobrar";
+  const m=String(p.balcaoMetodo||"");
+  if(/^dividido/.test(m)) return "dividido (dinheiro + POS)";
+  return {dinheiro:"dinheiro",vinti4:"Vinti4 (POS)",transf:"transferência"}[m]||m||"pago";
+ }
+ return p.pago ? "transferência" : "no balcão";
+}
+function linhasDe(p){
+ if(Array.isArray(p.linhas)&&p.linhas.length) return p.linhas.map(l=>({n:String(l.n||"?"),q:+l.q||0,v:(+l.q||0)*(+l.p||0)}));
+ return null;
+}
+const todos=()=>dados.flatMap(d=>d.pedidos.map(p=>Object.assign({_dia:d.dia},p)));
+
+/* ---------- ecrã ---------- */
+function desenhar(){
+ const ps=todos(), vs=ps.filter(vendido);
+ const tot=vs.reduce((s,p)=>s+(+p.total||0),0);
+ const bal=vs.filter(ehBalcao), web=vs.filter(p=>!ehBalcao(p));
+ const somar=l=>l.reduce((s,p)=>s+(+p.total||0),0);
+ const porPag={}; vs.forEach(p=>{ const k=pagamento(p); porPag[k]=(porPag[k]||0)+(+p.total||0); });
+ $("kpis").innerHTML=
+  `<div class="kpi"><small>Vendido</small><b>${tot} ECV</b></div>
+   <div class="kpi"><small>Pedidos</small><b>${vs.length}</b></div>
+   <div class="kpi"><small>Balcão</small><b>${bal.length} · ${somar(bal)} ECV</b></div>
+   <div class="kpi"><small>Website</small><b>${web.length} · ${somar(web)} ECV</b></div>`+
+  Object.entries(porPag).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="kpi"><small>${esc(k)}</small><b>${v} ECV</b></div>`).join("");
+ const av=[];
+ const canc=ps.length-vs.length; if(canc) av.push(canc+" pedido(s) cancelado(s): aparecem no CSV com o estado, mas não contam nos totais.");
+ const falhou=dados.filter(d=>d.fonte==="falhou").map(d=>dataPT(d.dia));
+ if(falhou.length) av.push("<b>Sem resposta do servidor</b> nestes dias: "+falhou.join(", ")+". Volte a carregar antes de enviar à contabilista.");
+ const ap=dados.filter(d=>d.fonte==="aparelho"||d.fonte==="misto").map(d=>dataPT(d.dia));
+ if(ap.length) av.push("Dias completados com a cópia da Gestão deste aparelho: "+ap.join(", ")+".");
+ const sem=vs.filter(p=>!linhasDe(p)).length; if(sem) av.push(sem+" pedido(s) antigo(s) sem detalhe por produto: contam no total, não na tabela por produto.");
+ const porCob=bal.filter(p=>!p.balcaoPago).length; if(porCob) av.push(porCob+" venda(s) do balcão ainda «por cobrar».");
+ $("avisos").innerHTML=av.map(a=>`<div class="aviso">${a}</div>`).join("");
+
+ /* por dia */
+ const dl=dados.map(d=>{ const v=d.pedidos.filter(vendido); return {dia:d.dia,n:v.length,b:somar(v.filter(ehBalcao)),w:somar(v.filter(p=>!ehBalcao(p))),t:somar(v)}; });
+ $("tDias").innerHTML=`<table><tr><th>Dia</th><th class="n">Pedidos</th><th class="n">Balcão</th><th class="n">Website</th><th class="n">Total</th></tr>`+
+  dl.filter(x=>x.n).map(x=>`<tr><td>${dataPT(x.dia)}</td><td class="n">${x.n}</td><td class="n">${x.b}</td><td class="n">${x.w}</td><td class="n">${x.t}</td></tr>`).join("")+
+  `<tr class="tot"><td>Mês</td><td class="n">${vs.length}</td><td class="n">${somar(bal)}</td><td class="n">${somar(web)}</td><td class="n">${tot}</td></tr></table>`;
+
+ /* por produto */
+ const pr=porProduto(vs), maxQ=Math.max(1,...pr.map(x=>x.q));
+ $("tProd").innerHTML=pr.length?`<table><tr><th>Produto</th><th class="n">Qtd</th><th class="n">Valor</th><th></th></tr>`+
+  pr.map(x=>`<tr><td>${esc(x.n)}</td><td class="n">${x.q}</td><td class="n">${x.v}</td><td><span class="bar" style="width:${Math.round(60*x.q/maxQ)}px"></span></td></tr>`).join("")+
+  `</table><div class="sub">Valor = preço do produto antes dos descontos do pedido (os descontos estão no total de cada pedido).</div>`:`<div class="sub">Sem produtos detalhados neste mês.</div>`;
+
+ /* por hora */
+ const hs=porHora(vs), maxH=Math.max(1,...hs.map(x=>x.n));
+ $("tHora").innerHTML=`<table><tr><th>Hora</th><th class="n">Pedidos</th><th class="n">Valor</th><th></th></tr>`+
+  hs.map(x=>`<tr><td>${x.h==null?"sem hora":String(x.h).padStart(2,"0")+"h"}</td><td class="n">${x.n}</td><td class="n">${x.v}</td><td><span class="bar" style="width:${Math.round(60*x.n/maxH)}px"></span></td></tr>`).join("")+`</table>
+  <div class="sub">Hora em que o pedido foi feito (vendas feitas sem internet: a hora em que foram feitas).</div>`;
+ $("res").style.display="block";
+}
+function porProduto(vs){
+ const m={}; vs.forEach(p=>(linhasDe(p)||[]).forEach(l=>{ const x=m[l.n]=m[l.n]||{n:l.n,q:0,v:0}; x.q+=l.q; x.v+=l.v; }));
+ return Object.values(m).sort((a,b)=>b.q-a.q||b.v-a.v);
+}
+function porHora(vs){
+ const m={}; vs.forEach(p=>{ const h=horaDe(p), k=h==null?"x":h; const x=m[k]=m[k]||{h,n:0,v:0}; x.n++; x.v+=(+p.total||0); });
+ return Object.values(m).sort((a,b)=>(a.h==null?99:a.h)-(b.h==null?99:b.h));
+}
+
+/* ---------- ficheiros ---------- */
+/* CSV para Excel em português: separador ";", UTF-8 com BOM (acentos certos), valores em ECV inteiros */
+function csv(linhas){
+ const c=v=>{ const s=String(v==null?"":v); return /[;"\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+ return "﻿"+linhas.map(l=>l.map(c).join(";")).join("\r\n")+"\r\n";
+}
+function baixar(nome,texto,tipo){
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(new Blob([texto],{type:tipo||"text/csv;charset=utf-8"}));
+ a.download=nome; document.body.appendChild(a); a.click();
+ setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+}
+function linhasContabilista(){
+ const l=[["Data","Hora","Código","Origem","Modo","Estado","Pagamento","Total (ECV)","Artigos"]];
+ todos().sort((a,b)=>(a._dia+(a.feitoAs||a.criado||"")).localeCompare(b._dia+(b.feitoAs||b.criado||""))).forEach(p=>{
+  l.push([dataPT(p._dia), p.feitoAs||p.criado||"", p.code||"", ehBalcao(p)?"Balcão":"Website", p.modo==="entrega"?"Entrega":"Levantar",
+   p.status==="cancelado"?"Cancelado":"Vendido", pagamento(p), +p.total||0,
+   (linhasDe(p)||[]).map(x=>x.q+"x "+x.n).join(", ") || (Array.isArray(p.itens)?p.itens.join(", "):"")]);
+ });
+ const vs=todos().filter(vendido);
+ l.push([]); l.push(["Total do mês (sem cancelados)","","","","","","",vs.reduce((s,p)=>s+(+p.total||0),0),vs.length+" pedidos"]);
+ return l;
+}
+function baixarContabilista(){ baixar("vendas-"+MES+".csv", csv(linhasContabilista())); }
+function baixarResumoDias(){
+ const l=[["Data","Pedidos","Balcão (ECV)","Website (ECV)","Total (ECV)","Dinheiro","Vinti4 (POS)","Transferência","Dividido","Por cobrar"]];
+ dados.forEach(d=>{
+  const v=d.pedidos.filter(vendido), s=f=>v.filter(f).reduce((t,p)=>t+(+p.total||0),0), pg=k=>s(p=>pagamento(p)===k);
+  l.push([dataPT(d.dia), v.length, s(ehBalcao), s(p=>!ehBalcao(p)), s(()=>true), pg("dinheiro"), pg("Vinti4 (POS)"), pg("transferência"),
+   pg("dividido (dinheiro + POS)"), pg("por cobrar")]);
+ });
+ baixar("resumo-diario-"+MES+".csv", csv(l));
+}
+function baixarProdutoHora(){
+ const vs=todos().filter(vendido), horas=[...new Set(vs.map(horaDe).filter(h=>h!=null))].sort((a,b)=>a-b);
+ const m={};
+ vs.forEach(p=>{ const h=horaDe(p); (linhasDe(p)||[]).forEach(x=>{ const r=m[x.n]=m[x.n]||{q:0,v:0,h:{}}; r.q+=x.q; r.v+=x.v; if(h!=null) r.h[h]=(r.h[h]||0)+x.q; }); });
+ const l=[["Produto","Quantidade","Valor (ECV)"].concat(horas.map(h=>String(h).padStart(2,"0")+"h"))];
+ Object.entries(m).sort((a,b)=>b[1].q-a[1].q).forEach(([n,r])=>l.push([n,r.q,r.v].concat(horas.map(h=>r.h[h]||0))));
+ baixar("produto-hora-"+MES+".csv", csv(l));
+}
+function baixarCopia(){
+ const c={loja:"Emma's Place", mes:MES, geradoEm:new Date().toISOString(),
+  nota:"Cópia de segurança dos pedidos. Contém dados pessoais dos clientes: guardar em local seguro.",
+  dias:dados.map(d=>({dia:d.dia, fonte:d.fonte, pedidos:d.pedidos}))};
+ baixar("copia-pedidos-"+MES+".json", JSON.stringify(c,null,1), "application/json");
+}
+</script>
+</body>
+</html>
