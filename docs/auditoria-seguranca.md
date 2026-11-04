@@ -15,7 +15,7 @@ Legenda: **Facto** = confirmado no código ou em teste · **Dedução** = prová
 | S3 | Indicação de "pago" e estado inicial vêm do cliente | Alta | Dedução; a confirmar no Worker |
 | S4 | Código promocional: verificação e gasto em passos separados; sem limite de tentativas visível | Média | Worker |
 | S5 | Reservas de hora (`/reserve`) e encomendas (`/order`) sem chave nem limite de pedidos | Média | Worker |
-| S6 | A chave dos painéis vai no endereço (`?key=`) e é a mesma para tudo | Média | Worker |
+| S6 | A chave dos painéis vai no endereço (`?key=`) | Média | Worker |
 | S7 | A chave fica guardada no aparelho (`localStorage`) sem prazo | Baixa | Decisão do dono |
 | S8 | Repositório público | Informação | Decisão do dono |
 
@@ -79,8 +79,9 @@ Recomendação: regra de limite de pedidos (rate limiting) da Cloudflare em `/or
 
 ## S6 — Chave no endereço e chave única
 
-O `?key=` fica nos registos de acesso e no histórico do navegador. A mesma chave abre Gestão, Vendas e Cozinha.
-Recomendação: cabeçalho `Authorization`, uma chave por painel, e as Vendas e a Cozinha sem acesso a `/menu-set`,
+O `?key=` fica nos registos de acesso e no histórico do navegador. A Gestão diz que a Cozinha tem chave própria;
+não consigo confirmar no Worker se cada chave só abre o que precisa.
+Recomendação: cabeçalho `Authorization` e, no Worker, as chaves das Vendas e da Cozinha sem acesso a `/menu-set`,
 `/estado-set` e `/stock-set`.
 
 ## S7 — Chave guardada no aparelho
