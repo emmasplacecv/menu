@@ -27,6 +27,10 @@ const realFetch = window.fetch.bind(window);
 
 const T_LER = 5000, T_ESCREVER = 12000, T_SONDA = 5000;   // prazos em ms
 const AUTO_ENTREGUE_MIN = 30;   // venda offline enviada mais de 30 min depois → entra já como "entregue"
+/* 04-11-2026: venda que JÁ TENTOU ir para o servidor e falhou a meio (a resposta perdeu-se): o servidor pode tê-la
+   gravado sem a lista de pedidos ainda a mostrar (o KV da Cloudflare demora até ~60 s a mostrar o que se gravou).
+   Antes de a procurar e reenviar espera-se este tempo — senão podia ficar em duplicado. */
+const T_DUVIDA = (typeof window.EPO_T_DUVIDA === "number") ? window.EPO_T_DUVIDA : 90000;
 const MSG_BLOQ = "Sem internet: esta alteração precisa de ligação ao servidor e pode não ter ficado guardada. Tente outra vez quando a internet voltar.";
 const MSG_1A  = "Sem internet. A primeira entrada neste aparelho tem de ser feita com internet.";
 const EST_TXT = {aguarda:"aguarda", confirmado:"na fila", preparar:"a preparar", pronto:"pronto", entregue:"entregue", cancelado:"cancelado"};
@@ -294,11 +298,13 @@ async function escrever(url, u, init){
   }
   const pendentes = await idb.count("fila");
   const depende = alvo && alvo.indexOf("off-") === 0;          // ainda à espera do seu pedido na fila
+  let tentou = false;
   if (!est.offline && !pendentes && !depende){
     try { return await redeFetch(url, init, T_ESCREVER); }
-    catch(e){ if (!eRede(e)) throw e; ficouOffline(); }
+    catch(e){ if (!eRede(e)) throw e; ficouOffline(); tentou = true; }
   }
   const op = criarOp(cam, u, url, init);
+  if (tentou && op.k === "order") op.duvida = true;          // pode ter chegado: ver T_DUVIDA
   op.desc = await descrever(op);
   await idb.add("fila", op);
   avisar(); agendarSync(est.offline ? 2000 : 200);
@@ -411,6 +417,7 @@ async function enviarOp(op, fila, codigos){
         return "ok";
       }
       const key = new URL(op.url).searchParams.get("key") || "";
+      if (op.duvida && Date.now() - op.t < T_DUVIDA) return "rede";   // dá tempo ao servidor de a mostrar (ver T_DUVIDA)
       /* já chegou numa tentativa anterior (a ligação caiu antes da resposta)? */
       let idReal = await procurarCodigo(op.corpo, [op.dia, hojeISO()], key, codigos);
       if (!idReal){
