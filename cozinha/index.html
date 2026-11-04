@@ -96,6 +96,16 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
  background:var(--dark);color:#F7F1E4;white-space:nowrap;}
 .ped .tipo.ent{background:var(--gold);color:var(--dark);}
 .ped .tipo.web{background:#4A2259;color:#F6EDE0;}
+/* 04-11-2026: MODO DO PEDIDO sempre à vista — ícone + texto + cor (não depende só da cor) */
+.modo{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;letter-spacing:1.2px;font-weight:800;padding:4px 10px;
+ border-radius:20px;white-space:nowrap;color:#fff;font-family:inherit;line-height:1.2;text-transform:uppercase;}
+.modo.ent{background:#C25E12;}
+.modo.lev{background:#2F5D62;}
+.modo.mini{font-size:9.5px;letter-spacing:.9px;padding:2px 7px;vertical-align:1px;}
+.tags{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.ped.capa .t0.ent{background:#C25E12;color:#fff;} .ped.capa .t0.lev{background:#2F5D62;color:#fff;}
+.ped .top .tags .modo{font-size:12px;padding:5px 11px;}
+
 .ped .top.sep{margin-top:12px;padding-top:12px;border-top:2px solid var(--line);}
 
 .ped .meta{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;color:var(--ink2);
@@ -353,6 +363,12 @@ let _assinatura="", _ultimaOk=0, falhas=0, _aCarregar=false;
    Os de hoje continuam de 3 em 3 s; os dos dias seguintes de FUT_CADA_S em FUT_CADA_S s
    (não precisam de mais e poupa pedidos ao servidor).
    ============================================================ */
+/* 04-11-2026: MODO DO PEDIDO — 🛵 ENTREGA ou 🛍 LEVANTAR, em todos os pedidos (antes só a entrega tinha etiqueta
+   e um pedido sem ela deixava a dúvida). Mesma função na Gestão, na Cozinha e nas Vendas. */
+function ehEntrega(p){ return !!p && p.modo==="entrega"; }
+function modoTxt(p){ return ehEntrega(p) ? "Entrega" : "Levantar"; }
+function modoTag(p,mini){ const e=ehEntrega(p);
+ return `<span class="modo ${e?"ent":"lev"}${mini?" mini":""}">${e?"🛵 ENTREGA":"🛍 LEVANTAR"}</span>`; }
 const DIAS_FUT=[1,2], FUT_CADA_S=10;
 let _fut={}, _futT=0;                         // dia ISO -> pedidos desse dia
 function isoDia(k){ const d=new Date(Date.now()+k*86400000);
@@ -569,8 +585,8 @@ function cartaoPed(p){ {
   if(porVer) return `<div class="ped capa" role="button" tabindex="0" aria-label="Pedido novo do website — ver pedido"
      onclick="marcarVisto('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();marcarVisto('${p.id}')}">
     <div class="sino">🔔</div>
-    <div class="t1">PEDIDO NOVO · ${ent?"WEBSITE · ENTREGA":"WEBSITE"}</div>
-    ${p._futuro?`<div class="t0">PARA ${curtoDia(p._dia)}</div>`:""}
+    <div class="t1">PEDIDO NOVO · WEBSITE</div>
+    <div class="t0 ${ent?"ent":"lev"}">${ent?"🛵 ENTREGA":"🛍 LEVANTAR"}${p._futuro?" · PARA "+curtoDia(p._dia):""}</div>
     <div class="t2">Ver pedido</div>
     <div class="bt">👆 Toque para abrir</div>
    </div>`;
@@ -580,7 +596,7 @@ function cartaoPed(p){ {
    <ul>${(p.itens||[]).map(i=>`<li>${artigo(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${esc(p.zona)}${p.morada?" — "+esc(p.morada):""}</div>`:(p.morada?`<div class="mor">📍 ${esc(p.morada)}</div>`:"")}${p.piso>0?`<div class="andar">🏢 ${esc(p.piso)}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${esc(p.taxaAndar)} ECV</div>`:""}
    <div class="top sep"><span class="hora">${ent?"sair":"levantar"} <b>${p.slot||"—"}</b>${p._futuro?` <b class="pdia">${curtoDia(p._dia)}</b>`:""}</span>
-    <span class="tipo ${p.balcao?"":(ent?"ent":"web")}">${p.balcao?"BALCÃO":(ent?"WEBSITE · ENTREGA":"WEBSITE")}</span></div>
+    <span class="tags">${modoTag(p)}<span class="tipo ${p.balcao?"":"web"}">${p.balcao?"BALCÃO":"WEBSITE"}</span></span></div>
    <div class="meta">${p.code||""}${p.criado?" · pedido às "+p.criado:""}${!p.balcao&&vistoDe(p)?' · <span class="vistoOk">👀 visto às '+vistoDe(p)+'</span>':""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
    ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
    <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>

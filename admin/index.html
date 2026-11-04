@@ -82,6 +82,14 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
  background:var(--dark);color:#F7F1E4;}
 .ped .tipo.ent{background:var(--gold);color:var(--dark);}
 .ped .tipo.web{background:#4A2259;color:#F6EDE0;}
+/* 04-11-2026: MODO DO PEDIDO sempre à vista — ícone + texto + cor (não depende só da cor) */
+.modo{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;letter-spacing:1.2px;font-weight:800;padding:4px 10px;
+ border-radius:20px;white-space:nowrap;color:#fff;font-family:inherit;line-height:1.2;text-transform:uppercase;}
+.modo.ent{background:#C25E12;}
+.modo.lev{background:#2F5D62;}
+.modo.mini{font-size:9.5px;letter-spacing:.9px;padding:2px 7px;vertical-align:1px;}
+.tags{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+
 .ped .tot .pg{font-weight:600;color:#3F6B33;} .ped .tot .npg{font-weight:600;color:#8C2F2F;}
 .ped .cli{font-size:14.5px;margin-top:6px;}
 .ped .cod{font-family:monospace;font-size:12.5px;color:var(--ink2);}
@@ -1456,7 +1464,14 @@ function metPedido(p){
 }
 /* 23-10-2026: etiqueta do cartão = ORIGEM do pedido (Website ou Balcão); "levantar" deixou de aparecer
    (é o normal). Entrega ao domicílio fica indicada: "WEBSITE · ENTREGA". */
-function origemPedido(p){ return p.balcao ? "BALCÃO" : (p.modo==="entrega" ? "WEBSITE · ENTREGA" : "WEBSITE"); }
+/* 04-11-2026: MODO DO PEDIDO — 🛵 ENTREGA ou 🛍 LEVANTAR, em todos os pedidos (antes só a entrega tinha etiqueta
+   e um pedido sem ela deixava a dúvida). Mesma função na Gestão, na Cozinha e nas Vendas. */
+function ehEntrega(p){ return !!p && p.modo==="entrega"; }
+function modoTxt(p){ return ehEntrega(p) ? "Entrega" : "Levantar"; }
+function modoTag(p,mini){ const e=ehEntrega(p);
+ return `<span class="modo ${e?"ent":"lev"}${mini?" mini":""}">${e?"🛵 ENTREGA":"🛍 LEVANTAR"}</span>`; }
+/* a origem fica só a origem; o modo tem etiqueta própria (modoTag) */
+function origemPedido(p){ return p.balcao ? "BALCÃO" : "WEBSITE"; }
 /* 23-10-2026: nas vendas do balcão as Vendas escrevem "Cliente à espera · PAGO (…)" no início da nota;
    isso já está na etiqueta BALCÃO e no "PAGO" junto ao total, por isso sai daqui. Fica o resto da nota. */
 function notasLimpas(p){
@@ -1506,7 +1521,7 @@ async function carregarPedidos(){
    acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Entregue":"Levantado"}</button>`;
   return `<div class="ped ${p.status}">
    <div class="top"><span class="hora">${p.slot||"—"}</span>
-    <span class="tipo ${p.balcao?"":(ent?"ent":"web")}">${origemPedido(p)}</span></div>
+    <span class="tags">${modoTag(p)}<span class="tipo ${p.balcao?"":"web"}">${origemPedido(p)}</span></span></div>
    <div class="cli"><b>${p.nome||"(sem nome)"}</b>${p.tel?` · <a href="tel:${p.tel.replace(/\s/g,"")}" style="color:var(--verde);font-weight:600;text-decoration:none">${p.tel}</a>`:""}
     · <span class="cod">${p.code||""}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
     ${p._futuro?' · <b style="color:#8A5A12">'+(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
@@ -1624,7 +1639,8 @@ function hisDesenhar(){
  const ESTX={aguarda:"AGUARDA",confirmado:"CONFIRMADO",preparar:"A PREPARAR",pronto:"PRONTO",entregue:"ENTREGUE",cancelado:"CANCELADO"};
  $("hisLista").innerHTML=Object.keys(porDia).sort().reverse().map(dia=>{
   const ps=porDia[dia], tv=ps.filter(p=>p.status!=="cancelado").reduce((s,p)=>s+(+p.total||0),0);
-  return `<div class="hdia"><span>${hEsc(hDiaTxt(dia))}</span><span>${ps.length} · ${tv.toLocaleString("pt-PT")} ECV</span></div>`+
+  const vivos=ps.filter(p=>p.status!=="cancelado"), nEnt=vivos.filter(ehEntrega).length, nLev=vivos.length-nEnt;
+  return `<div class="hdia"><span>${hEsc(hDiaTxt(dia))}</span><span>${ps.length} · ${tv.toLocaleString("pt-PT")} ECV · 🛍 ${nLev} · 🛵 ${nEnt}</span></div>`+
    ps.map(p=>{
     const e=hEstado(p), cls=e==="feito"?"hst-ok":"hst-"+e, ent=p.modo==="entrega";
     const comp = p.balcao ? `<b>Balcão · ${p.balcaoPago?"pago"+(metPedido(p)?" ("+hEsc(metPedido(p))+")":""):"por pagar"}</b>`
@@ -1632,7 +1648,7 @@ function hisDesenhar(){
                   ` · <a href="#" onclick="hisUmComp('${hEsc(p.code)}','${p._dia}');return false">Descarregar</a>` : "");
     return `<details class="hrow ${p.status||""}"><summary>
       <span class="hh">${hEsc(p.slot||"—")}</span>
-      <span class="hn">${hEsc(p.nome||"(sem nome)")}<small>${hEsc(p.code||"")}${ent?" · entrega":""}${(!p.balcao&&p.code)?` · <a class="hclip" href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📎 PDF</a>`:""}</small></span>
+      <span class="hn">${hEsc(p.nome||"(sem nome)")}<small>${modoTag(p,true)} ${hEsc(p.code||"")}${(!p.balcao&&p.code)?` · <a class="hclip" href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📎 PDF</a>`:""}</small></span>
       <span class="ht">${(+p.total||0).toLocaleString("pt-PT")}<small class="${cls}">${ESTX[p.status]||hEsc(p.status||"")}</small></span></summary>
       <div class="hb">
        ${p.tel?`<a href="tel:${hEsc(String(p.tel).replace(/\s/g,""))}">${hEsc(p.tel)}</a> · `:""}feito às ${hEsc(p.criado||"—")}${p.quando&&p.quando!=="hoje"?" · para "+hEsc(p.quando):""}
@@ -1649,7 +1665,7 @@ function hisDesenhar(){
 function hCsvTexto(lista){
  const col=["Dia","Feito às","Hora","Código","Nome","Telefone","Modo","Zona","Morada","Produtos","Total (ECV)","Estado","Balcão","Notas"];
  const q=v=>{ const s=String(v==null?"":v); return /[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
- const linhas=lista.map(p=>[p._dia,p.criado,p.slot,p.code,p.nome,p.tel,p.modo,p.zona,p.morada,(p.itens||[]).join(" | "),p.total,p.status,
+ const linhas=lista.map(p=>[p._dia,p.criado,p.slot,p.code,p.nome,p.tel,modoTxt(p),p.zona,p.morada,(p.itens||[]).join(" | "),p.total,p.status,
   p.balcao?(p.balcaoPago?"pago":"por pagar"):"",p.notas].map(q).join(";"));
  return "﻿"+[col.join(";")].concat(linhas).join("\r\n");
 }
