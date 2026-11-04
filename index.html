@@ -4188,10 +4188,11 @@ function desenharHoraGanho(){
 }
 function refreshChk(){
  if(promo){                       // o código pode deixar de fazer sentido com o carrinho actual
-  if(promo.modo && promo.modo!==mode){
-   promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: só válido para '+(promo&&promo.modo==="entrega"?"entregas":"levantamento no local")+'.</span>';
-  } else if(promo.min && sub()<promo.min){
-   promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: precisa de '+ (promo?promo.min:0) +' ECV em produtos.</span>';
+  const pr=promo;                 // 04-11-2026: a mensagem lê o código guardado aqui (antes lia-o já apagado: "0 ECV", modo errado)
+  if(pr.modo && pr.modo!==mode){
+   promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: só válido para '+(pr.modo==="entrega"?"entregas":"levantamento no local")+'.</span>';
+  } else if(pr.min && sub()<pr.min){
+   promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: precisa de '+ pr.min +' ECV em produtos.</span>';
   } else if((promo.tipo==="catfree"||promo.tipo==="pctcat") && !temCategoria(promo.cat)){
    promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: sem produtos dessa categoria no pedido.</span>';
   }
