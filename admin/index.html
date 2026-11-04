@@ -1405,7 +1405,7 @@ function linhaFeito(p){
  const f=feitoEm(p); if(!f) return "";
  let h=`<div class="feito">Pedido feito: <b>${f.txt}</b>${f.ms?" · "+haQuanto(f.ms):""}</div>`;
  if(f.ms && p.status==="aguarda" && !p.balcao && (Date.now()-f.ms)>PRAZO_COMP*60000)
-  h+=`<div class="atraso" data-atraso="${String(p.code||"").replace(/"/g,"")}">Passaram os ${PRAZO_COMP} min dados ao cliente para o comprovativo. Sem comprovativo, pode cancelar.</div>`;
+  h+=`<div class="atraso" data-atraso="${hEsc(p.code||"")}">Passaram os ${PRAZO_COMP} min dados ao cliente para o comprovativo. Sem comprovativo, pode cancelar.</div>`;
  return h;
 }
 
@@ -1480,6 +1480,35 @@ function notasLimpas(p){
  return t.trim();
 }
 
+/* 04-11-2026: SEGURANÇA — tudo o que vem do pedido foi escrito pelo cliente (ou por quem chamar o servidor
+   directamente). No HTML vai sempre por hEsc(); dentro de onclick="…" vai por jsArg() (texto JS já escapado). */
+function jsArg(v){ return hEsc(JSON.stringify(String(v==null?"":v))); }
+/* 04-11-2026: CONFIRMAR VALORES — o total e os preços das linhas são calculados no telemóvel do cliente e o
+   servidor guarda-os como chegam. Antes de aceitar o comprovativo, a Gestão compara com o menu de agora:
+   · linha abaixo de 80% do preço do produto no menu (descontos e campanhas não mexem no preço da linha);
+   · total abaixo de metade da soma das linhas (só um código promocional grande o explica).
+   Só avisa; não muda nada. Produtos que a Gestão não conhece (combos, milkshakes) não são comparados. */
+function precoMinMenu(n){
+ n=nomeAtual(String(n||""));
+ if(n===ACAI_NOME){ const l=ACAI_LINHAS[0], o=edit.p&&edit.p[l.k]; return +((o&&o.m!=null)?o.m:l.base)||0; }
+ if(/^Combo |^Milkshake/i.test(n)) return 0;
+ return precoProdAgora(n);
+}
+function avisoValores(p){
+ if(!p || p.balcao || !Array.isArray(p.linhas) || !p.linhas.length) return "";
+ const prob=[]; let soma=0;
+ p.linhas.forEach(l=>{
+  const q=+l.q, pr=+l.p, base=precoMinMenu(l.n);
+  if(!(q>0) || !isFinite(pr) || pr<0){ prob.push(hEsc(l.n)+": quantidade ou preço inválido"); return; }
+  soma+=q*pr;
+  if(base>0 && pr<base*0.8) prob.push(hEsc(l.n)+": "+pr+" ECV (menu: "+base+")");
+ });
+ const tot=+p.total;
+ if(!isFinite(tot) || tot<0) prob.push("total inválido");
+ else if(soma>0 && tot<soma*0.5) prob.push("total "+tot+" ECV para "+soma+" ECV em produtos — confirme o código promocional");
+ return prob.length ? `<div class="nt" style="color:#8C2F2F;font-weight:700">⚠ Confirmar valores antes de aceitar: ${prob.join(" · ")}</div>` : "";
+}
+
 async function carregarPedidos(){
  try{
   // pedidos de hoje + dos 2 dias seguintes (encomendas feitas fora de horas
@@ -1508,31 +1537,33 @@ async function carregarPedidos(){
   let acts="";
   /* 20-10-2026: vendas do balcão são pagas e entregues no balcão — na Gestão ficam só como registo
      (sem comprovativo, sem confirmar, sem levantamento). Fica o 🗑 Apagar, para testes e enganos. */
+  const id=jsArg(p.id);
   if(p.balcao) acts="";
   else if(p.status==="aguarda")
-   acts=`<button class="bok" onclick="mudar('${p.id}','confirmado')">Comprovativo recebido</button>
-         <button class="bno" onclick="mudar('${p.id}','cancelado')">Cancelar</button>`;
+   acts=`<button class="bok" onclick="mudar(${id},'confirmado')">Comprovativo recebido</button>
+         <button class="bno" onclick="mudar(${id},'cancelado')">Cancelar</button>`;
   else if(p.status==="confirmado")
-   acts=`<button class="bnx" onclick="mudar('${p.id}','preparar')">Pôr a preparar</button>
-         <button class="bno" onclick="mudar('${p.id}','cancelado')">Cancelar</button>`;
+   acts=`<button class="bnx" onclick="mudar(${id},'preparar')">Pôr a preparar</button>
+         <button class="bno" onclick="mudar(${id},'cancelado')">Cancelar</button>`;
   else if(p.status==="preparar")
-   acts=`<button class="bok" onclick="mudar('${p.id}','pronto')">Marcar pronto</button>`;
+   acts=`<button class="bok" onclick="mudar(${id},'pronto')">Marcar pronto</button>`;
   else if(p.status==="pronto")
-   acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Entregue":"Levantado"}</button>`;
-  return `<div class="ped ${p.status}">
-   <div class="top"><span class="hora">${p.slot||"—"}</span>
+   acts=`<button class="bok" onclick="mudar(${id},'entregue')">${ent?"Entregue":"Levantado"}</button>`;
+  return `<div class="ped ${hEsc(p.status)}">
+   <div class="top"><span class="hora">${hEsc(p.slot||"—")}</span>
     <span class="tags">${modoTag(p)}<span class="tipo ${p.balcao?"":"web"}">${origemPedido(p)}</span></span></div>
-   <div class="cli"><b>${p.nome||"(sem nome)"}</b>${p.tel?` · <a href="tel:${p.tel.replace(/\s/g,"")}" style="color:var(--verde);font-weight:600;text-decoration:none">${p.tel}</a>`:""}
-    · <span class="cod">${p.code||""}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
-    ${p._futuro?' · <b style="color:#8A5A12">'+(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
+   <div class="cli"><b>${hEsc(p.nome||"(sem nome)")}</b>${p.tel?` · <a href="tel:${hEsc(String(p.tel).replace(/[^\d+]/g,""))}" style="color:var(--verde);font-weight:600;text-decoration:none">${hEsc(p.tel)}</a>`:""}
+    · <span class="cod">${hEsc(p.code||"")}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
+    ${p._futuro?' · <b style="color:#8A5A12">'+hEsc(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
    ${linhaFeito(p)}
-   <ul>${p.itens.map(i=>`<li>${hItem(i)}</li>`).join("")}</ul>
-   ${p.zona?`<div class="mor">📍 ${p.zona}${p.morada?" — "+p.morada:""}</div>`:(p.morada?`<div class="mor">📍 ${p.morada}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${p.piso}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${p.taxaAndar} ECV</div>`:""}
-   ${notasLimpas(p)?`<div class="nt">Notas: ${notasLimpas(p)}</div>`:""}
-   <div class="tot">${p.total} ECV${p.balcao?(p.balcaoPago?` · <span class="pg">PAGO${metPedido(p)?" ("+hEsc(metPedido(p))+")":""}</span>`:` · <span class="npg">POR PAGAR</span>`):""}</div>
-   ${!p.balcao&&p.code?`<div class="nt"><span data-comp="${String(p.code).replace(/"/g,"")}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a></div>`:""}
-   <div class="estL"><div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>${linhaVisto(p)}</div>
-   <div class="acts">${acts}<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')">🗑 Apagar</button></div>
+   ${avisoValores(p)}
+   <ul>${(Array.isArray(p.itens)?p.itens:[]).map(i=>`<li>${hItem(i)}</li>`).join("")}</ul>
+   ${p.zona?`<div class="mor">📍 ${hEsc(p.zona)}${p.morada?" — "+hEsc(p.morada):""}</div>`:(p.morada?`<div class="mor">📍 ${hEsc(p.morada)}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${hEsc(p.piso)}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${hEsc(p.taxaAndar)} ECV</div>`:""}
+   ${notasLimpas(p)?`<div class="nt">Notas: ${hEsc(notasLimpas(p))}</div>`:""}
+   <div class="tot">${hEsc(p.total)} ECV${p.balcao?(p.balcaoPago?` · <span class="pg">PAGO${metPedido(p)?" ("+hEsc(metPedido(p))+")":""}</span>`:` · <span class="npg">POR PAGAR</span>`):""}</div>
+   ${!p.balcao&&p.code?`<div class="nt"><span data-comp="${hEsc(p.code)}"></span><a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">Ver comprovativo</a></div>`:""}
+   <div class="estL"><div class="est">${hEsc(String(ESTADOS[p.status]||p.status||"").toUpperCase())}</div>${linhaVisto(p)}</div>
+   <div class="acts">${acts}<button class="bdel" onclick="apagar(${id},${jsArg(p.code||"")})">🗑 Apagar</button></div>
   </div>`;
  }).join("");
  desenharComprovativos();
@@ -1645,8 +1676,8 @@ function hisDesenhar(){
     const e=hEstado(p), cls=e==="feito"?"hst-ok":"hst-"+e, ent=p.modo==="entrega";
     const comp = p.balcao ? `<b>Balcão · ${p.balcaoPago?"pago"+(metPedido(p)?" ("+hEsc(metPedido(p))+")":""):"por pagar"}</b>`
       : (p.code ? `<a href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener">Ver comprovativo</a>`+
-                  ` · <a href="#" onclick="hisUmComp('${hEsc(p.code)}','${p._dia}');return false">Descarregar</a>` : "");
-    return `<details class="hrow ${p.status||""}"><summary>
+                  ` · <a href="#" onclick="hisUmComp(${jsArg(p.code)},${jsArg(p._dia)});return false">Descarregar</a>` : "");
+    return `<details class="hrow ${hEsc(p.status||"")}"><summary>
       <span class="hh">${hEsc(p.slot||"—")}</span>
       <span class="hn">${hEsc(p.nome||"(sem nome)")}<small>${modoTag(p,true)} ${hEsc(p.code||"")}${(!p.balcao&&p.code)?` · <a class="hclip" href="${PROMO_API}/comprovativo?code=${encodeURIComponent(p.code)}&key=${encodeURIComponent(KEY)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📎 PDF</a>`:""}</small></span>
       <span class="ht">${(+p.total||0).toLocaleString("pt-PT")}<small class="${cls}">${ESTX[p.status]||hEsc(p.status||"")}</small></span></summary>
