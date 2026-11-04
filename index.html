@@ -8,6 +8,13 @@
 <meta property="og:title" content="Menu &amp; Encomendas — Emma's Place">
 <meta property="og:description" content="Escolha os seus produtos e encomende directamente aqui no site. Entregas grátis acima de 750$.">
 <meta property="og:type" content="restaurant.menu">
+<!-- 04-11-2026: GOOGLE E PARTILHAS — endereço oficial da página e imagem da pré-visualização (WhatsApp, Facebook) -->
+<link rel="canonical" href="https://emmasplace.cv/">
+<meta property="og:url" content="https://emmasplace.cv/">
+<meta property="og:site_name" content="Emma's Place">
+<meta property="og:locale" content="pt_PT">
+<meta property="og:image" content="https://emmasplace.cv/logo.jpg">
+<meta name="twitter:card" content="summary">
 <!-- MÉTRICAS — Microsoft Clarity (10-10-2026). Para desligar tudo, apagar este bloco <script>. -->
 <script>
 (function(){
@@ -15,19 +22,25 @@
  try{ fora = localStorage.getItem("ep_sem_metricas")==="1"; }catch(e){}
  window.EP_METRICAS = !fora;
  if(fora) return;      /* o visitante pediu para não ser registado neste dispositivo */
- (function(c,l,a,r,i,t,y){
-  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
- })(window, document, "clarity", "script", "yvo7lycm0l");
+ /* 04-11-2026: VELOCIDADE — o Clarity só se descarrega depois de a página estar pronta (não disputa a rede
+    nem o telemóvel com o menu). Os eventos enviados antes ficam na fila "q" e seguem na mesma. */
+ var c=window, l=document;
+ c.clarity=c.clarity||function(){(c.clarity.q=c.clarity.q||[]).push(arguments)};
+ function carregar(){
+  var t=l.createElement("script"); t.async=1; t.src="https://www.clarity.ms/tag/yvo7lycm0l";
+  var y=l.getElementsByTagName("script")[0]; y.parentNode.insertBefore(t,y);
+ }
+ if(l.readyState==="complete") carregar(); else c.addEventListener("load",carregar);
 })();
 </script>
 
 <link rel="icon" href="img/logo.webp">
-<link rel="preload" as="image" href="img/capa-1.webp">
+<link rel="preload" as="image" href="img/capa-1.webp" fetchpriority="high">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"CafeOrCoffeeShop","name":"Emma's Place | Coffee & More",
-"image":"https://emmasplace.cv/img/logo.webp","servesCuisine":["Café","Pequeno-almoço","Almoço"],
+{"@context":"https://schema.org","@type":"CafeOrCoffeeShop","@id":"https://emmasplace.cv/#cafe","name":"Emma's Place | Coffee & More",
+"url":"https://emmasplace.cv/","image":"https://emmasplace.cv/img/logo.webp","servesCuisine":["Café","Pequeno-almoço","Almoço"],
+"sameAs":["https://instagram.com/emmasplace.cv"],"hasMap":"https://maps.app.goo.gl/PUQn2B7j8WX2Sa9r7",
+"currenciesAccepted":"CVE","areaServed":{"@type":"City","name":"Praia"},
 "priceRange":"85–1050 ECV",
 "address":{"@type":"PostalAddress","streetAddress":"Av. Amílcar Cabral, Plateau (frente BAI/IMPAR)","addressLocality":"Praia","addressCountry":"CV"},
 "openingHoursSpecification":[
@@ -35,8 +48,11 @@
 {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:00","closes":"15:00"}],
 "hasMenu":{"@type":"Menu","url":"https://emmasplace.cv/#menu"}}
 </script>
+<!-- 04-11-2026: VELOCIDADE — as letras pedem-se logo aqui (antes: @import dentro do <style>, que só as pedia depois de ler o CSS). Mesmas letras. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&amp;family=Jost:wght@300;400;500;600&amp;family=Caveat:wght@600&amp;display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Jost:wght@300;400;500;600&family=Caveat:wght@600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{--cream:#F7F1E4;--card:#FFFCF6;--line:#E7DCC8;--dot:#CBB693;--ink:#34251D;
  --ink2:#785B42;--gold:#B8783D;--dark:#2F2119;--green:#66704A;--green2:#4E5937;--wa:#25D366;}
@@ -1531,9 +1547,9 @@ textarea.fld{min-height:74px;resize:vertical;}
 
 <section class="brand-story" id="sobre">
   <div class="story-photos" aria-hidden="true">
-    <img src="img/prod-iced-matcha-latte.webp" alt="" loading="lazy">
-    <img src="img/prod-pao-recheado-de-frango.webp" alt="" loading="lazy">
-    <img src="img/prod-salada-fria-de-atum.webp" alt="" loading="lazy">
+    <img src="img/prod-iced-matcha-latte.webp" alt="" loading="lazy" fetchpriority="low">
+    <img src="img/prod-pao-recheado-de-frango.webp" alt="" loading="lazy" fetchpriority="low">
+    <img src="img/prod-salada-fria-de-atum.webp" alt="" loading="lazy" fetchpriority="low">
   </div>
   <div class="story-copy">
     <span class="eyebrow" data-home-i18n="storyKicker"></span>
@@ -1958,7 +1974,7 @@ function desenharShakeBanner(){
  const ver=shakeMostra() && disp && !lojaFechada;
  b.style.display=ver?"flex":"none";
  if(!ver) return;
- b.innerHTML=`<span class="shk-fotos" aria-hidden="true">${["milkshake-de-framboesa","milkshake-de-morango","milkshake-de-groselha"].map(f=>`<img src="img/p/${f}.webp" alt="" loading="lazy">`).join("")}</span>
+ b.innerHTML=`<span class="shk-fotos" aria-hidden="true">${["milkshake-de-framboesa","milkshake-de-morango","milkshake-de-groselha"].map(f=>`<img src="img/p/${f}.webp" alt="" loading="lazy" fetchpriority="low">`).join("")}</span>
   <span><em>${esc(shk("k"))}</em><b>${esc(shk("b"))}</b><small>${esc(shk("s"))}</small></span><i aria-hidden="true">›</i>`;
 }
 function irShakes(){ const c=MENU.findIndex(x=>x.tk==="c_shakes"); if(c>=0) scrollCategory(c); else scrollHome("menu"); }
@@ -2701,7 +2717,7 @@ function buildBestsellers(){
  grid.innerHTML=BESTSELLERS.map(b0=>{
   const b=b0.img?b0:{n:b0.n,img:fotoDestaque(b0.n)};
   const f=findMenuItem(b.n);
-  if(!f) return `<article class="best-card blocked"><div class="best-media"><img src="${b.img}" alt="${esc(b.n)}" loading="lazy"><img class="best-logo" src="img/logo.webp" alt=""></div><div class="best-info"><div><div class="best-name">${esc(b.n)}</div><small class="best-status">${ht("unavailable")}</small></div><button class="best-add" disabled>+</button></div></article>`;
+  if(!f) return `<article class="best-card blocked"><div class="best-media"><img src="${b.img}" alt="${esc(b.n)}" loading="lazy" fetchpriority="low"><img class="best-logo" src="img/logo.webp" alt=""></div><div class="best-info"><div><div class="best-name">${esc(b.n)}</div><small class="best-status">${ht("unavailable")}</small></div><button class="best-add" disabled>+</button></div></article>`;
   const fim=esgotados.includes(f.item.n);
   const entregaBloqueada=mode==="entrega"&&f.item.nd;
   const blocked=lojaFechada||fim||entregaBloqueada;
@@ -2709,7 +2725,7 @@ function buildBestsellers(){
   const preco=f.item.g?`${f.item.p} <span>· ${f.item.g}</span>`:`${f.item.p}`;
   return `<article class="best-card${blocked?" blocked":""}"${blocked?mtrBlq(f.item.n,fim,lojaFechada):""}>
    <button class="best-media" type="button" ${blocked?"disabled":`onclick="pick(${f.ci},${f.ii})"`} aria-label="${esc(td(f.item.n))}">
-    <img src="${b.img}" alt="${esc(td(f.item.n))}" loading="lazy"><img class="best-logo" src="img/logo.webp" alt="">
+    <img src="${b.img}" alt="${esc(td(f.item.n))}" loading="lazy" fetchpriority="low"><img class="best-logo" src="img/logo.webp" alt="">
    </button>
    <div class="best-info"><div><div class="best-name">${esc(td(f.item.n))}</div><div class="best-price">${preco}</div>${status?`<small class="best-status">${status}</small>`:""}</div>
    <button class="best-add" type="button" ${blocked?"disabled":`onclick="pick(${f.ci},${f.ii})"`} aria-label="+ ${esc(td(f.item.n))}">+</button></div>
@@ -2772,7 +2788,7 @@ function cartaoProd(i,ci,ii){
  const nota=fim?`<small class="pc-st">${tm("acabou")}</small>`:(semEnt?`<small class="pc-st">${t("sonolocal")}</small>`:"");
  const abre=blocked?"":` onclick="pick(${ci},${ii})"`;
  return `<article class="pc${blocked?" blk":""}" data-k="${esc(i.n)}"${blocked?mtrBlq(i.n,fim,lojaFechada):""}>
-  <div class="pc-m"><button type="button" class="pc-foto${foto?"":" sem"}"${abre} ${blocked?"disabled":""} aria-label="${esc(nome)}">${foto?`<img src="${foto}" alt="" loading="lazy" decoding="async">`:(ICO[tk]||"")}</button>
+  <div class="pc-m"><button type="button" class="pc-foto${foto?"":" sem"}"${abre} ${blocked?"disabled":""} aria-label="${esc(nome)}">${foto?`<img src="${foto}" alt="" loading="lazy" fetchpriority="low" decoding="async">`:(ICO[tk]||"")}</button>
   ${blocked?`<span class="noadd pc-add" aria-hidden="true">✕</span>`:`<button type="button" class="add pc-add"${abre} aria-label="+ ${esc(nome)}">+</button>`}</div>
   ${(!blocked && ehShakeCamp(i.n) && shakeMostra())?`<span class="pc-tag">${esc(shk("tag"))}</span>`:""}
   <div class="pc-txt"><h4 class="pc-n">${nome}</h4>${i.d?`<p class="pc-d">${td(i.d)}</p>`:""}${nota}<div class="pc-pr">${(ehShakeCamp(i.n) && shakeMostra() && !i.g)
@@ -2791,7 +2807,7 @@ function estante(id,tk,titulo,nota,cartoes,extra){
 }
 function blocoEmBreve(){
  const cartoes=EM_BREVE.map(i=>{ const foto=fotoProd(i.n);
-  return `<article class="pc breve"><div class="pc-m"><div class="pc-foto">${foto?`<img src="${foto}" alt="" loading="lazy" decoding="async">`:""}</div><span class="selo"><span>${tm("breve")}</span></span></div>
+  return `<article class="pc breve"><div class="pc-m"><div class="pc-foto">${foto?`<img src="${foto}" alt="" loading="lazy" fetchpriority="low" decoding="async">`:""}</div><span class="selo"><span>${tm("breve")}</span></span></div>
    <div class="pc-txt"><h4 class="pc-n">${td(i.n)}</h4>${i.d?`<p class="pc-d">${td(i.d)}</p>`:""}</div></article>`; });
  return estante("cat-embreve","c_especiais",tm("breveTit"),tm("breveSub"),cartoes,"embreve");
 }
@@ -2801,7 +2817,7 @@ function blocoEmBreve(){
 function faixaEmBreve(){
  if(!EM_BREVE.length) return "";
  const itens=EM_BREVE.map(i=>{ const foto=fotoProd(i.n);
-  return `<li class="eb-it">${foto?`<img src="${foto}" alt="" loading="lazy" decoding="async">`:`<span class="eb-ph">${ICO.c_especiais}</span>`}
+  return `<li class="eb-it">${foto?`<img src="${foto}" alt="" loading="lazy" fetchpriority="low" decoding="async">`:`<span class="eb-ph">${ICO.c_especiais}</span>`}
    <span class="eb-tx"><b>${td(i.n)}</b>${i.d?`<small>${td(i.d)}</small>`:""}</span></li>`; }).join("");
  return `<section class="eb-band" id="cat-embreve" aria-labelledby="eb-tit">
   <header class="eb-h"><span class="eb-pill"><i></i>${tm("breve")}</span>
@@ -2835,11 +2851,15 @@ function abrirEstante(id,b){
 }
 /* sombra nas pontas da estante só quando há mais para ver desse lado */
 function prepararEstantes(){
- document.querySelectorAll(".cat2 .shelf").forEach(sh=>{
-  const marcar=()=>{ const max=sh.scrollWidth-sh.clientWidth-2;
-   sh.classList.toggle("mais-d", sh.scrollLeft<max); sh.classList.toggle("mais-e", sh.scrollLeft>2); };
-  sh.addEventListener("scroll",marcar,{passive:true}); marcar();
+ /* 04-11-2026: VELOCIDADE — ao abrir, mede todas as estantes primeiro e só depois marca as sombras
+    (antes media e marcava uma a uma, e o telemóvel recalculava a página inteira em cada estante). */
+ const est=[...document.querySelectorAll(".cat2 .shelf")];
+ const pinta=(sh,max,x)=>{ sh.classList.toggle("mais-d", x<max); sh.classList.toggle("mais-e", x>2); };
+ est.forEach(sh=>{
+  const marcar=()=>pinta(sh, sh.scrollWidth-sh.clientWidth-2, sh.scrollLeft);
+  sh.addEventListener("scroll",marcar,{passive:true});
  });
+ est.map(sh=>[sh, sh.scrollWidth-sh.clientWidth-2, sh.scrollLeft]).forEach(m=>pinta(m[0],m[1],m[2]));
 }
 
 /* ---------- CONSTRUIR MENU ---------- */
@@ -2871,11 +2891,11 @@ function build(){
    if(c.indisp) return "";
    const f=(COMBO_FOTOS[c.n]||[]).filter(x=>PFOTOS.has(x));
    if(c.esg||lojaFechada) return `<div class="combo off${c.full?" full":""}">
-   ${f.length?`<div class="cfotos">${f.map(x=>`<img src="img/p/${x}.webp" alt="" loading="lazy">`).join("")}</div>`:""}
+   ${f.length?`<div class="cfotos">${f.map(x=>`<img src="img/p/${x}.webp" alt="" loading="lazy" fetchpriority="low">`).join("")}</div>`:""}
    <div class="cn">${td(c.n)}</div><div class="ci">${td(c.d)}</div>
    <div class="brow"><span class="cp">${c.p}</span><small class="cesg">${lojaFechada?t("fechado"):tm("acabou")}</small></div></div>`;
    return `<div class="combo${c.full?" full":""}">
-   ${f.length?`<div class="cfotos">${f.map(x=>`<img src="img/p/${x}.webp" alt="" loading="lazy">`).join("")}</div>`:""}
+   ${f.length?`<div class="cfotos">${f.map(x=>`<img src="img/p/${x}.webp" alt="" loading="lazy" fetchpriority="low">`).join("")}</div>`:""}
    <div class="cn">${td(c.n)}</div><div class="ci">${td(c.d)}</div>
    <div class="brow"><span class="cp">${c.p}</span>
    <button class="add" onclick="addCombo(${i})" aria-label="Adicionar ${c.n}">+</button></div></div>`;
@@ -3198,10 +3218,11 @@ let asapOff=false, campAcai=false, escAcai=false;
 /* cfgAsap / cfgCamp / cfgEsc = {de, ate} das opções que ainda não acabaram (ou null)
    campServ = dia do próximo levantamento, dito pelo servidor nos horários (0 = ainda não se sabe) */
 let cfgAsap=null, cfgCamp=null, cfgEsc=null, campServ=0;
+var _fmtDiaCV=null;     // 04-11-2026: VELOCIDADE — o formatador cria-se uma vez (era criado em cada chamada)
 function diaCV(){
  const agora=new Date(); let y=0,m=0,d=0;
  try{
-  new Intl.DateTimeFormat("en-GB",{timeZone:"Atlantic/Cape_Verde",year:"numeric",month:"numeric",day:"numeric"})
+  (_fmtDiaCV=_fmtDiaCV||new Intl.DateTimeFormat("en-GB",{timeZone:"Atlantic/Cape_Verde",year:"numeric",month:"numeric",day:"numeric"}))
    .formatToParts(agora).forEach(x=>{ if(x.type==="year") y=+x.value; if(x.type==="month") m=+x.value; if(x.type==="day") d=+x.value; });
  }catch(e){}
  if(!y||!m||!d){ y=agora.getFullYear(); m=agora.getMonth()+1; d=agora.getDate(); }
@@ -4781,7 +4802,7 @@ function procurarMenu(v){
   const nota=fim?`<small class="only">${t("acabou")}</small>`:((mode==="entrega"&&i.nd)?`<small class="only">${t("sonolocal")}</small>`:"");
   const acao=dest?`abrirProduto('${String(i.n).replace(/'/g,"\\'")}')`:`pick(${r.ci},${r.ii})`;
   const ft=fotoProd(i.n);
-  return `<div class="it${blk?" blk":""}">${ft?`<img class="ms-f" src="${ft}" alt="" loading="lazy">`:""}<div class="nm">${esc(td(i.n))}<small class="cat">${esc(r.cat)}</small>${nota}</div>
+  return `<div class="it${blk?" blk":""}">${ft?`<img class="ms-f" src="${ft}" alt="" loading="lazy" fetchpriority="low">`:""}<div class="nm">${esc(td(i.n))}<small class="cat">${esc(r.cat)}</small>${nota}</div>
    <div class="pr">${i.p}${i.g?` <em>· ${i.g}</em>`:""}</div>
    ${blk?'<span class="noadd">✕</span>':`<button class="add" onclick="${acao}" aria-label="+ ${esc(td(i.n))}">+</button>`}</div>`;
  }).join("");

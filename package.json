@@ -1,0 +1,11 @@
+{
+  "name": "emmasplace-menu",
+  "private": true,
+  "description": "Site e painéis do Emma's Place. Este ficheiro só serve para os testes automáticos (não é publicado no site).",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 tests/*.test.js"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}
