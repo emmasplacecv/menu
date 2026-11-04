@@ -9,6 +9,7 @@ Cada linha diz quem decide ou quem faz: **Dono** = decisão do negócio · **Wor
 |---|---|---|
 | 1. Documentação (este ficheiro e `CLAUDE.md`) | ramo `claude/hopeful-hypatia-gzxhed` | por aprovar |
 | 2. Segurança dos painéis e das encomendas | ramo `claude/seguranca-paineis` | por aprovar |
+| Dados no KV e migração para D1 (análise, nada executado) | `docs/kv-dados-e-migracao.md` neste PR | por decidir |
 | 3. Testes de preços, descontos, taxas, códigos, stock e horários | ramo `claude/testes-precos` | por aprovar |
 | 4. Funcionamento sem internet (/vendas e /cozinha) | ramo `claude/offline-vendas-cozinha` | por aprovar |
 | 5. Exportação mensal CSV, cópia de segurança e relatório | ramo `claude/relatorios-mensais` | por aprovar |
@@ -28,6 +29,9 @@ Cada linha diz quem decide ou quem faz: **Dono** = decisão do negócio · **Wor
    mas não há forma de o confirmar sem os registos do Worker. → *Dono*
 4. **Encomenda repetida pelo mesmo código** (Worker): o servidor deve recusar uma segunda encomenda com o mesmo
    código `PED-…`/`BAL-…` no mesmo dia (idempotência). Protege contra envios repetidos quando a rede cai a meio. → *Worker*
+
+4b. **Stock, horas, códigos e encomendas no KV não aguentam dois clientes ao mesmo tempo** (vende-se o que não há,
+   encomendas podem perder-se). Proposta de migração faseada para D1 em `docs/kv-dados-e-migracao.md`. → *Dono + Worker*
 
 ## P1
 
