@@ -3,124 +3,290 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cafés gelados na Praia, Plateau — Emma's Place</title>
-<meta name="description" content="Iced latte, frappés e iced mocha no Emma's Place, Av. Amílcar Cabral (frente BAI/IMPAR), Plateau, Praia. Preços, horário e encomenda online.">
+<title>Cafés gelados na Praia, Plateau — Emma&#x27;s Place</title>
+<meta name="description" content="Iced latte, frappés e iced mocha no Emma&#x27;s Place, Av. Amílcar Cabral (frente BAI/IMPAR), Plateau, Praia. Preços, horário e encomenda online.">
 <link rel="canonical" href="https://emmasplace.cv/cafes-gelados/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://emmasplace.cv/cafes-gelados/">
 <meta property="og:site_name" content="Emma's Place">
 <meta property="og:locale" content="pt_PT">
-<meta property="og:title" content="Cafés gelados — Emma's Place, Plateau, Praia">
+<meta property="og:title" content="Cafés gelados — Emma&#x27;s Place, Plateau, Praia">
 <meta property="og:description" content="Iced latte, frappés e iced mocha. Encomende no site para levantar no Plateau ou com entrega na Praia.">
 <meta property="og:image" content="https://emmasplace.cv/img/p/frappe-de-caramelo.webp">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/img/logo.webp">
-<!-- 04-11-2026: PÁGINA DOS CAFÉS GELADOS (para quem procura no Google "cafés gelados Praia", "café gelado Plateau").
-     Produtos e preços = os do menu do site (index.html, BEBIDAS FRIAS + Iced Caramel Macchiato); ao abrir, a página
-     lê os preços do /admin (servidor) e corrige-os, tal como o menu. Se mudar um preço no código do menu,
-     mudar também aqui e nos dados estruturados (application/ld+json) abaixo. Encomendar = menu principal. -->
+<!-- Página local (gerada a partir do menu do site). Produtos e preços = os do menu (index.html); ao abrir, os preços
+     são corrigidos com os da Gestão > Menu (/locais/precos.js). Se mudar um preço no código do menu, mudar também aqui
+     e nos dados estruturados (application/ld+json). Encomendar = menu principal. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&amp;family=Jost:wght@300;400;500;600&amp;display=swap">
+<link rel="stylesheet" href="/locais/estilo.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
-{"@type":"CafeOrCoffeeShop","@id":"https://emmasplace.cv/#cafe","name":"Emma's Place | Coffee & More","url":"https://emmasplace.cv/",
- "image":"https://emmasplace.cv/img/logo.webp","servesCuisine":["Café","Pequeno-almoço","Almoço"],"priceRange":"85–1050 ECV",
- "currenciesAccepted":"CVE","sameAs":["https://instagram.com/emmasplace.cv"],"hasMap":"https://maps.app.goo.gl/PUQn2B7j8WX2Sa9r7",
- "address":{"@type":"PostalAddress","streetAddress":"Av. Amílcar Cabral, Plateau (frente BAI/IMPAR)","addressLocality":"Praia","addressCountry":"CV"},
- "openingHoursSpecification":[
-  {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"08:00","closes":"17:00"},
-  {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:00","closes":"15:00"}],
- "hasMenu":{"@id":"https://emmasplace.cv/cafes-gelados/#menu"}},
-{"@type":"Menu","@id":"https://emmasplace.cv/cafes-gelados/#menu","name":"Cafés gelados","inLanguage":"pt",
- "hasMenuSection":{"@type":"MenuSection","name":"Cafés gelados e frappés","hasMenuItem":[
-  {"@type":"MenuItem","name":"Iced Latte","offers":[{"@type":"Offer","name":"Médio","price":"225","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"250","priceCurrency":"CVE"}]},
-  {"@type":"MenuItem","name":"Café Instantâneo Gelado","offers":[{"@type":"Offer","name":"Médio","price":"275","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"300","priceCurrency":"CVE"}]},
-  {"@type":"MenuItem","name":"Frappé Clássico","offers":[{"@type":"Offer","name":"Médio","price":"275","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"300","priceCurrency":"CVE"}]},
-  {"@type":"MenuItem","name":"Frappé de Chocolate","offers":[{"@type":"Offer","name":"Médio","price":"325","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"350","priceCurrency":"CVE"}]},
-  {"@type":"MenuItem","name":"Frappé de Caramelo","offers":[{"@type":"Offer","name":"Médio","price":"350","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"375","priceCurrency":"CVE"}]},
-  {"@type":"MenuItem","name":"Iced Latte de Caramelo","offers":[{"@type":"Offer","name":"Médio","price":"350","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"375","priceCurrency":"CVE"}]},
-  {"@type":"MenuItem","name":"Iced Mocha","offers":[{"@type":"Offer","name":"Médio","price":"350","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"375","priceCurrency":"CVE"}]},
-  {"@type":"MenuItem","name":"Iced Caramel Macchiato","description":"com leite de coco","offers":[{"@type":"Offer","name":"Médio","price":"450","priceCurrency":"CVE"},{"@type":"Offer","name":"Grande","price":"500","priceCurrency":"CVE"}]}
- ]}},
-{"@type":"WebPage","@id":"https://emmasplace.cv/cafes-gelados/","url":"https://emmasplace.cv/cafes-gelados/","name":"Cafés gelados na Praia, Plateau — Emma's Place",
- "inLanguage":"pt","about":{"@id":"https://emmasplace.cv/#cafe"},
- "breadcrumb":{"@type":"BreadcrumbList","itemListElement":[
-  {"@type":"ListItem","position":1,"name":"Emma's Place","item":"https://emmasplace.cv/"},
-  {"@type":"ListItem","position":2,"name":"Cafés gelados","item":"https://emmasplace.cv/cafes-gelados/"}]}}
-]}
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "CafeOrCoffeeShop",
+   "@id": "https://emmasplace.cv/#cafe",
+   "name": "Emma's Place | Coffee & More",
+   "url": "https://emmasplace.cv/",
+   "image": "https://emmasplace.cv/img/logo.webp",
+   "servesCuisine": [
+    "Café",
+    "Pequeno-almoço",
+    "Almoço"
+   ],
+   "priceRange": "85–1050 ECV",
+   "currenciesAccepted": "CVE",
+   "sameAs": [
+    "https://instagram.com/emmasplace.cv"
+   ],
+   "hasMap": "https://maps.app.goo.gl/PUQn2B7j8WX2Sa9r7",
+   "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Av. Amílcar Cabral, Plateau (frente BAI/IMPAR)",
+    "addressLocality": "Praia",
+    "addressCountry": "CV"
+   },
+   "openingHoursSpecification": [
+    {
+     "@type": "OpeningHoursSpecification",
+     "dayOfWeek": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+     ],
+     "opens": "08:00",
+     "closes": "17:00"
+    },
+    {
+     "@type": "OpeningHoursSpecification",
+     "dayOfWeek": "Saturday",
+     "opens": "09:00",
+     "closes": "15:00"
+    }
+   ],
+   "hasMenu": {
+    "@id": "https://emmasplace.cv/#menu"
+   }
+  },
+  {
+   "@type": "Menu",
+   "@id": "https://emmasplace.cv/cafes-gelados/#menu",
+   "name": "Cafés gelados",
+   "inLanguage": "pt",
+   "hasMenuSection": {
+    "@type": "MenuSection",
+    "name": "Cafés gelados e frappés",
+    "hasMenuItem": [
+     {
+      "@type": "MenuItem",
+      "name": "Iced Latte",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "225",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "250",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Café Instantâneo Gelado",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "275",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "300",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Frappé Clássico",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "275",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "300",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Frappé de Chocolate",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "325",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "350",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Frappé de Caramelo",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "350",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "375",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Iced Latte de Caramelo",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "350",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "375",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Iced Mocha",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "350",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "375",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Iced Caramel Macchiato",
+      "offers": [
+       {
+        "@type": "Offer",
+        "name": "Médio",
+        "price": "450",
+        "priceCurrency": "CVE"
+       },
+       {
+        "@type": "Offer",
+        "name": "Grande",
+        "price": "500",
+        "priceCurrency": "CVE"
+       }
+      ],
+      "description": "com leite de coco"
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Combo Lanche",
+      "description": "café gelado ou frappé clássico + donut",
+      "offers": [
+       {
+        "@type": "Offer",
+        "price": "400",
+        "priceCurrency": "CVE"
+       }
+      ]
+     },
+     {
+      "@type": "MenuItem",
+      "name": "Combo Super combo",
+      "description": "sopa + pão recheado de frango ou caprese + café gelado ou frappé clássico",
+      "offers": [
+       {
+        "@type": "Offer",
+        "price": "760",
+        "priceCurrency": "CVE"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "@type": "WebPage",
+   "@id": "https://emmasplace.cv/cafes-gelados/",
+   "url": "https://emmasplace.cv/cafes-gelados/",
+   "name": "Cafés gelados na Praia, Plateau — Emma's Place",
+   "inLanguage": "pt",
+   "about": {
+    "@id": "https://emmasplace.cv/#cafe"
+   },
+   "mainEntity": {
+    "@id": "https://emmasplace.cv/cafes-gelados/#menu"
+   },
+   "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+     {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Emma's Place",
+      "item": "https://emmasplace.cv/"
+     },
+     {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Cafés gelados",
+      "item": "https://emmasplace.cv/cafes-gelados/"
+     }
+    ]
+   }
+  }
+ ]
+}
 </script>
-<style>
-/* Mesmas cores, letras e cartões do site (index.html) */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-:root{--cream:#F7F1E4;--card:#FFFCF6;--line:#E7DCC8;--ink:#34251D;--ink2:#785B42;--gold:#B8783D;--dark:#2F2119;
- --roxo:#4A2545;--roxo2:#63345C;--roxo3:#371A33;--lilas:#E6D2E1;}
-html{scroll-behavior:smooth;}
-body{background:radial-gradient(circle at 7% 4%,rgba(255,255,255,.72),transparent 24%),var(--cream);color:var(--ink);
- font-family:'Jost',system-ui,sans-serif;-webkit-text-size-adjust:100%;}
-.wrap{max-width:1180px;margin:0 auto;padding:14px 16px 24px;}
-.sitebar{position:sticky;top:0;z-index:65;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:76px;
- padding:10px 14px;margin-bottom:12px;background:rgba(255,252,246,.94);border:1px solid rgba(184,120,61,.18);
- border-radius:0 0 18px 18px;box-shadow:0 8px 28px rgba(52,37,29,.08);backdrop-filter:blur(14px);}
-.brand-lockup{display:flex;align-items:center;gap:11px;color:var(--ink);text-decoration:none;white-space:nowrap;}
-.brand-lockup img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#fff;}
-.brand-lockup strong{font-family:'Playfair Display',serif;font-size:21px;letter-spacing:1.1px;}
-.brand-lockup small{display:block;margin-top:2px;color:var(--ink2);font-size:9px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;}
-.topcart{display:inline-flex;align-items:center;padding:11px 18px;border-radius:40px;background:var(--roxo);color:#FBF4E6;
- text-decoration:none;font-weight:600;font-size:14.5px;white-space:nowrap;}
-.crumb{font-size:12.5px;color:var(--ink2);margin:4px 2px 10px;}
-.crumb a{color:var(--ink2);}
-.intro{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 18px;box-shadow:0 16px 38px rgba(52,37,29,.08);}
-.intro h1{font-family:'Playfair Display',serif;font-weight:700;font-size:30px;line-height:1.12;color:var(--ink);}
-.intro p{margin-top:10px;font-size:15.5px;line-height:1.6;color:var(--ink);font-weight:400;}
-.intro p.leve{color:var(--ink2);font-size:14px;}
-.go{display:inline-flex;align-items:center;justify-content:center;margin-top:16px;padding:14px 26px;border-radius:40px;
- background:var(--roxo);color:#FBF4E6;text-decoration:none;font-weight:600;font-size:16px;box-shadow:0 4px 12px rgba(74,37,69,.22);}
-h2{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-height:1.1;margin:28px 2px 12px;color:var(--ink);}
-.shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;}
-@media (min-width:720px){ .shelf{grid-template-columns:repeat(4,minmax(0,1fr));} }
-.pc{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:6px 6px 12px;
- box-shadow:0 1px 0 rgba(52,37,29,.04),0 10px 24px -14px rgba(52,37,29,.28);display:flex;flex-direction:column;}
-.pc.fora{display:none;}
-.pc-foto{display:block;width:100%;aspect-ratio:1/1;border-radius:17px;overflow:hidden;background:#F3E9DC;}
-.pc-foto img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 55%;}
-.pc-txt{padding:10px 6px 0;display:flex;flex-direction:column;flex:1;}
-.pc-n{font:600 14.5px/1.25 'Jost',sans-serif;color:var(--ink);}
-.pc-d{font-size:12px;line-height:1.3;color:var(--ink2);font-weight:300;margin-top:3px;}
-.pc-pr{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-top:auto;padding-top:8px;}
-.pc-p b,.pc-g b{font-family:'Playfair Display',serif;font-weight:700;font-size:17px;color:var(--ink);}
-.pc-g{opacity:.85;} .pc-g b{font-size:15px;color:#8B5E3C;}
-.pc-pr small{font-size:10.5px;font-weight:600;letter-spacing:.3px;color:var(--ink2);margin-left:1px;}
-.nota{font-size:13.5px;color:var(--ink2);line-height:1.55;margin:12px 2px 0;}
-.combos{display:grid;gap:10px;}
-@media (min-width:720px){ .combos{grid-template-columns:1fr 1fr;} }
-.combo{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;}
-.combo b{font-family:'Playfair Display',serif;font-size:17px;}
-.combo span{display:block;font-size:13px;color:var(--ink2);margin-top:2px;}
-.combo i{font-style:normal;font-family:'Playfair Display',serif;font-weight:700;font-size:18px;white-space:nowrap;}
-.combo.fora{display:none;}
-.info{background:var(--roxo);color:#F7F1E4;border-radius:18px;padding:22px 18px;margin-top:28px;box-shadow:0 12px 26px rgba(74,37,69,.2);}
-.info h2{color:#FFF7E9;margin:0 0 10px;}
-.info dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px;line-height:1.5;}
-.info dt{color:var(--lilas);font-weight:600;}
-.info a{color:#FFF7E9;font-weight:600;}
-.mapa{margin-top:14px;border-radius:14px;overflow:hidden;background:#E8DCCB;aspect-ratio:16/10;}
-.mapa iframe{display:block;width:100%;height:100%;border:0;}
-.mapbtn{display:inline-flex;align-items:center;gap:9px;margin-top:14px;padding:12px 22px;border-radius:40px;background:#F7F1E4;
- color:#22160E;text-decoration:none;font-size:15px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.18);}
-.mapbtn svg{width:19px;height:19px;color:var(--roxo);flex:none;}
-.info a.mapbtn{color:#22160E;}
-.fim{text-align:center;margin:26px 0 6px;}
-.site-footer{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:28px;margin-top:24px;padding:30px;background:var(--dark);color:#F7F1E4;border-radius:22px 22px 10px 10px;}
-@media (max-width:720px){ .site-footer{grid-template-columns:1fr;gap:18px;padding:24px 20px;} }
-.footer-brand{display:flex;gap:14px;align-items:center;}
-.footer-brand img{width:72px;height:72px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;background:#fff;}
-.footer-brand strong{display:block;font-family:'Playfair Display',serif;font-size:21px;}
-.footer-col b{display:block;color:var(--gold);font-family:'Playfair Display',serif;font-size:16px;margin-bottom:8px;}
-.footer-col span,.footer-col a{display:block;color:#D9C7A8;font-size:13px;line-height:1.7;text-decoration:none;}
-.footer-bottom{grid-column:1/-1;border-top:1px solid #5A4636;margin-top:4px;padding-top:13px;color:#BCA991;font-size:11.5px;text-align:center;}
-@media (max-width:420px){ .brand-lockup strong{font-size:18px;} .brand-lockup img{width:44px;height:44px;} .topcart{padding:10px 14px;font-size:13.5px;} .intro h1{font-size:26px;} }
-</style>
 </head>
 <body>
 <div class="wrap">
@@ -137,8 +303,7 @@ h2{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-heig
 
 <header class="intro">
   <h1>Cafés gelados no Plateau, Praia</h1>
-  <p>Cafés frios e frappés no Emma's Place, na Av. Amílcar Cabral, em frente ao BAI/IMPAR, no Plateau.
-     Tamanho médio ou grande, com o leite à escolha.</p>
+  <p>Cafés frios e frappés no Emma&#x27;s Place, na Av. Amílcar Cabral, em frente ao BAI/IMPAR, no Plateau. Tamanho médio ou grande, com o leite à escolha.</p>
   <p class="leve">Encomende no site para levantar no local ou com entrega na Praia. Entrega grátis acima de 750$.</p>
   <a class="go" href="/#menu">Encomendar no site</a>
 </header>
@@ -146,28 +311,28 @@ h2{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-heig
 <h2 id="menu">Cafés gelados e frappés</h2>
 <div class="shelf" id="lista">
   <article class="pc" data-n="Iced Latte"><div class="pc-foto"><img src="/img/p/iced-latte.webp" alt="Iced Latte" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Iced Latte</h3><div class="pc-pr"><span class="pc-p"><b>225$</b> <small>M</small></span><span class="pc-g"><b>250$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Iced Latte</h3><div class="pc-pr"><span class="pc-p"><b data-preco="Iced Latte" data-t="m" data-base="225">225$</b> <small>M</small></span><span class="pc-g"><b data-preco="Iced Latte" data-t="g" data-base="250">250$</b> <small>G</small></span></div></div></article>
   <article class="pc" data-n="Café Instantâneo Gelado"><div class="pc-foto"><img src="/img/p/cafe-instantaneo-gelado.webp" alt="Café Instantâneo Gelado" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Café Instantâneo Gelado</h3><div class="pc-pr"><span class="pc-p"><b>275$</b> <small>M</small></span><span class="pc-g"><b>300$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Café Instantâneo Gelado</h3><div class="pc-pr"><span class="pc-p"><b data-preco="Café Instantâneo Gelado" data-t="m" data-base="275">275$</b> <small>M</small></span><span class="pc-g"><b data-preco="Café Instantâneo Gelado" data-t="g" data-base="300">300$</b> <small>G</small></span></div></div></article>
   <article class="pc" data-n="Frappé Clássico"><div class="pc-foto"><img src="/img/p/frappe-classico.webp" alt="Frappé Clássico" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Frappé Clássico</h3><div class="pc-pr"><span class="pc-p"><b>275$</b> <small>M</small></span><span class="pc-g"><b>300$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Frappé Clássico</h3><div class="pc-pr"><span class="pc-p"><b data-preco="Frappé Clássico" data-t="m" data-base="275">275$</b> <small>M</small></span><span class="pc-g"><b data-preco="Frappé Clássico" data-t="g" data-base="300">300$</b> <small>G</small></span></div></div></article>
   <article class="pc" data-n="Frappé de Chocolate"><div class="pc-foto"><img src="/img/p/frappe-de-chocolate.webp" alt="Frappé de Chocolate" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Frappé de Chocolate</h3><div class="pc-pr"><span class="pc-p"><b>325$</b> <small>M</small></span><span class="pc-g"><b>350$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Frappé de Chocolate</h3><div class="pc-pr"><span class="pc-p"><b data-preco="Frappé de Chocolate" data-t="m" data-base="325">325$</b> <small>M</small></span><span class="pc-g"><b data-preco="Frappé de Chocolate" data-t="g" data-base="350">350$</b> <small>G</small></span></div></div></article>
   <article class="pc" data-n="Frappé de Caramelo"><div class="pc-foto"><img src="/img/p/frappe-de-caramelo.webp" alt="Frappé de Caramelo" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Frappé de Caramelo</h3><div class="pc-pr"><span class="pc-p"><b>350$</b> <small>M</small></span><span class="pc-g"><b>375$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Frappé de Caramelo</h3><div class="pc-pr"><span class="pc-p"><b data-preco="Frappé de Caramelo" data-t="m" data-base="350">350$</b> <small>M</small></span><span class="pc-g"><b data-preco="Frappé de Caramelo" data-t="g" data-base="375">375$</b> <small>G</small></span></div></div></article>
   <article class="pc" data-n="Iced Latte de Caramelo"><div class="pc-foto"><img src="/img/p/iced-latte-de-caramelo.webp" alt="Iced Latte de Caramelo" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Iced Latte de Caramelo</h3><div class="pc-pr"><span class="pc-p"><b>350$</b> <small>M</small></span><span class="pc-g"><b>375$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Iced Latte de Caramelo</h3><div class="pc-pr"><span class="pc-p"><b data-preco="Iced Latte de Caramelo" data-t="m" data-base="350">350$</b> <small>M</small></span><span class="pc-g"><b data-preco="Iced Latte de Caramelo" data-t="g" data-base="375">375$</b> <small>G</small></span></div></div></article>
   <article class="pc" data-n="Iced Mocha"><div class="pc-foto"><img src="/img/p/iced-mocha.webp" alt="Iced Mocha" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Iced Mocha</h3><div class="pc-pr"><span class="pc-p"><b>350$</b> <small>M</small></span><span class="pc-g"><b>375$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Iced Mocha</h3><div class="pc-pr"><span class="pc-p"><b data-preco="Iced Mocha" data-t="m" data-base="350">350$</b> <small>M</small></span><span class="pc-g"><b data-preco="Iced Mocha" data-t="g" data-base="375">375$</b> <small>G</small></span></div></div></article>
   <article class="pc" data-n="Iced Caramel Macchiato"><div class="pc-foto"><img src="/img/p/iced-caramel-macchiato.webp" alt="Iced Caramel Macchiato" width="400" height="400" loading="lazy" decoding="async"></div>
-    <div class="pc-txt"><h3 class="pc-n">Iced Caramel Macchiato</h3><p class="pc-d">com leite de coco</p><div class="pc-pr"><span class="pc-p"><b>450$</b> <small>M</small></span><span class="pc-g"><b>500$</b> <small>G</small></span></div></div></article>
+    <div class="pc-txt"><h3 class="pc-n">Iced Caramel Macchiato</h3><p class="pc-d">com leite de coco</p><div class="pc-pr"><span class="pc-p"><b data-preco="Iced Caramel Macchiato" data-t="m" data-base="450">450$</b> <small>M</small></span><span class="pc-g"><b data-preco="Iced Caramel Macchiato" data-t="g" data-base="500">500$</b> <small>G</small></span></div></div></article>
 </div>
 <p class="nota">Leite à escolha: normal, ou aveia, coco, soja, amêndoa ou sem lactose (+100$). Preços em ECV. Imagens meramente ilustrativas.</p>
 
 <h2>Combos com café gelado</h2>
 <div class="combos">
-  <div class="combo" data-c="LANCHE"><div><b>Lanche</b><span>café gelado ou frappé clássico + donut</span></div><i>400$</i></div>
-  <div class="combo" data-c="SUPER COMBO"><div><b>Super combo</b><span>sopa + pão recheado de frango ou caprese + café gelado ou frappé clássico</span></div><i>760$</i></div>
+  <div class="combo" data-partes='[[[&quot;Café Instantâneo Gelado&quot;, 275], [&quot;Frappé Clássico&quot;, 275]], [[&quot;Donut de Chocolate&quot;, 150], [&quot;Donut de Doce de Leite&quot;, 150]]]'><div><b>Lanche</b><span>café gelado ou frappé clássico + donut</span></div><i>400$</i></div>
+  <div class="combo" data-partes='[[[&quot;Sopa do Dia&quot;, 300]], [[&quot;Pão Recheado de Frango&quot;, 225], [&quot;Pão Recheado Caprese&quot;, 225]], [[&quot;Café Instantâneo Gelado&quot;, 275], [&quot;Frappé Clássico&quot;, 275]]]'><div><b>Super combo</b><span>sopa + pão recheado de frango ou caprese + café gelado ou frappé clássico</span></div><i>760$</i></div>
 </div>
 
 <section class="info" aria-labelledby="ondeT">
@@ -185,6 +350,8 @@ h2{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-heig
   </a>
 </section>
 
+<nav class="mais" aria-label="Também no Emma's Place"><b>Também no Emma's Place</b><a href="/acai/">Açaí</a><a href="/cafe/">Café</a><a href="/#menu">Menu completo</a></nav>
+
 <div class="fim"><a class="go" href="/#menu">Encomendar no site</a></div>
 
 <footer class="site-footer">
@@ -194,47 +361,6 @@ h2{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-heig
   <div class="footer-bottom">Preços em ECV · Imagens meramente ilustrativas</div>
 </footer>
 </div>
-
-<script>
-/* Preços do momento: os mesmos que o menu lê do servidor (Gestão > Menu). Sem resposta, ficam os da página.
-   Produto retirado do menu na Gestão -> sai daqui. Combos = soma das partes −5%, arredondado aos 5 (como no menu). */
-(function(){
- var API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
- var BASE={"Iced Latte":[225,250],"Café Instantâneo Gelado":[275,300],"Frappé Clássico":[275,300],"Frappé de Chocolate":[325,350],
-  "Frappé de Caramelo":[350,375],"Iced Latte de Caramelo":[350,375],"Iced Mocha":[350,375],"Iced Caramel Macchiato":[450,500],
-  "Donut de Chocolate":[150],"Donut de Doce de Leite":[150],"Sopa do Dia":[300],"Pão Recheado de Frango":[225],"Pão Recheado Caprese":[225]};
- var COMBOS={"LANCHE":[["Café Instantâneo Gelado","Frappé Clássico"],["Donut de Chocolate","Donut de Doce de Leite"]],
-  "SUPER COMBO":[["Sopa do Dia"],["Pão Recheado de Frango","Pão Recheado Caprese"],["Café Instantâneo Gelado","Frappé Clássico"]]};
- /* nomes antigos ainda guardados no servidor (iguais a NOMES_NOVOS do index.html) */
- var NOVOS={"Frape Clássico":"Frappé Clássico","Frape Chocolate":"Frappé de Chocolate","Frape Caramelo":"Frappé de Caramelo",
-  "Iced Caramelo Latte":"Iced Latte de Caramelo","Donut Chocolate":"Donut de Chocolate","Donut Doce de Leite":"Donut de Doce de Leite",
-  "Pão Rech. Frango":"Pão Recheado de Frango","Pão Rech. Caprese":"Pão Recheado Caprese"};
- var atual=function(k){ return NOVOS[k]||k; };
- function aplicar(ed){
-  var p0=(ed&&ed.p)||{}, p={}, off=((ed&&ed.off)||[]).map(atual);
-  Object.keys(p0).forEach(function(k){ var n=atual(k); if(!(n in p)||k===n) p[n]=p0[k]; });
-  var preco=function(n,k){ if(off.indexOf(n)>=0) return 0; var o=p[n], b=BASE[n]||[]; var v=o&&o[k?"g":"m"]; return +(v!=null?v:b[k])||0; };
-  document.querySelectorAll("#lista .pc").forEach(function(c){
-   var n=c.getAttribute("data-n"), m=preco(n,0), g=preco(n,1);
-   if(!m){ c.classList.add("fora"); return; }
-   var pm=c.querySelector(".pc-p b"), pg=c.querySelector(".pc-g b");
-   if(pm) pm.textContent=m+"$";
-   if(pg){ if(g) pg.textContent=g+"$"; else pg.parentNode.style.display="none"; }
-  });
-  document.querySelectorAll(".combo").forEach(function(c){
-   var soma=0, ok=true;
-   COMBOS[c.getAttribute("data-c")].forEach(function(op){ var v=op.map(function(n){ return preco(n,0); }).filter(function(x){ return x>0; });
-    if(!v.length) ok=false; else soma+=Math.max.apply(null,v); });
-   if(!ok){ c.classList.add("fora"); return; }
-   c.querySelector("i").textContent=(Math.floor(soma*95/100/5)*5)+"$";
-  });
- }
- try{
-  var ctl=window.AbortController?new AbortController():null, t=ctl?setTimeout(function(){ ctl.abort(); },5000):0;
-  fetch(API+"/menu-edit",ctl?{signal:ctl.signal}:undefined).then(function(r){ return r.json(); })
-   .then(function(d){ clearTimeout(t); if(d && !d.erro && d.edit) aplicar(d.edit); }).catch(function(){});
- }catch(e){}
-})();
-</script>
+<script src="/locais/precos.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,81 @@
+/* Páginas locais (cafés gelados, açaí, café): mesmas cores, letras e cartões do site (index.html) */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--cream:#F7F1E4;--card:#FFFCF6;--line:#E7DCC8;--ink:#34251D;--ink2:#785B42;--gold:#B8783D;--dark:#2F2119;
+ --roxo:#4A2545;--roxo2:#63345C;--roxo3:#371A33;--lilas:#E6D2E1;}
+html{scroll-behavior:smooth;}
+body{background:radial-gradient(circle at 7% 4%,rgba(255,255,255,.72),transparent 24%),var(--cream);color:var(--ink);
+ font-family:'Jost',system-ui,sans-serif;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1180px;margin:0 auto;padding:14px 16px 24px;}
+.sitebar{position:sticky;top:0;z-index:65;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:76px;
+ padding:10px 14px;margin-bottom:12px;background:rgba(255,252,246,.94);border:1px solid rgba(184,120,61,.18);
+ border-radius:0 0 18px 18px;box-shadow:0 8px 28px rgba(52,37,29,.08);backdrop-filter:blur(14px);}
+.brand-lockup{display:flex;align-items:center;gap:11px;color:var(--ink);text-decoration:none;white-space:nowrap;}
+.brand-lockup img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#fff;}
+.brand-lockup strong{font-family:'Playfair Display',serif;font-size:21px;letter-spacing:1.1px;}
+.brand-lockup small{display:block;margin-top:2px;color:var(--ink2);font-size:9px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;}
+.topcart{display:inline-flex;align-items:center;padding:11px 18px;border-radius:40px;background:var(--roxo);color:#FBF4E6;
+ text-decoration:none;font-weight:600;font-size:14.5px;white-space:nowrap;}
+.crumb{font-size:12.5px;color:var(--ink2);margin:4px 2px 10px;}
+.crumb a{color:var(--ink2);}
+.intro{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 18px;box-shadow:0 16px 38px rgba(52,37,29,.08);}
+.intro h1{font-family:'Playfair Display',serif;font-weight:700;font-size:30px;line-height:1.12;color:var(--ink);}
+.intro p{margin-top:10px;font-size:15.5px;line-height:1.6;color:var(--ink);font-weight:400;}
+.intro p.leve{color:var(--ink2);font-size:14px;}
+.go{display:inline-flex;align-items:center;justify-content:center;margin-top:16px;padding:14px 26px;border-radius:40px;
+ background:var(--roxo);color:#FBF4E6;text-decoration:none;font-weight:600;font-size:16px;box-shadow:0 4px 12px rgba(74,37,69,.22);}
+h2{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-height:1.1;margin:28px 2px 12px;color:var(--ink);}
+.shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;}
+@media (min-width:720px){ .shelf{grid-template-columns:repeat(4,minmax(0,1fr));} }
+.pc{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:6px 6px 12px;
+ box-shadow:0 1px 0 rgba(52,37,29,.04),0 10px 24px -14px rgba(52,37,29,.28);display:flex;flex-direction:column;}
+.pc.fora{display:none;}
+.pc-foto{display:block;width:100%;aspect-ratio:1/1;border-radius:17px;overflow:hidden;background:#F3E9DC;}
+.pc-foto img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 55%;}
+.pc-txt{padding:10px 6px 0;display:flex;flex-direction:column;flex:1;}
+.pc-n{font:600 14.5px/1.25 'Jost',sans-serif;color:var(--ink);}
+.pc-d{font-size:12px;line-height:1.3;color:var(--ink2);font-weight:300;margin-top:3px;}
+.pc-pr{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-top:auto;padding-top:8px;}
+.pc-p b,.pc-g b{font-family:'Playfair Display',serif;font-weight:700;font-size:17px;color:var(--ink);}
+.pc-g{opacity:.85;} .pc-g b{font-size:15px;color:#8B5E3C;}
+.pc-pr small{font-size:10.5px;font-weight:600;letter-spacing:.3px;color:var(--ink2);margin-left:1px;}
+.nota{font-size:13.5px;color:var(--ink2);line-height:1.55;margin:12px 2px 0;}
+.combos{display:grid;gap:10px;}
+@media (min-width:720px){ .combos{grid-template-columns:1fr 1fr;} }
+.combo{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;}
+.combo b{font-family:'Playfair Display',serif;font-size:17px;}
+.combo span{display:block;font-size:13px;color:var(--ink2);margin-top:2px;}
+.combo i{font-style:normal;font-family:'Playfair Display',serif;font-weight:700;font-size:18px;white-space:nowrap;}
+.combo.fora{display:none;}
+.info{background:var(--roxo);color:#F7F1E4;border-radius:18px;padding:22px 18px;margin-top:28px;box-shadow:0 12px 26px rgba(74,37,69,.2);}
+.info h2{color:#FFF7E9;margin:0 0 10px;}
+.info dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px;line-height:1.5;}
+.info dt{color:var(--lilas);font-weight:600;}
+.info a{color:#FFF7E9;font-weight:600;}
+.mapa{margin-top:14px;border-radius:14px;overflow:hidden;background:#E8DCCB;aspect-ratio:16/10;}
+.mapa iframe{display:block;width:100%;height:100%;border:0;}
+.mapbtn{display:inline-flex;align-items:center;gap:9px;margin-top:14px;padding:12px 22px;border-radius:40px;background:#F7F1E4;
+ color:#22160E;text-decoration:none;font-size:15px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.18);}
+.mapbtn svg{width:19px;height:19px;color:var(--roxo);flex:none;}
+.info a.mapbtn{color:#22160E;}
+.fim{text-align:center;margin:26px 0 6px;}
+.site-footer{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:28px;margin-top:24px;padding:30px;background:var(--dark);color:#F7F1E4;border-radius:22px 22px 10px 10px;}
+@media (max-width:720px){ .site-footer{grid-template-columns:1fr;gap:18px;padding:24px 20px;} }
+.footer-brand{display:flex;gap:14px;align-items:center;}
+.footer-brand img{width:72px;height:72px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;background:#fff;}
+.footer-brand strong{display:block;font-family:'Playfair Display',serif;font-size:21px;}
+.footer-col b{display:block;color:var(--gold);font-family:'Playfair Display',serif;font-size:16px;margin-bottom:8px;}
+.footer-col span,.footer-col a{display:block;color:#D9C7A8;font-size:13px;line-height:1.7;text-decoration:none;}
+.footer-bottom{grid-column:1/-1;border-top:1px solid #5A4636;margin-top:4px;padding-top:13px;color:#BCA991;font-size:11.5px;text-align:center;}
+@media (max-width:420px){ .brand-lockup strong{font-size:18px;} .brand-lockup img{width:44px;height:44px;} .topcart{padding:10px 14px;font-size:13.5px;} .intro h1{font-size:26px;} }
+/* cartão largo do açaí (três preços) */
+.pc.largo{grid-column:1/-1;flex-direction:row;gap:12px;align-items:center;padding:8px;}
+.pc.largo .pc-foto{width:42%;flex:none;}
+.pc.largo .pc-txt{padding:4px 4px 4px 0;}
+.precos{list-style:none;margin-top:8px;display:grid;gap:6px;}
+.precos li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13.5px;color:var(--ink2);line-height:1.3;}
+.precos li b{font-family:'Playfair Display',serif;font-weight:700;font-size:17px;color:var(--ink);white-space:nowrap;}
+@media (min-width:720px){ .pc.largo{grid-column:span 2;} }
+/* ligações para as outras páginas */
+.mais{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:22px;font-size:14px;}
+.mais b{flex-basis:100%;font-family:'Playfair Display',serif;font-size:17px;color:var(--ink);}
+.mais a{padding:8px 15px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;font-weight:600;}
