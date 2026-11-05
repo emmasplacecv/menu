@@ -21,18 +21,12 @@ Não há passo de compilação: o que está no ramo `main` é o que o site mostr
 | `img/`, `img/p/` | Fotos (capas, categorias, produtos em WebP) | — |
 | Ficheiros soltos na raiz (`capa-2.webp`, `pao.jpg`, …) | Cópias antigas; o site actual usa `img/` | — |
 
-### Servidor (Cloudflare Worker) — NÃO está neste repositório
+### Servidor (Cloudflare Worker) — repositório privado
 
-Tudo o que é dinâmico passa por `https://wispy-cherry-ee2e.joaomleal88.workers.dev`
-(constante `PROMO_API` / `API`). O código do Worker **não está aqui**: quem o tiver deve juntá-lo
-(sem segredos) numa pasta `worker/` para poder ser revisto e testado.
-
-Pontos de acesso usados pelas páginas (lista tirada do código das páginas):
-
-- Públicos: `/menu-edit`, `/estado`, `/soldout`, `/stock-dia`, `/slots`, `/reserve`, `/check`, `/redeem`, `/order`, `/comprovativo` (POST)
-- Com chave (`?key=`): `/orders`, `/order-status`, `/order-del`, `/order-pago`, `/order-visto`, `/stock-baixa`, `/stock-item`,
-  `/stock-set`, `/soldout-set`, `/menu-set`, `/estado-set`, `/entregas-set`, `/comprovativo` (GET), `/renovar`,
-  `/push-chave`, `/push-sub`, `/push-teste`, `/push-log`
+Tudo o que é dinâmico (menu do dia, stock, horários, pedidos, comprovativos, notificações) passa pelo Worker
+`https://wispy-cherry-ee2e.joaomleal88.workers.dev` (constante `PROMO_API` / `API` nas páginas).
+O código do Worker e a sua documentação (pontos de acesso, armazenamento, medições) estão num **repositório privado**.
+Alterações que precisem do servidor fazem-se e revêem-se lá; aqui só se muda o lado das páginas.
 
 ## Regras de trabalho (obrigatórias)
 
@@ -45,7 +39,7 @@ Pontos de acesso usados pelas páginas (lista tirada do código das páginas):
    Nunca escrever chaves, tokens ou palavras-passe no código, nos commits, nos PR ou nos testes.
    Os NIB/contas bancárias que o site mostra são públicos de propósito (para o cliente transferir).
 5. **Dados de clientes** (nome, telefone, morada, notas) vêm da internet: ao mostrar em HTML, **escapar sempre**
-   (`hEsc` na Gestão, `esc` na Cozinha e nas Vendas). Nunca pôr `${p.campo}` directo no `innerHTML`.
+   (`hEsc` na Gestão, `esc` na Cozinha e nas Vendas). Não montar HTML com texto do cliente sem passar por essas funções.
 6. **Hora de Cabo Verde** = UTC−1. O site usa `agoraCV()`/`diaCV()`; os painéis usam a hora do aparelho
    (os aparelhos da loja têm de estar na hora de Cabo Verde).
 7. Ao mudar um service worker (`sw.js`, `sw-vendas.js`), **subir o número de `VERSAO`**; senão os aparelhos ficam com a cópia antiga.
