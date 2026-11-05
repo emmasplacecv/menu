@@ -4444,19 +4444,21 @@ async function carregarMenuEdit(){
   return (ia<0?999:ia)-(ib<0?999:ib);
  });
 }
-async function carregarEsgotados(){
- try{
-  const r=await fetch(PROMO_API+"/soldout");
-  const d=await r.json();
-  esgotados = (d.itens || []).map(nomeAtual);
- }catch(e){ esgotados=[]; }
+/* 05-11-2026: VELOCIDADE — esgotados e stock do dia pedidos AO MESMO TEMPO (antes um esperava pelo outro).
+   Com o servidor lento, cada pedido em fila somava a espera toda outra vez. */
+async function lerEsgotados(){
+ const [so,sd]=await Promise.all([
+  fetch(PROMO_API+"/soldout").then(r=>r.json()).catch(()=>null),
+  fetch(PROMO_API+"/stock-dia").then(r=>r.json()).catch(()=>null)
+ ]);
+ const lista=((so&&so.itens)||[]).map(nomeAtual);
  // produtos cujo stock do dia chegou a zero contam como esgotados
- try{
-  const rs=await fetch(PROMO_API+"/stock-dia");
-  const ds=await rs.json();
-  const st=chavesAtuais(ds.itens||{});
-  Object.keys(st).forEach(n=>{ if(st[n]<=0 && !esgotados.includes(n)) esgotados.push(n); });
- }catch(e){}
+ const st=chavesAtuais((sd&&sd.itens)||{});
+ Object.keys(st).forEach(n=>{ if(st[n]<=0 && !lista.includes(n)) lista.push(n); });
+ return lista;
+}
+async function carregarEsgotados(pronto){
+ esgotados = await (pronto || lerEsgotados());
  build();
  // tirar do carrinho o que entretanto esgotou
  const fora=cart.filter(i=>esgotados.includes(i.name));
@@ -4897,8 +4899,12 @@ function pulsar(){
 })();
 
 carregarEstado();
-const _menuPronto=carregarMenuEdit();          /* o PDF do menu espera por isto (preços e produtos do /admin) */
-_menuPronto.then(carregarEsgotados);
+/* 05-11-2026: VELOCIDADE — ao abrir, os três pedidos ao servidor (menu do dia, esgotados, stock) partem juntos.
+   Os preços do /admin aparecem logo que o menu chega; os esgotados entram quando chegarem.
+   Antes iam em fila (menu → esgotados → stock) e, com o servidor lento, os preços certos demoravam o triplo. */
+const _esgPedido=lerEsgotados();
+const _menuPronto=carregarMenuEdit().then(()=>{ build(); });   /* o PDF do menu espera por isto (preços e produtos do /admin) */
+_menuPronto.then(()=>carregarEsgotados(_esgPedido));
 
 /* ---------- 25-10-2026: MENU EM PDF, GERADO NO MOMENTO ----------
    "Descarregar menu (PDF)" faz o PDF ali mesmo, com o menu que o site está a mostrar (preços, produtos e combos
