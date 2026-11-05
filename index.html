@@ -3921,7 +3921,6 @@ async function sendWA(){
   L.push("*PAGAMENTO:* no balcão, no levantamento.");
  }
 
- guardarUltimo();
  // regista o pedido no servidor, para o painel de gestão e para a cozinha
  /* o que este pedido consome do stock do dia (combos ficam de fora:
     o componente escolhido só se sabe no balcão) */
@@ -3941,21 +3940,26 @@ async function sendWA(){
  });
 
  /* O pedido passa a ser registado só aqui, no site. Como é o único canal,
-    esperamos pela resposta do servidor antes de dizer ao cliente que ficou feito. */
- let registado=false;
+    esperamos pela resposta do servidor antes de dizer ao cliente que ficou feito.
+    05-11-2026: "pedido feito" só quando o servidor ACEITA (resposta OK e sem "erro").
+    Se o servidor recusar, o cliente vê a mensagem que o servidor mandou e o pedido fica no ecrã.
+    Sem resposta (rede), o aviso de sempre: tentar outra vez — o código do pedido é o mesmo.
+    (Deixou de haver o envio de reserva por sendBeacon: esse não devolve a resposta do servidor.) */
+ let aceite=false, recusa="";
  try{
   /* text/plain evita o pedido CORS preflight — menos uma coisa a falhar em rede fraca */
   const r=await fetch(PROMO_API+"/order",{method:"POST",
    headers:{"Content-Type":"text/plain;charset=UTF-8"}, body:dadosPedido});
-  registado = r.ok;
+  let d=null; try{ d=await r.json(); }catch(e){}
+  if(d && d.erro) recusa=String(d.erro).slice(0,400);
+  else if(r.ok) aceite=true;
  }catch(e){}
- if(!registado){
-  try{
-   if(navigator.sendBeacon)
-    registado = navigator.sendBeacon(PROMO_API+"/order", new Blob([dadosPedido],{type:"text/plain"}));
-  }catch(e){}
+ if(!aceite){
+  if(recusa){ mtrErro("pedido_recusado"); alert(recusa); }
+  else avisar("okErro");
+  return;
  }
- if(!registado){ avisar("okErro"); return; }
+ guardarUltimo();        // «Repetir este pedido» só guarda pedidos que o servidor aceitou
 
  /* métricas: só características do pedido — nunca nome, contacto, morada ou código */
  mtrTag("pedido_modo",mode); mtrTag("pedido_pagamento",precisa?"transferencia":"balcao");

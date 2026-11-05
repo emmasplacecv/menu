@@ -112,6 +112,9 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
  margin-top:5px;letter-spacing:-.2px;}
 .ped .mor{font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.4;}
 .ped .nt{font-size:14.5px;color:#8C2F2F;margin-top:10px;font-weight:600;line-height:1.4;}
+.ped .stkf{margin-top:10px;padding:12px 14px;border-radius:14px;background:#8C2F2F;color:#fff;font-size:17px;font-weight:800;letter-spacing:.4px;line-height:1.35;}
+.ped .stkf small{display:block;font-size:13.5px;font-weight:500;letter-spacing:0;opacity:.9;margin-top:3px;}
+.ped.capa .stkf.curto{margin:0 0 14px;padding:8px 16px;border-radius:999px;font-size:14px;background:#C0392B;}
 .ped .est{font-size:11px;letter-spacing:1.6px;font-weight:700;color:var(--ink2);margin-top:10px;}
 .ped .acts{display:flex;gap:7px;margin-top:11px;}
 .ped .acts .bdel{flex:0 0 50px;background:transparent;border:1px solid var(--line);
@@ -574,6 +577,21 @@ function desenhar(){
   return sep + cartaoPed(p);
  }).join("");
 }
+/* 05-11-2026: STOCK EM FALTA — igual à Gestão (avisoStockFalta lá). Aparece também no cartão tapado. */
+function faltaStockLista(sf){
+ if(!sf) return null;
+ const fmt=(n,q)=>String(n)+((+q>0)?" (falta "+(+q)+")":"");
+ if(Array.isArray(sf)) return sf.map(x=>(x&&typeof x==="object") ? fmt(x.n||x.nome||x.item||"?", x.q!=null?x.q:x.falta) : String(x)).filter(Boolean);
+ if(typeof sf==="object") return Object.keys(sf).filter(k=>sf[k]).map(k=>fmt(k, typeof sf[k]==="number"?sf[k]:0));
+ if(typeof sf==="string") return [sf];
+ return [];
+}
+function avisoStockFalta(p,curto){
+ const l=faltaStockLista(p&&p.stockFalta);
+ if(!l) return "";
+ if(curto) return `<div class="stkf curto" role="alert">⚠️ STOCK EM FALTA</div>`;
+ return `<div class="stkf" role="alert">⚠️ STOCK EM FALTA${l.length?": "+l.map(esc).join(" · "):""}<small>Confirme com a Gestão antes de preparar.</small></div>`;
+}
 function cartaoPed(p){ {
   const ent=p.modo==="entrega", id=jsArg(p.id);
   let acts="";
@@ -590,10 +608,12 @@ function cartaoPed(p){ {
     <div class="t1">PEDIDO NOVO · WEBSITE</div>
     <div class="t0 ${ent?"ent":"lev"}">${ent?"🛵 ENTREGA":"🛍 LEVANTAR"}${p._futuro?" · PARA "+curtoDia(p._dia):""}</div>
     <div class="t2">Ver pedido</div>
+    ${avisoStockFalta(p,true)}
     <div class="bt">👆 Toque para abrir</div>
    </div>`;
   return `<div class="ped ${esc(p.status)}${atr?" atrasado":""}" onclick="marcarVisto(${id})">
    <div class="cli"><b>${esc(p.nome||"(sem nome)")}</b>${p.tel?`<a class="tel" href="tel:${esc(String(p.tel).replace(/\s/g,""))}">${esc(p.tel)}</a>`:""}</div>
+   ${avisoStockFalta(p)}
    ${blocoNotas(p)}
    <ul>${(p.itens||[]).map(i=>`<li>${artigo(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${esc(p.zona)}${p.morada?" — "+esc(p.morada):""}</div>`:(p.morada?`<div class="mor">📍 ${esc(p.morada)}</div>`:"")}${p.piso>0?`<div class="andar">🏢 ${esc(p.piso)}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${esc(p.taxaAndar)} ECV</div>`:""}
