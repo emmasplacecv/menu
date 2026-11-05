@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt" data-lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sobre a Emma's Place — café no Plateau, Praia</title>
+<meta name="description" content="A Emma's Place, cafetaria móvel no Plateau, Praia: arábica e robusta explicados, o que leva cada bebida de café e matcha, morada e horário.">
+<link rel="canonical" href="https://emmasplace.cv/sobre/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://emmasplace.cv/sobre/">
+<meta property="og:site_name" content="Emma's Place">
+<meta property="og:title" content="Sobre a Emma's Place — Plateau, Praia">
+<meta property="og:description" content="Arábica e robusta, o que leva cada bebida e onde estamos.">
+<meta property="og:image" content="https://emmasplace.cv/logo.jpg">
+<link rel="icon" href="/img/logo.webp">
+<!-- 05-11-2026: PÁGINA "SOBRE" (português e inglês na mesma página).
+     COMO EDITAR: cada texto existe duas vezes, um com data-l="pt" e outro com data-l="en". Mudar os dois.
+     Os espaços POR PREENCHER (fundadores) estão marcados com a classe "por-preencher": trocar o texto entre [ ] e
+     apagar a classe quando estiver preenchido. Ver docs/confirmar-sobre.md para o que falta confirmar. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&amp;family=Jost:wght@300;400;500;600&amp;display=swap">
+<link rel="stylesheet" href="/locais/estilo.css">
+<style>
+/* só esta página (o resto vem de /locais/estilo.css, o mesmo estilo das páginas do Google) */
+html[data-lang="pt"] [data-l="en"],html[data-lang="en"] [data-l="pt"]{display:none!important;}
+.linguas{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;background:#fff;}
+.linguas button{border:0;background:transparent;padding:8px 12px;font:600 12px/1 'Jost',sans-serif;letter-spacing:.8px;color:var(--ink2);cursor:pointer;}
+.linguas button[aria-pressed="true"]{background:var(--dark);color:#F7F1E4;}
+.acoes-topo{display:flex;align-items:center;gap:8px;}
+.sec{margin-top:26px;}
+.sec>p{font-size:15px;line-height:1.6;margin:0 2px 12px;}
+.comp{display:grid;gap:10px;}
+@media(min-width:720px){ .comp{grid-template-columns:1fr 1fr;} }
+.cafe{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;}
+.cafe h3{font-family:'Playfair Display',serif;font-size:20px;}
+.cafe .sp{font-size:12px;color:var(--ink2);font-style:italic;}
+.cafe dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin-top:10px;font-size:14px;line-height:1.45;}
+.cafe dt{font-weight:600;color:var(--ink);}
+.cafe dd{color:var(--ink2);}
+.aviso{font-size:13px;color:var(--ink2);line-height:1.55;margin:10px 2px 0;}
+.bebidas{display:grid;grid-template-columns:1fr;gap:10px;}
+@media(min-width:560px){ .bebidas{grid-template-columns:1fr 1fr;} }
+@media(min-width:960px){ .bebidas{grid-template-columns:1fr 1fr 1fr;} }
+.beb{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px 12px 8px 8px;}
+.beb img{width:76px;height:76px;border-radius:13px;object-fit:cover;object-position:50% 55%;flex:none;background:#F3E9DC;}
+.beb h3{font:600 15px/1.25 'Jost',sans-serif;}
+.beb .ing{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.beb .ing span{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;color:var(--ink);}
+.beb .ing span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c,#999);}
+.beb small{display:block;margin-top:5px;font-size:11.5px;color:var(--ink2);}
+.beb small.ok{color:#2E6B32;}
+.i-cafe{--c:#5A3A26}.i-leite{--c:#EADBC6}.i-gelo{--c:#9CC9E0}.i-xarope{--c:#C9893F}.i-choc{--c:#3B2314}.i-matcha{--c:#7FA344}.i-coco{--c:#F4F0E6}.i-agua{--c:#BFE0EE}
+.grupo{font-family:'Playfair Display',serif;font-size:19px;margin:18px 2px 10px;}
+.fund{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px 16px;}
+.fund p{font-size:15px;line-height:1.6;margin-top:8px;}
+.fund-grid{display:grid;gap:14px;margin-top:14px;}
+@media(min-width:720px){ .fund-grid{grid-template-columns:220px 1fr;align-items:start;} }
+.por-preencher{border:2px dashed #C9893F;border-radius:14px;background:#FFF6E2;color:#7A5233;padding:12px 14px;font-size:14px;line-height:1.5;}
+.por-preencher::before{content:"POR PREENCHER · TO BE FILLED IN";display:block;font:700 10.5px/1 'Jost',sans-serif;letter-spacing:1.6px;color:#B5791F;margin-bottom:6px;}
+.foto-vazia{aspect-ratio:4/5;display:grid;place-items:center;text-align:center;}
+@media(max-width:719px){ .foto-vazia{aspect-ratio:auto;min-height:140px;max-width:260px;} }
+@media(max-width:440px){
+ .wrap{padding-left:10px;padding-right:10px;}
+ .sitebar{gap:6px;padding:8px;}
+ .brand-lockup{gap:6px;min-width:0;flex:1 1 auto;} .brand-lockup img{width:36px;height:36px;flex:none;}
+ .brand-lockup span{min-width:0;overflow:hidden;}
+ .brand-lockup strong{display:block;font-size:13.5px;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .brand-lockup small{display:none;}
+ .acoes-topo{gap:5px;flex:none;} .linguas button{padding:7px 8px;font-size:11px;}
+ .topcart{padding:8px 11px;font-size:12.5px;white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="sitebar" aria-label="Navegação principal">
+  <a class="brand-lockup" href="/" aria-label="Emma's Place — início">
+    <img src="/img/logo.webp" alt="Logótipo Emma's Place" width="52" height="52">
+    <span><strong>EMMA'S PLACE</strong><small>Plateau · Praia</small></span>
+  </a>
+  <div class="acoes-topo">
+    <div class="linguas" role="group" aria-label="Idioma · Language">
+      <button type="button" data-set="pt" aria-pressed="true">PT</button><button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="topcart" href="/"><span data-l="pt">Ver menu</span><span data-l="en">See menu</span></a>
+  </div>
+</nav>
+
+<div class="crumb"><a href="/">Emma's Place</a> › <span data-l="pt">Sobre</span><span data-l="en">About</span></div>
+
+<header class="intro">
+  <h1 data-l="pt">Sobre a Emma's Place</h1>
+  <h1 data-l="en">About Emma's Place</h1>
+  <p>Coffee &amp; More — <span data-l="pt">sabores que acolhem, momentos que ficam.</span><span data-l="en">flavours that welcome you, moments that stay.</span></p>
+  <p data-l="pt">Uma cafetaria móvel no Plateau, na Av. Amílcar Cabral, em frente ao BAI/IMPAR, na Praia. Aqui explicamos um pouco do café e o que leva cada bebida do menu.</p>
+  <p data-l="en">A mobile café in Plateau, on Av. Amílcar Cabral, opposite BAI/IMPAR, in Praia. Here we explain a little about coffee and what goes into each drink on the menu.</p>
+  <a class="go" href="/"><span data-l="pt">Ver menu</span><span data-l="en">See menu</span></a>
+</header>
+
+<!-- ============ ARÁBICA E ROBUSTA (conhecimento geral; não diz que café a Emma's Place usa) ============ -->
+<section class="sec" aria-labelledby="t-cafe">
+  <h2 id="t-cafe"><span data-l="pt">Arábica e robusta</span><span data-l="en">Arabica and robusta</span></h2>
+  <p data-l="pt">Quase todo o café do mundo vem de duas espécies da planta do café. Muitos cafés são lotes que misturam as duas.</p>
+  <p data-l="en">Almost all the world's coffee comes from two species of the coffee plant. Many coffees are blends of both.</p>
+  <div class="comp">
+    <article class="cafe">
+      <h3><span data-l="pt">Arábica</span><span data-l="en">Arabica</span></h3><div class="sp">Coffea arabica</div>
+      <dl>
+        <dt data-l="pt">Sabor</dt><dt data-l="en">Flavour</dt>
+        <dd data-l="pt">Mais suave e aromático. Pode ter notas frutadas, florais ou de chocolate, conforme a origem e a torra.</dd>
+        <dd data-l="en">Smoother and more aromatic. It can have fruity, floral or chocolate notes, depending on origin and roast.</dd>
+        <dt data-l="pt">Cafeína</dt><dt data-l="en">Caffeine</dt>
+        <dd data-l="pt">Menos: cerca de 1,2 a 1,5% do grão.</dd>
+        <dd data-l="en">Less: about 1.2 to 1.5% of the bean.</dd>
+        <dt data-l="pt">Acidez</dt><dt data-l="en">Acidity</dt>
+        <dd data-l="pt">Mais alta e viva.</dd><dd data-l="en">Higher and brighter.</dd>
+        <dt data-l="pt">Corpo</dt><dt data-l="en">Body</dt>
+        <dd data-l="pt">Leve a médio.</dd><dd data-l="en">Light to medium.</dd>
+      </dl>
+    </article>
+    <article class="cafe">
+      <h3>Robusta</h3><div class="sp">Coffea canephora</div>
+      <dl>
+        <dt data-l="pt">Sabor</dt><dt data-l="en">Flavour</dt>
+        <dd data-l="pt">Mais intenso e amargo, com notas terrosas, de cereais ou de frutos secos.</dd>
+        <dd data-l="en">Stronger and more bitter, with earthy, cereal or nutty notes.</dd>
+        <dt data-l="pt">Cafeína</dt><dt data-l="en">Caffeine</dt>
+        <dd data-l="pt">Mais: cerca de 2,2 a 2,7% do grão, perto do dobro.</dd>
+        <dd data-l="en">More: about 2.2 to 2.7% of the bean, close to double.</dd>
+        <dt data-l="pt">Acidez</dt><dt data-l="en">Acidity</dt>
+        <dd data-l="pt">Mais baixa.</dd><dd data-l="en">Lower.</dd>
+        <dt data-l="pt">Corpo</dt><dt data-l="en">Body</dt>
+        <dd data-l="pt">Mais encorpado. No espresso, costuma dar mais crema.</dd>
+        <dd data-l="en">Fuller. In espresso, it usually gives more crema.</dd>
+      </dl>
+    </article>
+  </div>
+  <p class="aviso" data-l="pt">Valores gerais e aproximados: cada café muda com a origem, a variedade, a torra e a forma de preparar.</p>
+  <p class="aviso" data-l="en">General, approximate values: every coffee changes with origin, variety, roast and brewing method.</p>
+</section>
+
+<!-- ============ O QUE LEVA CADA BEBIDA (nomes e regras do menu do site; o resto é "composição habitual") ============
+     "ok" = confirmado no site. Tudo o que não está confirmado aparece como "composição habitual" e está em docs/confirmar-sobre.md -->
+<section class="sec" aria-labelledby="t-beb">
+  <h2 id="t-beb"><span data-l="pt">O que leva cada bebida</span><span data-l="en">What goes into each drink</span></h2>
+  <p data-l="pt">Bebidas de café e matcha do menu. Com leite, pode escolher leite normal ou aveia, coco, soja, amêndoa ou sem lactose (+100$). Quase todas existem em tamanho médio ou grande.</p>
+  <p data-l="en">Coffee and matcha drinks on the menu. With milk, you can choose regular milk or oat, coconut, soy, almond or lactose-free (+100$). Almost all come in medium or large.</p>
+
+  <h3 class="grupo" style="margin-top:6px"><span data-l="pt">Quentes</span><span data-l="en">Hot</span></h3>
+  <div class="bebidas">
+    <article class="beb"><img src="/img/p/espresso.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Espresso</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">café espresso</span><span class="i-cafe" data-l="en">espresso coffee</span></div>
+      <small data-l="pt">Composição habitual · só para levantar no local</small><small data-l="en">Usual recipe · pick-up only</small></div></article>
+    <article class="beb"><img src="/img/p/espresso-duplo.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Espresso Duplo</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">duas doses de espresso</span><span class="i-cafe" data-l="en">two espresso shots</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/latte-classico.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Latte Clássico</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span></div>
+      <small class="ok" data-l="pt">Meia de leite (no menu)</small><small class="ok" data-l="en">White coffee with milk (on the menu)</small></div></article>
+    <article class="beb"><img src="/img/p/americano.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Americano</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-agua" data-l="pt">água quente</span><span class="i-agua" data-l="en">hot water</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/cappuccino.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Cappuccino</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-leite" data-l="pt">espuma de leite</span><span class="i-leite" data-l="en">milk foam</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/mocha.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Mocha</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-choc" data-l="pt">chocolate</span><span class="i-choc" data-l="en">chocolate</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/latte-de-caramelo.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Latte de Caramelo</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-xarope" data-l="pt">xarope de caramelo</span><span class="i-xarope" data-l="en">caramel syrup</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+  </div>
+
+  <h3 class="grupo"><span data-l="pt">Frias</span><span data-l="en">Iced</span></h3>
+  <div class="bebidas">
+    <article class="beb"><img src="/img/p/iced-latte.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Iced Latte</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo</span><span class="i-gelo" data-l="en">ice</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/cafe-instantaneo-gelado.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Café Instantâneo Gelado</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">café instantâneo</span><span class="i-cafe" data-l="en">instant coffee</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo</span><span class="i-gelo" data-l="en">ice</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/frappe-classico.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Frappé Clássico</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">café</span><span class="i-cafe" data-l="en">coffee</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo batido</span><span class="i-gelo" data-l="en">blended ice</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/frappe-de-chocolate.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Frappé de Chocolate</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">café</span><span class="i-cafe" data-l="en">coffee</span><span class="i-choc" data-l="pt">chocolate</span><span class="i-choc" data-l="en">chocolate</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo batido</span><span class="i-gelo" data-l="en">blended ice</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/frappe-de-caramelo.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Frappé de Caramelo</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">café</span><span class="i-cafe" data-l="en">coffee</span><span class="i-xarope" data-l="pt">caramelo</span><span class="i-xarope" data-l="en">caramel</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo batido</span><span class="i-gelo" data-l="en">blended ice</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/iced-latte-de-caramelo.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Iced Latte de Caramelo</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-xarope" data-l="pt">xarope de caramelo</span><span class="i-xarope" data-l="en">caramel syrup</span><span class="i-gelo" data-l="pt">gelo</span><span class="i-gelo" data-l="en">ice</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+    <article class="beb"><img src="/img/p/iced-mocha.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Iced Mocha</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-choc" data-l="pt">chocolate</span><span class="i-choc" data-l="en">chocolate</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo</span><span class="i-gelo" data-l="en">ice</span></div>
+      <small data-l="pt">Composição habitual</small><small data-l="en">Usual recipe</small></div></article>
+  </div>
+
+  <h3 class="grupo">Matcha &amp; <span data-l="pt">coco</span><span data-l="en">coconut</span></h3>
+  <div class="bebidas">
+    <article class="beb"><img src="/img/p/iced-matcha-latte.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Iced Matcha Latte</h3>
+      <div class="ing"><span class="i-matcha">matcha</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo</span><span class="i-gelo" data-l="en">ice</span></div>
+      <small data-l="pt">Composição habitual · sem café</small><small data-l="en">Usual recipe · no coffee</small></div></article>
+    <article class="beb"><img src="/img/p/matcha-creme-frappuccino.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Matcha Crème Frappuccino</h3>
+      <div class="ing"><span class="i-matcha">matcha</span><span class="i-leite" data-l="pt">leite</span><span class="i-leite" data-l="en">milk</span><span class="i-gelo" data-l="pt">gelo batido</span><span class="i-gelo" data-l="en">blended ice</span></div>
+      <small data-l="pt">Composição habitual · sem café</small><small data-l="en">Usual recipe · no coffee</small></div></article>
+    <article class="beb"><img src="/img/p/raw-coconut-latte.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Raw Coconut Latte</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-coco" data-l="pt">leite de coco</span><span class="i-coco" data-l="en">coconut milk</span></div>
+      <small data-l="pt">Composição habitual (a confirmar)</small><small data-l="en">Usual recipe (to be confirmed)</small></div></article>
+    <article class="beb"><img src="/img/p/iced-caramel-macchiato.webp" alt="" width="76" height="76" loading="lazy"><div><h3>Iced Caramel Macchiato</h3>
+      <div class="ing"><span class="i-cafe" data-l="pt">espresso</span><span class="i-cafe" data-l="en">espresso</span><span class="i-coco" data-l="pt">leite de coco</span><span class="i-coco" data-l="en">coconut milk</span><span class="i-xarope" data-l="pt">caramelo</span><span class="i-xarope" data-l="en">caramel</span><span class="i-gelo" data-l="pt">gelo</span><span class="i-gelo" data-l="en">ice</span></div>
+      <small class="ok" data-l="pt">Com leite de coco (no menu); o resto é composição habitual</small><small class="ok" data-l="en">With coconut milk (on the menu); the rest is the usual recipe</small></div></article>
+  </div>
+  <p class="aviso" data-l="pt">"Composição habitual" é a receita mais comum desta bebida; a preparação pode variar. Alergias ou intolerâncias? Diga-nos nas notas do pedido.</p>
+  <p class="aviso" data-l="en">"Usual recipe" is the most common recipe for this drink; preparation may vary. Allergies or intolerances? Tell us in the order notes.</p>
+</section>
+
+<!-- ============ FUNDADORES: texto genérico + espaços POR PREENCHER (não inventar factos, datas, formação nem citações) ============ -->
+<section class="sec" aria-labelledby="t-fund">
+  <h2 id="t-fund"><span data-l="pt">Quem está por trás</span><span data-l="en">Who is behind it</span></h2>
+  <div class="fund">
+    <p data-l="pt">Começar uma cafetaria móvel é começar pequeno e aprender com cada cliente. Uma carrinha no Plateau permite estar onde as pessoas passam durante o dia, com um menu curto e preparado na hora.</p>
+    <p data-l="en">Starting a mobile café means starting small and learning from every customer. A coffee van in Plateau makes it possible to be where people pass during the day, with a short menu made to order.</p>
+    <div class="fund-grid">
+      <div class="por-preencher foto-vazia"><span data-l="pt">[FOTO DOS FUNDADORES]</span><span data-l="en">[FOUNDERS' PHOTO]</span></div>
+      <div>
+        <div class="por-preencher"><span data-l="pt">[NOMES DOS FUNDADORES]</span><span data-l="en">[FOUNDERS' NAMES]</span></div>
+        <div class="por-preencher" style="margin-top:10px"><span data-l="pt">[A NOSSA HISTÓRIA — 3 a 5 frases: como começou, porquê o Plateau, porquê uma carrinha, o nome Emma's Place]</span>
+          <span data-l="en">[OUR STORY — 3 to 5 sentences: how it started, why Plateau, why a van, the name Emma's Place]</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOCALIZAÇÃO, HORÁRIO E ENCOMENDAR ============ -->
+<section class="info" aria-labelledby="ondeT">
+  <h2 id="ondeT"><span data-l="pt">Onde estamos</span><span data-l="en">Where we are</span></h2>
+  <dl>
+    <dt data-l="pt">Morada</dt><dt data-l="en">Address</dt><dd>Av. Amílcar Cabral, Plateau (frente BAI/IMPAR), Praia</dd>
+    <dt data-l="pt">Horário</dt><dt data-l="en">Hours</dt>
+    <dd data-l="pt">Seg–Sex 08h–17h · Sáb 09h–15h</dd><dd data-l="en">Mon–Fri 08:00–17:00 · Sat 09:00–15:00</dd>
+    <dt>Instagram</dt><dd><a href="https://instagram.com/emmasplace.cv" target="_blank" rel="noopener">@emmasplace.cv</a></dd>
+  </dl>
+  <div class="mapa"><iframe title="Mapa: Emma's Place, Av. Amílcar Cabral, Plateau, Praia" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+    src="https://maps.google.com/maps?q=Emma%27s%20Place%2C%20Avenida%20Am%C3%ADlcar%20Cabral%2C%20Plateau%2C%20Praia%2C%20Cabo%20Verde&amp;z=17&amp;output=embed"></iframe></div>
+  <a class="mapbtn" href="https://maps.app.goo.gl/PUQn2B7j8WX2Sa9r7" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+    <span data-l="pt">Abrir no Google Maps</span><span data-l="en">Open in Google Maps</span>
+  </a>
+</section>
+
+<div class="fim"><a class="go" href="/#menu"><span data-l="pt">Encomendar no site</span><span data-l="en">Order online</span></a></div>
+
+<footer class="site-footer">
+  <div class="footer-brand"><img src="/img/logo.webp" alt="Logótipo Emma's Place" width="72" height="72" loading="lazy"><div><strong>EMMA'S PLACE</strong></div></div>
+  <div class="footer-col"><b data-l="pt">Horário</b><b data-l="en">Hours</b><span data-l="pt">Seg–Sex 08h–17h · Sáb 09h–15h</span><span data-l="en">Mon–Fri 08:00–17:00 · Sat 09:00–15:00</span><span>Plateau, Praia</span></div>
+  <div class="footer-col"><b data-l="pt">Contactos</b><b data-l="en">Contact</b><a href="/#menu"><span data-l="pt">Encomendar no site</span><span data-l="en">Order online</span></a><a href="https://instagram.com/emmasplace.cv" target="_blank" rel="noopener">@emmasplace.cv</a></div>
+  <div class="footer-bottom"><span data-l="pt">Preços em ECV · Imagens meramente ilustrativas</span><span data-l="en">Prices in ECV · Images for illustration only</span></div>
+</footer>
+</div>
+<script>
+/* Língua da página: a escolhida aqui, senão a do site (ep_lang). Português para "pt"; inglês para as outras. */
+(function(){
+ var raiz=document.documentElement;
+ function por(l){ l=(l==="pt")?"pt":"en"; raiz.setAttribute("data-lang",l); raiz.lang=l;
+  document.querySelectorAll(".linguas button").forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-set")===l ? "true" : "false"); }); }
+ var g="pt"; try{ g=localStorage.getItem("ep_lang")||(navigator.language||"pt").slice(0,2).toLowerCase(); }catch(e){}
+ por(g);
+ document.querySelectorAll(".linguas button").forEach(function(b){ b.addEventListener("click",function(){
+  var l=b.getAttribute("data-set"); por(l); try{ localStorage.setItem("ep_lang",l); }catch(e){} }); });
+})();
+</script>
+</body>
+</html>
