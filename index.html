@@ -1757,7 +1757,7 @@ textarea.fld{min-height:74px;resize:vertical;}
    REGRA: nunca passar aqui nome, contacto, morada, notas ou código do pedido.
    Se o Clarity estiver bloqueado ou recusado pelo visitante, nada acontece.
    ============================================================ */
-function mtr(n){ try{ if(window.EP_METRICAS && typeof window.clarity==="function") window.clarity("event",n); }catch(e){} }
+function mtr(n){ try{ if(typeof EP_FUNIL!=="undefined" && EP_FUNIL[n]) epContar(EP_FUNIL[n]); }catch(e){} try{ if(window.EP_METRICAS && typeof window.clarity==="function") window.clarity("event",n); }catch(e){} }
 function mtrTag(k,v){ try{ if(window.EP_METRICAS && typeof window.clarity==="function" && v!=null && v!=="") window.clarity("set",k,String(v).slice(0,80)); }catch(e){} }
 /* aviso que trava o cliente no checkout: fica registado QUAL foi (chave do texto, igual em todas as línguas) */
 function mtrErro(k){ mtrTag("erro_checkout",k); mtr("erro_checkout"); }
@@ -1777,11 +1777,11 @@ document.addEventListener("click",function(e){
 });
 /* aviso no rodapé + opção de não ser registado (fica guardada no telemóvel do visitante) */
 const MTR_TXT={
- pt:{on:"Usamos o Microsoft Clarity para ver como o site é usado (toques e navegação) e melhorá-lo. O que escreve nos campos — nome, contacto, morada, notas — não é gravado.",sair:"Não registar a minha visita",off:"A sua navegação não é registada neste dispositivo.",voltar:"Voltar a permitir"},
- en:{on:"We use Microsoft Clarity to see how this site is used (taps and navigation) and improve it. What you type in the fields — name, contact, address, notes — is not recorded.",sair:"Don't record my visit",off:"Your browsing is not recorded on this device.",voltar:"Allow again"},
- fr:{on:"Nous utilisons Microsoft Clarity pour voir comment le site est utilisé (clics et navigation) et l'améliorer. Ce que vous écrivez dans les champs — nom, contact, adresse, notes — n'est pas enregistré.",sair:"Ne pas enregistrer ma visite",off:"Votre navigation n'est pas enregistrée sur cet appareil.",voltar:"Autoriser à nouveau"},
- de:{on:"Wir nutzen Microsoft Clarity, um zu sehen, wie die Seite verwendet wird (Klicks und Navigation), und sie zu verbessern. Was Sie in die Felder eingeben — Name, Kontakt, Adresse, Notizen — wird nicht aufgezeichnet.",sair:"Meinen Besuch nicht aufzeichnen",off:"Ihr Besuch wird auf diesem Gerät nicht aufgezeichnet.",voltar:"Wieder erlauben"},
- nl:{on:"We gebruiken Microsoft Clarity om te zien hoe de site wordt gebruikt (klikken en navigatie) en om deze te verbeteren. Wat u in de velden invult — naam, contact, adres, notities — wordt niet opgenomen.",sair:"Mijn bezoek niet registreren",off:"Uw bezoek wordt op dit apparaat niet geregistreerd.",voltar:"Weer toestaan"}
+ pt:{on:"Usamos o Microsoft Clarity para ver como o site é usado (toques e navegação) e melhorá-lo, e contamos as visitas por dia, sem dados pessoais. O que escreve nos campos — nome, contacto, morada, notas — não é gravado.",sair:"Não registar a minha visita",off:"A sua navegação não é registada neste dispositivo.",voltar:"Voltar a permitir"},
+ en:{on:"We use Microsoft Clarity to see how this site is used (taps and navigation) and improve it, and we count visits per day, with no personal data. What you type in the fields — name, contact, address, notes — is not recorded.",sair:"Don't record my visit",off:"Your browsing is not recorded on this device.",voltar:"Allow again"},
+ fr:{on:"Nous utilisons Microsoft Clarity pour voir comment le site est utilisé (clics et navigation) et l'améliorer, et nous comptons les visites par jour, sans données personnelles. Ce que vous écrivez dans les champs — nom, contact, adresse, notes — n'est pas enregistré.",sair:"Ne pas enregistrer ma visite",off:"Votre navigation n'est pas enregistrée sur cet appareil.",voltar:"Autoriser à nouveau"},
+ de:{on:"Wir nutzen Microsoft Clarity, um zu sehen, wie die Seite verwendet wird (Klicks und Navigation), und sie zu verbessern, und wir zählen die Besuche pro Tag, ohne personenbezogene Daten. Was Sie in die Felder eingeben — Name, Kontakt, Adresse, Notizen — wird nicht aufgezeichnet.",sair:"Meinen Besuch nicht aufzeichnen",off:"Ihr Besuch wird auf diesem Gerät nicht aufgezeichnet.",voltar:"Wieder erlauben"},
+ nl:{on:"We gebruiken Microsoft Clarity om te zien hoe de site wordt gebruikt (klikken en navigatie) en om deze te verbeteren, en we tellen de bezoeken per dag, zonder persoonsgegevens. Wat u in de velden invult — naam, contact, adres, notities — wordt niet opgenomen.",sair:"Mijn bezoek niet registreren",off:"Uw bezoek wordt op dit apparaat niet geregistreerd.",voltar:"Weer toestaan"}
 };
 function mtrRodape(){
  const b=document.getElementById("privBox"); if(!b) return;
@@ -2569,6 +2569,18 @@ function taxaAndar(){
    (ver ficheiro worker-promocodes.js).
    ============================================================ */
 const PROMO_API="https://wispy-cherry-ee2e.joaomleal88.workers.dev";
+/* MEDIÇÃO DO FUNIL: conta por dia, sem dados pessoais */
+const EP_FUNIL={add_carrinho:"carrinho",checkout_iniciado:"checkout"};
+function epContar(passo){
+ try{
+  if(!window.EP_METRICAS) return;
+  const hoje=new Date(Date.now()-36e5).toISOString().slice(0,10), k="ep_funil_"+passo;
+  if(localStorage.getItem(k)===hoje) return;
+  localStorage.setItem(k,hoje);
+  if(navigator.sendBeacon) navigator.sendBeacon(PROMO_API+"/m?e="+passo);
+ }catch(e){}
+}
+epContar("visita");
 
 /* ---- Nomes dos produtos corrigidos a 08-10-2026 ----
    O servidor pode ainda ter dados guardados com o nome antigo (preços, ordem, retirados, esgotados, stock):
