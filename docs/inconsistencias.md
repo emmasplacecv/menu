@@ -12,22 +12,21 @@ Correr: `npm install` e depois `npm test`.
 
 A causa das duas era a mesma: a mensagem lia o código depois de o apagar. Os preços e os totais já estavam certos; só o texto do aviso estava errado.
 
-## Por decidir ou por corrigir no Worker (não mexi)
+## Por decidir ou por tratar no servidor (não mexi)
 
 | # | Inconsistência | Risco | Quem decide |
 |---|---|---|---|
-| I3 | **O total da encomenda é calculado no telemóvel** e o servidor guarda-o como chega (ver auditoria de segurança) | alto | Worker |
-| I4 | **O código promocional é gasto antes de a encomenda ficar registada.** Se `/order` falhar, o cliente perde o código | médio | Worker |
-| I5 | Se a resposta de `/order` se perder (rede fraca), o site volta a enviar com `sendBeacon`, e a mesma encomenda pode ficar **duas vezes** | médio | Worker (recusar o código repetido) |
-| I6 | **Combos não descontam stock no site** (descontam nas /vendas). Um combo do site com o último donut não o tira do stock | médio | Dono |
-| I7 | "Entrega grátis acima de 750$" conta o subtotal **depois** dos descontos. Um pedido de 780$ com código de 50$ paga entrega | baixo | Dono (texto ou regra) |
-| I8 | Nas entregas há sempre **taxa de serviço de 5%**, mesmo com "entrega grátis". O texto "Entregas grátis" não fala dela | baixo/reputação | Dono |
-| I9 | Nas zonas de 350 ECV ou mais, a entrega só é grátis acima de 750$ **com hora marcada**. O texto "Entrega grátis acima de 750$" não o diz | baixo | Dono |
-| I10 | A categoria "MATCHA &amp; COCO" é guardada no carrinho com `&amp;`. Um código promocional criado para "MATCHA & COCO" (com `&`) não encontraria os produtos | a confirmar no Worker | Worker |
-| I11 | A Gestão, as Vendas e a fila offline usam a **data do aparelho**; o site usa a hora de Cabo Verde. Um aparelho com a hora errada mostra o dia errado | baixo | Dono (aparelhos na hora certa) |
-| I12 | O menu, os combos, os milkshakes e o horário estão **copiados em 4 ficheiros**. Hoje coincidem (o teste de consistência passa), mas é fácil desalinhar | médio a prazo | Programação |
-| I13 | Na Gestão, `COMBOS_BASE` ainda tem os preços antigos (225, 405, 500…). Só servem quando um produto do combo sai do menu (o preço automático passa a 0) | baixo | Programação |
-| I14 | Os comentários do código dizem "zonas de **400** ECV para cima", mas a regra usa **350** (`ZONA_MARCADA_MIN`). Falam também de um `ZONA_FREE_MAX` que não existe e de "açaí a 790" (hoje 950). Só os comentários estão errados; o código está certo | nenhum | — |
+| I3 | Os códigos promocionais devem ser tratados no mesmo passo em que a encomenda fica registada | médio | Worker |
+| I4 | Quando a rede cai a meio de um envio, o site pode enviar a encomenda outra vez. O servidor deve tratar o mesmo código como a mesma encomenda | médio | Worker |
+| I5 | **Combos não descontam stock no site** (descontam nas /vendas). Um combo do site com o último donut não o tira do stock | médio | Dono |
+| I6 | "Entrega grátis acima de 750$" conta o subtotal **depois** dos descontos. Um pedido de 780$ com código de 50$ paga entrega | baixo | Dono (texto ou regra) |
+| I7 | Nas entregas há sempre **taxa de serviço de 5%**, mesmo com "entrega grátis". O texto "Entregas grátis" não fala dela | baixo/reputação | Dono |
+| I8 | Nas zonas de 350 ECV ou mais, a entrega só é grátis acima de 750$ **com hora marcada**. O texto "Entrega grátis acima de 750$" não o diz | baixo | Dono |
+| I9 | A categoria "MATCHA &amp; COCO" é guardada no carrinho com `&amp;`. Um código promocional criado para "MATCHA & COCO" (com `&`) não encontraria os produtos | a confirmar no Worker | Worker |
+| I10 | A Gestão, as Vendas e a fila offline usam a **data do aparelho**; o site usa a hora de Cabo Verde. Um aparelho com a hora errada mostra o dia errado | baixo | Dono (aparelhos na hora certa) |
+| I11 | O menu, os combos, os milkshakes e o horário estão **copiados em 4 ficheiros**. Hoje coincidem (o teste de consistência passa), mas é fácil desalinhar | médio a prazo | Programação |
+| I12 | Na Gestão, `COMBOS_BASE` ainda tem os preços antigos (225, 405, 500…). Só servem quando um produto do combo sai do menu (o preço automático passa a 0) | baixo | Programação |
+| I13 | Os comentários do código dizem "zonas de **400** ECV para cima", mas a regra usa **350** (`ZONA_MARCADA_MIN`). Falam também de um `ZONA_FREE_MAX` que não existe e de "açaí a 790" (hoje 950). Só os comentários estão errados; o código está certo | nenhum | — |
 
 ## Confirmado pelos testes (está certo)
 
