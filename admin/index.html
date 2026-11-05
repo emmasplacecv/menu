@@ -100,6 +100,8 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
 .ped li{font-size:14.5px;padding:3px 0;border-bottom:1px dotted var(--line);}
 .ped li:last-child{border-bottom:none;}
 .ped .nt{font-size:13.5px;color:#8C2F2F;margin-top:7px;}
+.ped .stkf{margin-top:8px;padding:10px 12px;border-radius:12px;background:#8C2F2F;color:#fff;font-size:15px;font-weight:800;letter-spacing:.3px;line-height:1.35;}
+.ped .stkf small{display:block;font-size:12.5px;font-weight:500;letter-spacing:0;opacity:.9;margin-top:2px;}
 .ped .tot{font-size:14.5px;font-weight:600;margin-top:7px;}
 .ped .acts{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px;}
 .ped .acts .bdel{flex:0 0 auto;min-width:0;background:transparent;border:1px solid var(--linha,#E7DCC8);
@@ -1483,6 +1485,22 @@ function notasLimpas(p){
 /* 04-11-2026: SEGURANÇA — tudo o que vem do pedido foi escrito pelo cliente (ou por quem chamar o servidor
    directamente). No HTML vai sempre por hEsc(); dentro de onclick="…" vai por jsArg() (texto JS já escapado). */
 function jsArg(v){ return hEsc(JSON.stringify(String(v==null?"":v))); }
+/* 05-11-2026: STOCK EM FALTA — o servidor marca o pedido com "stockFalta" quando não havia stock que chegasse.
+   Aceita uma lista ["Açaí", …] ou [{n|nome|item, q|falta}], um mapa {"Açaí": 1}, um número, um texto ou true.
+   Mostra-se em destaque no cartão (Gestão e Cozinha), para confirmar com o cliente antes de preparar. */
+function faltaStockLista(sf){
+ if(!sf) return null;
+ const fmt=(n,q)=>String(n)+((+q>0)?" (falta "+(+q)+")":"");
+ if(Array.isArray(sf)) return sf.map(x=>(x&&typeof x==="object") ? fmt(x.n||x.nome||x.item||"?", x.q!=null?x.q:x.falta) : String(x)).filter(Boolean);
+ if(typeof sf==="object") return Object.keys(sf).filter(k=>sf[k]).map(k=>fmt(k, typeof sf[k]==="number"?sf[k]:0));
+ if(typeof sf==="string") return [sf];
+ return [];
+}
+function avisoStockFalta(p){
+ const l=faltaStockLista(p&&p.stockFalta);
+ if(!l) return "";
+ return `<div class="stkf" role="alert">⚠️ STOCK EM FALTA${l.length?": "+l.map(hEsc).join(" · "):""}<small>Confirme com o cliente antes de preparar.</small></div>`;
+}
 /* 04-11-2026: CONFIRMAR VALORES — o total e os preços das linhas são calculados no telemóvel do cliente e o
    servidor guarda-os como chegam. Antes de aceitar o comprovativo, a Gestão compara com o menu de agora:
    · linha abaixo de 80% do preço do produto no menu (descontos e campanhas não mexem no preço da linha);
@@ -1556,6 +1574,7 @@ async function carregarPedidos(){
     · <span class="cod">${hEsc(p.code||"")}</span>${p._offline?' · <b style="color:#8C2F2F">📴 por enviar</b>':""}
     ${p._futuro?' · <b style="color:#8A5A12">'+hEsc(p.quando&&p.quando!=="hoje"?p.quando:p._dia)+'</b>':""}</div>
    ${linhaFeito(p)}
+   ${avisoStockFalta(p)}
    ${avisoValores(p)}
    <ul>${(Array.isArray(p.itens)?p.itens:[]).map(i=>`<li>${hItem(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${hEsc(p.zona)}${p.morada?" — "+hEsc(p.morada):""}</div>`:(p.morada?`<div class="mor">📍 ${hEsc(p.morada)}</div>`:"")}${p.piso>0?`<div class="nt">🏢 ${hEsc(p.piso)}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${hEsc(p.taxaAndar)} ECV</div>`:""}
