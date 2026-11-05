@@ -92,3 +92,15 @@ test("sitemap.xml tem a página principal e as três páginas locais", async () 
   const s = require("fs").readFileSync(require("path").join(__dirname, "..", "sitemap.xml"), "utf8");
   for (const c of ["/", ...PAGINAS]) assert.ok(s.includes("<loc>https://emmasplace.cv" + c + "</loc>"), c);
 });
+
+test("rodapé da página principal tem ligações discretas para as três páginas locais", async () => {
+  const amb = await abrir();
+  try {
+    const page = await amb.context.newPage();
+    await page.goto(amb.base + "/", { waitUntil: "load" });
+    const r = await page.evaluate(() => [...document.querySelectorAll("footer .footer-locais a")].map(a => [a.textContent, a.getAttribute("href"),
+      getComputedStyle(a).color === getComputedStyle(a.closest(".footer-bottom")).color]));
+    assert.deepEqual(r.map(x => x[1]), ["/acai/", "/cafe/", "/cafes-gelados/"]);
+    assert.ok(r.every(x => x[2]), "as ligações devem ter a mesma cor discreta do rodapé");
+  } finally { await amb.fechar(); }
+});
