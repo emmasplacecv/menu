@@ -1404,10 +1404,15 @@ textarea.fld{min-height:74px;resize:vertical;}
   <section class="home-hero capa mural" aria-labelledby="home-title">
     <div class="capa-fotos" aria-hidden="true">
       <div class="hero-slide" style="--px:80%;background-image:url('img/capa-1.webp')"></div>
-      <div class="hero-slide" style="--px:26%;background-image:url('img/capa-2.webp')"></div>
+      <div class="hero-slide" style="--px:26%" data-bg="img/capa-2.webp"></div>
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-3.webp')"></div>
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-4.webp')"></div>
     </div>
+    <!-- 05-11-2026: VELOCIDADE — a capa-2 só aparece depois do mural (vários segundos): descarrega-se quando a página
+         já abriu (ou aos 4 s), para não disputar a rede com o que se vê primeiro. O aspecto é o mesmo. -->
+    <script>(function(){ var feito=false; function por(){ if(feito) return; feito=true;
+      document.querySelectorAll(".hero-slide[data-bg]").forEach(function(e){ e.style.backgroundImage="url('"+e.getAttribute("data-bg")+"')"; }); }
+      window.addEventListener("load",por); setTimeout(por,4000); })();</script>
     <!-- MURAL DOS DESCONTOS: fundo de cor em movimento (só decoração; o texto está no painel, em #capaMural) -->
     <div class="capa-mural on" id="capaMuralFundo" aria-hidden="true">
       <i class="mur-a"></i><i class="mur-b"></i><i class="mur-p"></i>
