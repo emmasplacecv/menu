@@ -1392,11 +1392,74 @@ textarea.fld{min-height:74px;resize:vertical;}
  .eb-tx small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:11.5px;line-height:1.3;color:#6E5468;margin-top:2px;}
 }
 @media(prefers-reduced-motion:reduce){ .eb-pill i{animation:none;opacity:1;} }
+
+/* ===== 05-11-2026: LIMPEZA VISUAL (telemóvel primeiro). Marca, cores, fotos, preços e regras iguais. ===== */
+/* 1) Cabeçalho + categorias numa só barra fixa e OPACA (nada se vê por trás); idioma num selector; música na barra */
+.topo-fixo{position:sticky;top:0;z-index:65;margin:0 0 12px;background:#FFFCF6;
+ border:1px solid rgba(184,120,61,.18);border-top:0;border-radius:0 0 18px 18px;box-shadow:0 8px 24px rgba(52,37,29,.10);}
+.topo-fixo .sitebar{position:static;margin:0;border:0;border-radius:0;box-shadow:none;background:transparent;
+ backdrop-filter:none;-webkit-backdrop-filter:none;}
+.topo-fixo .catnav{position:static;margin:0;border:0;border-top:1px solid var(--line);border-radius:0 0 18px 18px;
+ box-shadow:none;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;}
+.topo-acoes{display:flex;align-items:center;gap:7px;margin-left:auto;flex:0 0 auto;}
+.topo-acoes .topcart{margin-left:0;}
+.lang-sel{appearance:none;-webkit-appearance:none;height:34px;padding:0 24px 0 11px;border:1.5px solid var(--line);border-radius:999px;
+ background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23785B42' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 9px center/9px 6px;
+ font:600 12px/1 'Jost',sans-serif;letter-spacing:.8px;color:var(--ink);cursor:pointer;}
+.lang-sel:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+.topo-fixo .musicbtn{position:static;width:34px;height:34px;flex:none;border-width:1.5px;box-shadow:none;background:#fff;}
+.topo-fixo .musicbtn svg{width:16px;height:16px;}
+.topo-fixo .musicbtn.on{background:var(--dark);}
+:root{--salto:150px;}
+@media(max-width:719px){
+ :root{--salto:118px;}
+ .topo-fixo{margin:-8px -10px 10px;border-left:0;border-right:0;border-radius:0 0 16px 16px;}   /* toda a largura do ecrã */
+ .topo-fixo .sitebar{min-height:54px;padding:7px 10px;gap:6px;}
+ .topo-fixo .brand-lockup img{width:38px;height:38px;}
+ .topo-fixo .brand-lockup strong{font-size:15px;}
+ .topo-fixo .brand-lockup small{font-size:8px;letter-spacing:1.3px;}
+ .topo-fixo .catnav{padding:4px 8px 6px;gap:4px;border-radius:0 0 16px 16px;}
+ .topo-fixo .catnav button{padding:9px 10px;font-size:11px;}
+ .topo-acoes{gap:6px;}
+ .topo-fixo .topcart{padding:9px 11px;}
+}
+@media(max-width:359px){ .topo-fixo .brand-lockup small{display:none;} }
+/* o painel Recolher/Entrega passou para depois dos Mais pedidos: espaço até à pesquisa */
+.menu-zone .order-panel{margin:0 0 12px;}
+
+/* 2) Banners da capa: fotos reais em vez dos desenhos. Açaí (−8%): img/capa-4.webp sobre roxo-açaí.
+      Pedidos online (−5%): img/capa-1.webp sobre castanho. As condições do desconto ficam legíveis (12 px ou mais). */
+.capa .capa-trop{background:#3A1735;}
+.capa .capa-mural{background:#2F2119;}
+.capa .capa-trop>*,.capa .capa-mural>*{display:none!important;}
+.capa .capa-trop::before,.capa .capa-mural::before{content:"";position:absolute;top:0;bottom:0;right:0;left:52%;
+ background:#3A1735 url('img/capa-4.webp') no-repeat 50% 46%/cover;}
+.capa .capa-mural::before{background:#2F2119 url('img/capa-1.webp') no-repeat 50% 40%/cover;}
+.capa .capa-trop::after,.capa .capa-mural::after{content:"";position:absolute;inset:0;
+ background:linear-gradient(90deg,#3A1735 0%,#3A1735 52%,rgba(58,23,53,.7) 60%,rgba(58,23,53,.18) 74%,rgba(58,23,53,0) 86%);}
+.capa .capa-mural::after{background:linear-gradient(90deg,#2F2119 0%,#2F2119 52%,rgba(47,33,25,.7) 60%,rgba(47,33,25,.18) 74%,rgba(47,33,25,0) 86%);}
+.capa.mural .mur-k{margin:0 0 2px;font:600 11px/1.2 'Jost',sans-serif;letter-spacing:2.2px;text-transform:uppercase;color:#F3D5B3;
+ transform:none;animation:none;}
+.capa.mural .mur-5{color:#FFF8E8;text-shadow:none;transform:none;}
+.capa.mural .mur-5>span,.capa.mural .mur-off{animation:none;}
+.capa.mural .mur-off{padding:0;background:transparent;box-shadow:none;transform:none;color:#F3D5B3;font:italic 600 clamp(17px,5vw,20px)/1.1 'Playfair Display',serif;}
+.capa.mural .mur-l{max-width:9.5em;color:#FFF8E8;}
+.capa.mural .mur-l b{color:#F3D5B3;background:none;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;}
+.capa.mural .mur-n{opacity:1;color:#F7EBDD;font-size:12px;line-height:1.35;max-width:20em;}
+.capa.mural .mur-k,.capa.mural .mur-l,.capa.mural .mur-n,.capa.mural .mur-off{text-shadow:0 1px 3px rgba(20,6,18,.45);}
+.capa.mural .capa-cta,.capa.mural.trop .capa-cta{background:#F3D5B3;color:var(--dark);}
+.capa.mural .capa-pts button,.capa.mural.trop .capa-pts button{background:rgba(255,248,232,.35);}
+@media(max-width:719px){ .home-hero.capa.mural{--n5:clamp(66px,21vw,86px);} }
+@media(min-width:720px){ .capa .capa-trop::before,.capa .capa-mural::before{left:55%;} .capa.mural .mur-l{max-width:13em;}
+ .capa.mural .mur-n{font-size:13.5px;max-width:26em;} }
 </style>
 </head>
 <body>
 <div class="wrap" data-clarity-unmask="true">
 
+<!-- 05-11-2026: LIMPEZA VISUAL — cabeçalho e categorias numa só barra fixa e opaca; idioma num selector pequeno;
+     o botão da música passa para a barra (deixa de flutuar por cima dos botões de compra) -->
+<div class="topo-fixo" id="topoFixo">
 <nav class="sitebar" aria-label="Navegação principal">
   <a class="brand-lockup" href="#inicio" aria-label="Emma's Place — início">
     <img src="img/logo.webp" alt="Logótipo Emma's Place">
@@ -1409,12 +1472,20 @@ textarea.fld{min-height:74px;resize:vertical;}
     <a href="#contactos" data-home-i18n="navContact"></a>
   </div>
   <div class="site-meta"><b data-home-i18n="hours"></b><span data-home-i18n="openHours"></span></div>
-  <button class="topcart" type="button" onclick="openCart()">
-    <span class="topcart-label" data-home-i18n="order"></span><span class="cnt" id="topCnt">0</span>
-  </button>
+  <div class="topo-acoes">
+    <select class="lang-sel" id="langSel" aria-label="Idioma · Language" onchange="setLang(this.value)"></select>
+    <button class="musicbtn" id="musicBtn" type="button" onclick="alternarMusica()" aria-label="Desligar a música ambiente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>
+      </svg>
+    </button>
+    <button class="topcart" type="button" onclick="openCart()">
+      <span class="topcart-label" data-home-i18n="order"></span><span class="cnt" id="topCnt">0</span>
+    </button>
+  </div>
 </nav>
-
-<nav class="langs" id="langs"></nav>
+<nav class="catnav" id="catNav" aria-label="Categorias do menu"></nav>
+</div>
 
 <div id="bannerFechado" class="fechado" style="display:none"></div>
 
@@ -1476,18 +1547,6 @@ textarea.fld{min-height:74px;resize:vertical;}
   </section>
 </main>
 
-<!-- RECOLHER / ENTREGA (compacto) -->
-<header class="order-panel" id="como-encomendar">
-  <div class="modebox">
-    <div class="avisoent" id="avisoEntregas" style="display:none"></div>
-    <div class="chips" id="topChips">
-      <button class="chip sel" onclick="setMode('recolha',true)" data-i18n="recolha"></button>
-      <button class="chip" onclick="setMode('entrega',true)" data-i18n="entrega"></button>
-    </div>
-    <div class="mnote" id="modeNote">Levanta na carrinha, no Plateau (frente BAI/IMPAR).</div>
-  </div>
-  <div class="again" id="againBox" style="display:none"></div>
-</header>
 
 <!-- CAMPANHA AÇAÍ: só aparece com a campanha ligada no /admin (o texto é escrito por desenharCamp) -->
 <button type="button" class="camp" id="campBanner" onclick="abrirProduto('Açaí')"></button>
@@ -1496,12 +1555,6 @@ textarea.fld{min-height:74px;resize:vertical;}
 
 <!-- MENU: barra de categorias fixa + destaque + categorias pela ordem de ORDEM_CAT -->
 <div class="menu-zone" id="menu">
-  <nav class="catnav" id="catNav" aria-label="Categorias do menu"></nav>
-  <div class="msearch" role="search">
-    <input id="mBusca" class="msearch-in" type="search" autocomplete="off" enterkeyhint="search"
-           oninput="procurarMenu(this.value)" onkeydown="if(event.key==='Escape'){this.value='';procurarMenu('');}">
-    <div id="mBuscaRes" class="msearch-res" hidden aria-live="polite"></div>
-  </div>
 
   <section class="drop" id="novidades" aria-labelledby="drop-title">
     <div class="drop-copy">
@@ -1531,13 +1584,30 @@ textarea.fld{min-height:74px;resize:vertical;}
     </div>
     <div class="best-grid" id="bestGrid"></div>
   </section>
-  <div id="emBreveBox"></div>
+  <!-- RECOLHER / ENTREGA (compacto) — 05-11-2026: depois dos Mais pedidos -->
+  <header class="order-panel" id="como-encomendar">
+  <div class="modebox">
+    <div class="avisoent" id="avisoEntregas" style="display:none"></div>
+    <div class="chips" id="topChips">
+      <button class="chip sel" onclick="setMode('recolha',true)" data-i18n="recolha"></button>
+      <button class="chip" onclick="setMode('entrega',true)" data-i18n="entrega"></button>
+    </div>
+    <div class="mnote" id="modeNote">Levanta na carrinha, no Plateau (frente BAI/IMPAR).</div>
+  </div>
+  <div class="again" id="againBox" style="display:none"></div>
+  </header>
+  <div class="msearch" role="search">
+    <input id="mBusca" class="msearch-in" type="search" autocomplete="off" enterkeyhint="search"
+           oninput="procurarMenu(this.value)" onkeydown="if(event.key==='Escape'){this.value='';procurarMenu('');}">
+    <div id="mBuscaRes" class="msearch-res" hidden aria-live="polite"></div>
+  </div>
 <div class="cards" id="menuCards"></div>
 
   <section class="combos" id="cat-combos">
   <div class="ribbon" data-i18n="combos"></div>
   <div class="cgrid" id="combos"></div>
 </section>
+  <div id="emBreveBox"></div>
   <p class="fotos-nota" data-i18n="fotosNota"></p>
 </div>
 
@@ -1588,11 +1658,6 @@ textarea.fld{min-height:74px;resize:vertical;}
 </div>
 
 <audio id="bgm" loop preload="none" src="musica-ambiente.mp3"></audio>
-<button class="musicbtn" id="musicBtn" onclick="alternarMusica()" aria-label="Desligar a música ambiente">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>
-  </svg>
-</button>
 
 <nav class="bar" data-clarity-unmask="true">
   <button class="ct" id="cartBtn" onclick="openCart()"><span class="cnt" id="cnt">0</span><span data-i18n="verped"></span><span class="ctot" id="ctot"></span></button>
@@ -2416,6 +2481,31 @@ function setLang(l){
  traduzir();
 }
 
+/* 05-11-2026: LIMPEZA VISUAL — textos mais curtos do açaí (duas frases + o aviso de disponibilidade),
+   "Ver carrinho" na barra de baixo e preços sempre no mesmo formato (950$, +50$). Os preços e as regras não mudam. */
+(function(){
+ const R={
+  pt:{dropSub:"Copo de <b>355 ml</b>, sempre cheio, com granola, leite em pó, fruta e toppings à escolha. <b>{o}$ no site</b>, com transferência e hora marcada para levantar ({p}$ no balcão).",
+      dropNote:"<b>Disponibilidade limitada:</b> pode esgotar durante o dia — vale sempre a disponibilidade indicada no menu.",
+      verped:"Ver carrinho",acaiCada:"+{x}$ cada",acaiAdd:"Adicionar · {p}$",falta:"Faltam <b>{x}$</b> em produtos para a entrega ficar grátis — e poupa os {y}$."},
+  en:{dropSub:"A <b>355 ml</b> cup, always full, with your choice of granola, milk powder, fruit and toppings. <b>{o}$ online</b>, paid by transfer with a scheduled pick-up time ({p}$ at the counter).",
+      dropNote:"<b>Limited availability:</b> it may sell out during the day — the availability shown on the menu always applies.",
+      verped:"View cart",acaiCada:"+{x}$ each",acaiAdd:"Add · {p}$",falta:"<b>{x}$</b> more in items and delivery is free — saving you {y}$."},
+  fr:{dropSub:"Gobelet de <b>355 ml</b>, toujours plein, avec granola, lait en poudre, fruits et toppings au choix. <b>{o}$ en ligne</b>, payé par virement, retrait à heure choisie ({p}$ au comptoir).",
+      dropNote:"<b>Disponibilité limitée :</b> peut s'épuiser en cours de journée — seule compte la disponibilité indiquée au menu.",
+      verped:"Voir le panier",acaiCada:"+{x}$ chacun",acaiAdd:"Ajouter · {p}$",falta:"Encore <b>{x}$</b> d'articles et la livraison est offerte — {y}$ d'économie."},
+  de:{dropSub:"<b>355-ml</b>-Becher, immer voll, mit Granola, Milchpulver, Früchten und Toppings nach Wahl. <b>{o}$ online</b>, per Überweisung, Abholung zur Wunschzeit ({p}$ an der Theke).",
+      dropNote:"<b>Begrenzt verfügbar:</b> kann im Tagesverlauf ausverkauft sein — maßgeblich ist immer die Angabe im Menü.",
+      verped:"Warenkorb ansehen",acaiCada:"je +{x}$",acaiAdd:"Hinzufügen · {p}$",falta:"Noch <b>{x}$</b> und die Lieferung ist gratis — {y}$ gespart."},
+  nl:{dropSub:"Beker van <b>355 ml</b>, altijd vol, met granola, melkpoeder, fruit en toppings naar keuze. <b>{o}$ online</b>, betaald per overschrijving, afhalen op gekozen tijd ({p}$ aan de balie).",
+      dropNote:"<b>Beperkt beschikbaar:</b> kan in de loop van de dag uitverkocht raken — de beschikbaarheid in het menu is altijd leidend.",
+      verped:"Winkelwagen bekijken",acaiCada:"+{x}$ per stuk",acaiAdd:"Toevoegen · {p}$",falta:"Nog <b>{x}$</b> en de bezorging is gratis — {y}$ bespaard."}
+ };
+ for(const l in R) if(I18N[l]) Object.assign(I18N[l],R[l]);
+})();
+/* preço como se mostra ao cliente, igual em todo o site: 950$ (as mensagens para a equipa continuam em ECV) */
+function pr$(v){ return v+"$"; }
+
 const FREE=750, TAXA=225, PRAZO=15;
 
 /* ---------------- ZONAS DE ENTREGA (referência: Plateau) ----------------
@@ -2537,8 +2627,8 @@ function mudarPiso(d){
 }
 function notaPiso(p){
  if(p===0) return t("pisosem");
- if(p<=3) return "+50 ECV";
- return semElevador ? "+150 ECV" : "+100 ECV";
+ if(p<=3) return "+50$";
+ return semElevador ? "+150$" : "+100$";
 }
 function setElevador(tem){
  semElevador = !tem;
@@ -2738,7 +2828,7 @@ function buildBestsellers(){
   const entregaBloqueada=mode==="entrega"&&f.item.nd;
   const blocked=lojaFechada||fim||entregaBloqueada;
   const status=lojaFechada?t("fechado"):(fim?t("acabou"):(entregaBloqueada?t("sonolocal"):""));
-  const preco=f.item.g?`${f.item.p} <span>· ${f.item.g}</span>`:`${f.item.p}`;
+  const preco=f.item.g?`${pr$(f.item.p)} <span>· ${pr$(f.item.g)}</span>`:pr$(f.item.p);
   return `<article class="best-card${blocked?" blocked":""}"${blocked?mtrBlq(f.item.n,fim,lojaFechada):""}>
    <button class="best-media" type="button" ${blocked?"disabled":`onclick="pick(${f.ci},${f.ii})"`} aria-label="${esc(td(f.item.n))}">
     <img src="${b.img}" alt="${esc(td(f.item.n))}" loading="lazy" fetchpriority="low"><img class="best-logo" src="img/logo.webp" alt="">
@@ -2909,11 +2999,11 @@ function build(){
    if(c.esg||lojaFechada) return `<div class="combo off${c.full?" full":""}">
    ${f.length?`<div class="cfotos">${f.map(x=>`<img src="img/p/${x}.webp" alt="" loading="lazy" fetchpriority="low">`).join("")}</div>`:""}
    <div class="cn">${td(c.n)}</div><div class="ci">${td(c.d)}</div>
-   <div class="brow"><span class="cp">${c.p}</span><small class="cesg">${lojaFechada?t("fechado"):tm("acabou")}</small></div></div>`;
+   <div class="brow"><span class="cp">${pr$(c.p)}</span><small class="cesg">${lojaFechada?t("fechado"):tm("acabou")}</small></div></div>`;
    return `<div class="combo${c.full?" full":""}">
    ${f.length?`<div class="cfotos">${f.map(x=>`<img src="img/p/${x}.webp" alt="" loading="lazy" fetchpriority="low">`).join("")}</div>`:""}
    <div class="cn">${td(c.n)}</div><div class="ci">${td(c.d)}</div>
-   <div class="brow"><span class="cp">${c.p}</span>
+   <div class="brow"><span class="cp">${pr$(c.p)}</span>
    <button class="add" onclick="addCombo(${i})" aria-label="Adicionar ${c.n}">+</button></div></div>`;
  }).join("");
  buildBestsellers();
@@ -2938,11 +3028,11 @@ const exOff=(tipo,nome)=>esgotados.includes(exK(tipo,nome));
 const exNome=k=>String(k).split(":").slice(2).join(":");
 const EX_TX={
  acabou:{pt:"acabou hoje",en:"sold out today",fr:"épuisé aujourd'hui",de:"heute aus",nl:"vandaag uitverkocht"},
- semBase:{pt:"Granola e leite em pó esgotados hoje — fica ao preço de {p} ECV, sem agravamento.",
-  en:"Granola and milk powder are sold out today — price stays at {p} ECV, no surcharge.",
-  fr:"Granola et lait en poudre épuisés aujourd'hui — le prix reste à {p} ECV, sans supplément.",
-  de:"Granola und Milchpulver sind heute aus — der Preis bleibt bei {p} ECV, ohne Aufschlag.",
-  nl:"Granola en melkpoeder zijn vandaag uitverkocht — de prijs blijft {p} ECV, zonder toeslag."},
+ semBase:{pt:"Granola e leite em pó esgotados hoje — fica ao preço de {p}$, sem agravamento.",
+  en:"Granola and milk powder are sold out today — price stays at {p}$, no surcharge.",
+  fr:"Granola et lait en poudre épuisés aujourd'hui — le prix reste à {p}$, sans supplément.",
+  de:"Granola und Milchpulver sind heute aus — der Preis bleibt bei {p}$, ohne Aufschlag.",
+  nl:"Granola en melkpoeder zijn vandaag uitverkocht — de prijs blijft {p}$, zonder toeslag."},
  soAcai:{pt:"só açaí — ao preço de baixo",en:"açaí only — at the lower price",fr:"açaí seul — au prix inférieur",
   de:"nur Açaí — zum niedrigeren Preis",nl:"alleen açaí — tegen de lagere prijs"},
  aviso:{pt:"Entretanto acabou o que segue. Retirámos do seu pedido e o preço foi corrigido:",
@@ -3026,17 +3116,17 @@ function pick(ci,ii){
  $("optDesc").innerHTML=i.d?td(i.d):"";
  let h="";
  if(i.g) h+=`<div class="lbl">${t("tamanho")}</div><div class="chips" id="szC">
-   <button class="chip sel" onclick="setSize('M',this)">${t("medio")} · ${i.p}</button>
-   <button class="chip" onclick="setSize('G',this)">${t("grande")} · ${i.g}</button></div>`;
+   <button class="chip sel" onclick="setSize('M',this)">${t("medio")} · ${pr$(i.p)}</button>
+   <button class="chip" onclick="setSize('G',this)">${t("grande")} · ${pr$(i.g)}</button></div>`;
  /* um extra que a cozinha marcou como acabado fica bloqueado, com "acabou hoje" */
  const esg=`<small class="esgx">${ext("acabou")}</small>`;
  if(c.milk && !i.nm) h+=`<div class="lbl">${t("leite")}</div><div class="chips" id="mkC">`+
    LEITES.map((m,k)=>{ const fo=k>0&&exOff("leite",m[0]);
-    return `<button class="chip tl${k===0?" sel":""}${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="setMilk('${m[0]}',this)"`}>${td(m[0])}${m[1]?` +${m[1]}`:""}${fo?esg:""}</button>`;
+    return `<button class="chip tl${k===0?" sel":""}${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="setMilk('${m[0]}',this)"`}>${td(m[0])}${m[1]?` +${pr$(m[1])}`:""}${fo?esg:""}</button>`;
    }).join("")+`</div>`;
  if(c.extras) h+=`<div class="lbl">${t("extras")}</div><div class="chips">`+
    c.extras.map(e=>{ const fo=exOff("extra",e[0]);
-    return `<button class="chip tl${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="tglEx('${e[0]}',${e[1]},this)"`}>${td(e[0])} +${e[1]}${fo?esg:""}</button>`;
+    return `<button class="chip tl${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="tglEx('${e[0]}',${e[1]},this)"`}>${td(e[0])} +${pr$(e[1])}${fo?esg:""}</button>`;
    }).join("")+`</div>`;
  /* ingredientes que o cliente pode retirar (não há acrescentar) */
  if(i.sem) h+=`<div class="lbl">${t("personalizar")}</div><div class="optsem">`+
@@ -3092,7 +3182,7 @@ function acaiHTML(i){
  const extra=s=>{ const fo=exOff("acaix",s);
   return `<button type="button" class="chip xt tl${fo?" esg":""}" aria-pressed="false"`+
    (fo?' disabled aria-disabled="true"':` onclick="tglXt('${q(s)}',this)"`)+
-   `>${td(s)}${fo?esg:`<small>+${i.xp} ECV</small>`}</button>`; };
+   `>${td(s)}${fo?esg:`<small>+${pr$(i.xp)}</small>`}</button>`; };
  const grupo=(n,k,tag,chips)=>`<div class="acai-h"><div class="lbl"><i>${n}</i>${t(k)}</div>${tag?`<em>${tag}</em>`:""}</div>
    <div class="opttop g2">${chips}</div>`;
  const inc=t("acaiInc");
@@ -3187,7 +3277,7 @@ function refresh(){
  $("cnt").textContent=n;
  const tc=$("topCnt"); if(tc) tc.textContent=n;
  $("cartBtn").style.opacity=n?1:.85;
- const ct=$("ctot"); if(ct) ct.textContent = n ? (sub()+" ECV") : "";
+ const ct=$("ctot"); if(ct) ct.textContent = n ? pr$(sub()) : "";
  document.querySelector(".bar").classList.toggle("has", n>0);
  if(n>_ultimoN && typeof pulsar==="function") pulsar();
  _ultimoN=n;
@@ -3213,7 +3303,7 @@ function renderCart(){
    <div class="cinfo">${td(i.name)}${i.opts.length?`<small>${i.opts.map(o=>o==="SÓ AÇAÍ"?`<b class="sotag">${td(o)}</b>`:td(o)).join(" · ")}</small>`:""}</div>
    <div class="qty"><button type="button" aria-label="−1 ${esc(td(i.name))}" onclick="chg('${i.key.replace(/'/g,"\\'")}',-1)">−</button><b>${i.q}</b>
    <button type="button" class="mais" aria-label="+1 ${esc(td(i.name))}" onclick="chg('${i.key.replace(/'/g,"\\'")}',1)">+</button></div>
-   <div class="cp2">${i.price*i.q}</div></div>`).join("")+totalsHTML();
+   <div class="cp2">${pr$(i.price*i.q)}</div></div>`).join("")+totalsHTML();
 }
 /* ============================================================
    OPÇÕES DO DIA, ligadas no /admin (09-10-2026)
@@ -3596,7 +3686,7 @@ async function aplicarPromo(){
  if(d.erro){ mtr("promo_recusada"); promo=null; $("promoMsg").innerHTML='<span class="pbad">'+d.erro+'</span>'; refreshChk(); return; }
  const p=d.promo;
  if(p.modo && p.modo!==mode){ $("promoMsg").innerHTML='<span class="pbad">Só válido para '+(p.modo==="entrega"?"entregas":"levantamento no local")+'.</span>'; return; }
- if(p.min && sub()<p.min){ $("promoMsg").innerHTML='<span class="pbad">Precisa de '+p.min+' ECV em produtos para usar este código.</span>'; return; }
+ if(p.min && sub()<p.min){ $("promoMsg").innerHTML='<span class="pbad">Precisa de '+pr$(p.min)+' em produtos para usar este código.</span>'; return; }
  if((p.tipo==="catfree"||p.tipo==="pctcat") && !temCategoria(p.cat)){ $("promoMsg").innerHTML='<span class="pbad">Este código é para '+p.cat.toLowerCase()+' — adicione ao pedido primeiro.</span>'; return; }
  promo=p; promo.d=textoPromo(p);
  mtr("promo_aplicada");
@@ -3636,14 +3726,14 @@ function totalsHTML(){
  const s=sub(), dsc=desconto(), d5=descOnline(), dr=descResto(), da=descAcai(), sv=servico(), cp=campCalc(), dc=descCamp();
  /* a entrega é grátis ACIMA de 750 — 750 certos ainda paga */
  const falta=Math.max(5, Math.ceil((FREE+1-subLiq())/5)*5);
- let h=`<div class="tot"><span>${t("subtotal")}</span><b>${s} ECV</b></div>`;
- if(dr) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descon")} (−${DESC_ONLINE}%)</span><b>−${dr} ECV</b></div>`;
- if(da) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descAcai").replace("{p}",DESC_ACAI_TXT)}</span><b>−${da} ECV</b></div>`;
+ let h=`<div class="tot"><span>${t("subtotal")}</span><b>${pr$(s)}</b></div>`;
+ if(dr) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descon")} (−${DESC_ONLINE}%)</span><b>−${pr$(dr)}</b></div>`;
+ if(da) h+=`<div class="tot" style="color:#2E6B32"><span>${t("descAcai").replace("{p}",DESC_ACAI_TXT)}</span><b>−${pr$(da)}</b></div>`;
  const ec=escCalc();
  const dcS=ganhaOnline()?shakeCalc().v:0, dcA=dc-dcS;
- if(dcA) h+=`<div class="tot" style="color:#2E6B32"><span>${ec.v?et("escTot"):ct(cp.tipo===3?"campTot3":"campTot2")}</span><b>−${dcA} ECV</b></div>`;
- if(dcS) h+=`<div class="tot" style="color:#2E6B32"><span>${esc(shk("tot"))}</span><b>−${dcS} ECV</b></div>`;
- if(dsc) h+=`<div class="tot" style="color:#2E6B32"><span>${t("desconto")} (${promo.c})</span><b>−${dsc} ECV</b></div>`;
+ if(dcA) h+=`<div class="tot" style="color:#2E6B32"><span>${ec.v?et("escTot"):ct(cp.tipo===3?"campTot3":"campTot2")}</span><b>−${pr$(dcA)}</b></div>`;
+ if(dcS) h+=`<div class="tot" style="color:#2E6B32"><span>${esc(shk("tot"))}</span><b>−${pr$(dcS)}</b></div>`;
+ if(dsc) h+=`<div class="tot" style="color:#2E6B32"><span>${t("desconto")} (${promo.c})</span><b>−${pr$(dsc)}</b></div>`;
  if(!slotHoje && slotQuando)
   h+=`<div class="warn" style="border-color:#8C2F2F;background:#F6E9E6;color:#8C2F2F;">
    ${t("atencao").replace("{v}",mode==="entrega"?t("vEnt"):t("vRec")).replace("{q}",slotQuando)}
@@ -3673,14 +3763,14 @@ function totalsHTML(){
   const txZona=taxa();
   h+= (txZona===0)
    ? `<div class="tot" style="color:#2E6B32"><span>${t("entrega")}</span><b>${t("gratis")}</b></div>`
-   : `<div class="tot"><span>${t("entrega")}</span><b>${txZona} ECV</b></div>`;
+   : `<div class="tot"><span>${t("entrega")}</span><b>${pr$(txZona)}</b></div>`;
   if(txZona>0 && zona && zona.p<ZONA_MARCADA_MIN)
    h+=`<div class="warn">${t("falta").replace("{x}",falta).replace("{y}",txZona)}</div>`;
   const txP=taxaAndar();
-  if(txP>0) h+=`<div class="tot"><span>${t("sobretaxand")}</span><b>${txP} ECV</b></div>`;
+  if(txP>0) h+=`<div class="tot"><span>${t("sobretaxand")}</span><b>${pr$(txP)}</b></div>`;
  }
- if(sv) h+=`<div class="tot"><span>${t("taxaserv")}</span><b>${sv} ECV</b></div>`;
- h+=`<div class="tot grand"><span>${t("totalpag")}</span><span>${total()} ECV</span></div>`;
+ if(sv) h+=`<div class="tot"><span>${t("taxaserv")}</span><b>${pr$(sv)}</b></div>`;
+ h+=`<div class="tot grand"><span>${t("totalpag")}</span><span>${pr$(total())}</span></div>`;
  if(sv) h+=`<div class="note" style="border:none;padding-top:0;margin-top:2px">${t("taxaservnota")}</div>`;
  return h;
 }
@@ -3850,7 +3940,7 @@ async function sendWA(){
    if(!cart.length){ avisar("avvazio"); return; }
    if(mudou.length)
     alert(ext("aviso")+"\n\n"+mudou.map(m=>"• "+m.nome+" — "+m.extras.map(x=>x+" ("+ext("acabou")+")").join(", ")).join("\n")+
-          (total()!==t0 ? "\n\n"+t("seupedido")+": "+total()+" ECV" : ""));
+          (total()!==t0 ? "\n\n"+t("seupedido")+": "+pr$(total()) : ""));
    openCart(); return;
   }
  }
@@ -4017,7 +4107,7 @@ function mostrarConfirmacao(precisa, d){
   const cop=k=>'<button type="button" class="pgcop" onclick="copiar(this,pgValor(\''+k+'\'))">'+t("copiar")+'</button>';
   $("okPay").innerHTML=
    '<div class="pgdados">'+
-    '<div class="pgvalor"><span>'+t("okPagar")+'</span><b>'+d.total+' ECV</b></div>'+
+    '<div class="pgvalor"><span>'+t("okPagar")+'</span><b>'+pr$(d.total)+'</b></div>'+
     '<div class="ln"><span>'+t("okBanco")+'</span><b>'+esc(d.banco.b)+'</b></div>'+
     '<div class="ln"><span>'+t("okTitular")+'</span><b>'+esc(d.banco.t)+(d.banco.titK?'<small class="tsub">'+t(d.banco.titK)+'</small>':'')+'</b></div>'+
     '<div class="ln"><span>'+esc(d.banco.lbl)+'</span><b>'+esc(d.banco.c)+'</b>'+cop("conta")+'</div>'+
@@ -4265,7 +4355,7 @@ function drawBank(){
   <div class="ln"><span>${t("titular")}</span><b>${banco.t}${banco.titK?`<small class="tsub">${t(banco.titK)}</small>`:""}</b></div>
   <div class="ln"><span>${banco.lbl}</span><b>${banco.c}</b></div>
   ${nota?`<div class="bnota">${nota}</div>`:""}
-  <div class="ln"><span>${t("valorex")}</span><span class="amt">${total()} ECV</span></div>
+  <div class="ln"><span>${t("valorex")}</span><span class="amt">${pr$(total())}</span></div>
   <div class="ref">${t("refnota")}<br><b data-clarity-mask="true">${codigo}</b></div>`;
 }
 
@@ -4512,9 +4602,9 @@ function traduzir(){
  // campos de texto
  const ph=[["fName","nomeph"],["fAddr","moradaph"],["fNotes","notasph"],["fPromo","promoph"],["fZona","zonaph"]];
  ph.forEach(([id,k])=>{ const e=$(id); if(e) e.placeholder=t(k); });
- // botões de idioma
- $("langs").innerHTML=LANGS.map(([c,r])=>
-  `<button class="${c===LANG?"sel":""}" onclick="setLang('${c}')">${r}</button>`).join("");
+ // idioma: selector pequeno na barra do topo (05-11-2026; antes eram 5 botões numa linha própria)
+ const ls=$("langSel");
+ if(ls){ ls.innerHTML=LANGS.map(([c,r])=>`<option value="${c}"${c===LANG?" selected":""}>${r}</option>`).join(""); ls.value=LANG; }
  // nota do modo de entrega
  const mn=$("modeNote");
  if(mn) mn.innerHTML=(mode==="entrega")?t("notaent"):t("notarec");
@@ -4811,7 +4901,7 @@ function procurarMenu(v){
   if(r.combo!=null){
    const c=r.c;
    return `<div class="it"><div class="nm">${esc(td(c.n))}<small class="cat">Combo · ${esc(td(c.d))}</small></div>
-    <div class="pr">${c.p}</div>${lojaFechada?'<span class="noadd">✕</span>':`<button class="add" onclick="addCombo(${r.combo})" aria-label="+ ${esc(td(c.n))}">+</button>`}</div>`;
+    <div class="pr">${pr$(c.p)}</div>${lojaFechada?'<span class="noadd">✕</span>':`<button class="add" onclick="addCombo(${r.combo})" aria-label="+ ${esc(td(c.n))}">+</button>`}</div>`;
   }
   const i=r.i, fim=esgotados.includes(i.n), blk=lojaFechada||fim||(mode==="entrega"&&i.nd);
   const dest=(MENU[r.ci].tk===CAT_DESTAQUE && DESTAQUE.includes(i.n));
@@ -4819,7 +4909,7 @@ function procurarMenu(v){
   const acao=dest?`abrirProduto('${String(i.n).replace(/'/g,"\\'")}')`:`pick(${r.ci},${r.ii})`;
   const ft=fotoProd(i.n);
   return `<div class="it${blk?" blk":""}">${ft?`<img class="ms-f" src="${ft}" alt="" loading="lazy" fetchpriority="low">`:""}<div class="nm">${esc(td(i.n))}<small class="cat">${esc(r.cat)}</small>${nota}</div>
-   <div class="pr">${i.p}${i.g?` <em>· ${i.g}</em>`:""}</div>
+   <div class="pr">${pr$(i.p)}${i.g?` <em>· ${pr$(i.g)}</em>`:""}</div>
    ${blk?'<span class="noadd">✕</span>':`<button class="add" onclick="${acao}" aria-label="+ ${esc(td(i.n))}">+</button>`}</div>`;
  }).join("");
  box.hidden=false;
