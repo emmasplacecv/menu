@@ -310,6 +310,8 @@ const ESTADOS={confirmado:"A aguardar",preparar:"Em preparação",pronto:"Pronto
 let KEY="", pedidos=[], filtro="activos";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+/* 04-11-2026: texto vindo do pedido dentro de onclick="…": JS escapado e depois HTML escapado (com a plica) */
+const jsArg=v=>esc(JSON.stringify(String(v==null?"":v))).replace(/'/g,"&#39;");
 
 $("hoje").textContent=new Date().toLocaleDateString("pt-PT",
  {weekday:"long",day:"2-digit",month:"long"}).toUpperCase();
@@ -573,33 +575,33 @@ function desenhar(){
  }).join("");
 }
 function cartaoPed(p){ {
-  const ent=p.modo==="entrega";
+  const ent=p.modo==="entrega", id=jsArg(p.id);
   let acts="";
-  if(p.status==="confirmado") acts=`<button class="bnx" onclick="mudar('${p.id}','preparar')">Começar</button>`;
-  else if(p.status==="preparar") acts=`<button class="bok" onclick="mudar('${p.id}','pronto')">Pronto</button>`;
-  else if(p.status==="pronto") acts=`<button class="bok" onclick="mudar('${p.id}','entregue')">${ent?"Saiu":"Levantado"}</button>`;
-  acts += `<button class="bdel" onclick="apagar('${p.id}','${(p.code||"").replace(/'/g,"")}')" title="Apagar pedido">🗑</button>`;
+  if(p.status==="confirmado") acts=`<button class="bnx" onclick="mudar(${id},'preparar')">Começar</button>`;
+  else if(p.status==="preparar") acts=`<button class="bok" onclick="mudar(${id},'pronto')">Pronto</button>`;
+  else if(p.status==="pronto") acts=`<button class="bok" onclick="mudar(${id},'entregue')">${ent?"Saiu":"Levantado"}</button>`;
+  acts += `<button class="bdel" onclick="apagar(${id},${jsArg(p.code||"")})" title="Apagar pedido">🗑</button>`;
   const atr=(!p._futuro && p.status!=="entregue" && atrasado(p.slot));
   const porVer=precisaVisto(p);
   /* 03-11-2026: por ver → só a capa. O quadrado inteiro é o botão; nada do pedido aparece. */
   if(porVer) return `<div class="ped capa" role="button" tabindex="0" aria-label="Pedido novo do website — ver pedido"
-     onclick="marcarVisto('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();marcarVisto('${p.id}')}">
+     onclick="marcarVisto(${id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();marcarVisto(${id})}">
     <div class="sino">🔔</div>
     <div class="t1">PEDIDO NOVO · WEBSITE</div>
     <div class="t0 ${ent?"ent":"lev"}">${ent?"🛵 ENTREGA":"🛍 LEVANTAR"}${p._futuro?" · PARA "+curtoDia(p._dia):""}</div>
     <div class="t2">Ver pedido</div>
     <div class="bt">👆 Toque para abrir</div>
    </div>`;
-  return `<div class="ped ${p.status}${atr?" atrasado":""}" onclick="marcarVisto('${p.id}')">
+  return `<div class="ped ${esc(p.status)}${atr?" atrasado":""}" onclick="marcarVisto(${id})">
    <div class="cli"><b>${esc(p.nome||"(sem nome)")}</b>${p.tel?`<a class="tel" href="tel:${esc(String(p.tel).replace(/\s/g,""))}">${esc(p.tel)}</a>`:""}</div>
    ${blocoNotas(p)}
    <ul>${(p.itens||[]).map(i=>`<li>${artigo(i)}</li>`).join("")}</ul>
    ${p.zona?`<div class="mor">📍 ${esc(p.zona)}${p.morada?" — "+esc(p.morada):""}</div>`:(p.morada?`<div class="mor">📍 ${esc(p.morada)}</div>`:"")}${p.piso>0?`<div class="andar">🏢 ${esc(p.piso)}º andar${p.semElevador?" · SEM ELEVADOR":""} · sobretaxa ${esc(p.taxaAndar)} ECV</div>`:""}
-   <div class="top sep"><span class="hora">${ent?"sair":"levantar"} <b>${p.slot||"—"}</b>${p._futuro?` <b class="pdia">${curtoDia(p._dia)}</b>`:""}</span>
+   <div class="top sep"><span class="hora">${ent?"sair":"levantar"} <b>${esc(p.slot||"—")}</b>${p._futuro?` <b class="pdia">${curtoDia(p._dia)}</b>`:""}</span>
     <span class="tags">${modoTag(p)}<span class="tipo ${p.balcao?"":"web"}">${p.balcao?"BALCÃO":"WEBSITE"}</span></span></div>
-   <div class="meta">${p.code||""}${p.criado?" · pedido às "+p.criado:""}${!p.balcao&&vistoDe(p)?' · <span class="vistoOk">👀 visto às '+vistoDe(p)+'</span>':""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
+   <div class="meta">${esc(p.code||"")}${p.criado?" · pedido às "+esc(p.criado):""}${!p.balcao&&vistoDe(p)?' · <span class="vistoOk">👀 visto às '+vistoDe(p)+'</span>':""}${p._offline?' · <b style="color:#8C2F2F">📴 só neste aparelho (por enviar)</b>':""}</div>
    ${atr?`<div class="atr">Hora ultrapassada</div>`:""}
-   <div class="est">${(ESTADOS[p.status]||p.status).toUpperCase()}</div>
+   <div class="est">${esc(String(ESTADOS[p.status]||p.status||"").toUpperCase())}</div>
    <div class="acts">${acts}</div>
   </div>`;
  }

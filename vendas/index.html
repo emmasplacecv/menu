@@ -722,6 +722,10 @@ const exOff=(tipo,nome)=>esgotados.includes(exK(tipo,nome));
 const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO","COMBOS"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+/* 04-11-2026: SEGURANÇA — os pedidos lidos do servidor podem ter sido escritos por qualquer pessoa.
+   escA = dentro de um atributo HTML ("…") · jsArg = texto dentro de onclick="…" (JS escapado e depois HTML) */
+const escA=s=>esc(s==null?"":s).replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+const jsArg=v=>escA(JSON.stringify(String(v==null?"":v)));
 const IC_X='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
 $("hoje").textContent=new Date().toLocaleDateString("pt-PT",
@@ -1751,13 +1755,13 @@ function desenharHist(){
   const linhas=(Array.isArray(p.linhas)&&p.linhas.length)?p.linhas.map(x=>x.q+"x "+x.n):(p.itens||[]);
   const nt=String(p.notas||"").replace(/^(MODIFICADO \(substitui [^)]*\) · )?Cliente à espera · (PAGO(?: \([^)]*\))?|POR PAGAR)( · )?/,"");
   const ph=(metEnviado[p.code]&&metEnviado[p.code].h)||p.balcaoPagoHora||"";
-  return `<div class="sx ${canc?"canc":(pg?"sim":"nao")}${_prontosNovos.has(p.id)?" novo-pronto":""}" data-code="${esc(p.code)}" data-id="${esc(p.id)}">
+  return `<div class="sx ${canc?"canc":(pg?"sim":"nao")}${_prontosNovos.has(p.id)?" novo-pronto":""}" data-code="${escA(p.code)}" data-id="${escA(p.id)}">
    <div class="cab" role="button" tabindex="0" aria-expanded="${ab}">
     <span class="lk" aria-hidden="true">🔒</span>
     <span class="q"><b>${esc(p.nome||"")}</b><small>${esc(p.code)}${p.criado?" · "+esc(p.criado):""}${canc?"":` <span class="kst ${esc(p.status||"")}">${esc(EST_TXT[p.status]||p.status||"")}</span>`}${emEdicao.has(p.code)?" · ✎ em edição":""}${p._offline?' · <b style="color:var(--vermelho)">📴 por enviar</b>':""}</small></span>
-    <span class="v"><b>${p.total||0}</b><small>${canc?"CANCELADO":(pg?"✓ PAGO"+(m?" · "+esc(metTxtP(p)).toUpperCase():""):"POR COBRAR")}</small></span>
+    <span class="v"><b>${+p.total||0}</b><small>${canc?"CANCELADO":(pg?"✓ PAGO"+(m?" · "+esc(metTxtP(p)).toUpperCase():""):"POR COBRAR")}</small></span>
    </div>
-   ${(!pg&&!canc)?`<button type="button" class="cobrar2" onclick="abrirCobrar('${esc(p.code)}')">Cobrar ${p.total||0} ECV</button>`:""}
+   ${(!pg&&!canc)?`<button type="button" class="cobrar2" onclick="abrirCobrar(${jsArg(p.code)})">Cobrar ${+p.total||0} ECV</button>`:""}
    ${ab?`<div class="det"><ul>${linhas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
      ${nt?`<div class="dica">Notas: ${esc(nt)}</div>`:""}
      ${pg?`<div class="dica">Pago${m?" em "+esc(metTxt(m).toLowerCase()):""}${ph?" às "+esc(ph):""}.</div>`:""}
@@ -1808,12 +1812,12 @@ function desenharHist(){
 function abrirOpcoes(code){
  const p=(pedidos||[]).find(x=>x.code===code); if(!p) return;
  const pg=pagoEnviado[code]===true, canc=p.status==="cancelado", m=metDe(p), c=esc(code);
- $("opSheet").innerHTML=`<h3>${esc(p.nome||"")} · ${p.total||0} ECV</h3>
+ $("opSheet").innerHTML=`<h3>${esc(p.nome||"")} · ${+p.total||0} ECV</h3>
   <div class="sub">${c} · ${canc?"cancelado":(pg?"pago"+(m?" ("+esc(metTxtP(p))+")":""):"por cobrar")} · cozinha: ${esc(EST_TXT[p.status]||p.status||"")}</div>
   <div class="acc">
-   ${canc?"":`<button type="button" class="ed" onclick="fecharOpcoes();modificar('${c}')">✎ Editar pedido<small>Abre no carrinho. A cozinha só recebe a mudança quando carregar em «Fechar e reenviar».</small></button>`}
-   ${canc?"":(pg?`<button type="button" class="dz" onclick="fecharOpcoes();desfazerPago('${c}')">↩ Afinal não pagou<small>Volta para «Por cobrar».</small></button>`
-                 :`<button type="button" class="cb" onclick="fecharOpcoes();abrirCobrar('${c}')">💵 Cobrar ${p.total||0} ECV</button>`)}
+   ${canc?"":`<button type="button" class="ed" onclick="fecharOpcoes();modificar(${jsArg(code)})">✎ Editar pedido<small>Abre no carrinho. A cozinha só recebe a mudança quando carregar em «Fechar e reenviar».</small></button>`}
+   ${canc?"":(pg?`<button type="button" class="dz" onclick="fecharOpcoes();desfazerPago(${jsArg(code)})">↩ Afinal não pagou<small>Volta para «Por cobrar».</small></button>`
+                 :`<button type="button" class="cb" onclick="fecharOpcoes();abrirCobrar(${jsArg(code)})">💵 Cobrar ${+p.total||0} ECV</button>`)}
   </div>
   <button type="button" class="fx" onclick="fecharOpcoes()">Fechar</button>`;
  $("opBg").classList.add("on");
