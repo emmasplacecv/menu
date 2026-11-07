@@ -486,7 +486,7 @@ function migrarNomes(ed){
 
 /* Lista de produtos — tem de coincidir com os nomes do menu. */
 const COMBOS_BASE=[{"n": "PEQUENO-ALMOÇO", "d": "espresso + donut ou muffin de chocolate", "p": 225, "full": false}, {"n": "LANCHE", "d": "café gelado ou frappé clássico + donut", "p": 405, "full": false}, {"n": "SOPA E PÃO", "d": "sopa do dia + pão recheado de frango ou caprese", "p": 500, "full": false}, {"n": "ALMOÇO LEVE", "d": "pão recheado de frango ou caprese + sumo de laranja", "p": 570, "full": false}, {"n": "SALADA E PÃO", "d": "salada fria de frango + pão recheado de frango ou caprese", "p": 640, "full": false}, {"n": "SALADA E SUMO", "d": "salada fria de frango + sumo de laranja", "p": 785, "full": false}, {"n": "SUPER COMBO", "d": "sopa + pão recheado de frango ou caprese + café gelado ou frappé clássico", "p": 760, "full": true}];
-const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "d": "copo de 355 ml · preços nas três linhas abaixo"}, {"n": "Água de Coco Grande", "m": 400, "d": "coco grande inteiro · natural, servido no coco"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 475, "d": "473 ml"}, {"n": "Sumo de Ananás", "m": 475, "d": "473 ml"}, {"n": "Sumo de Maracujá", "m": 475, "d": "473 ml"}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
+const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "d": "copo de 355 ml · preços nas três linhas abaixo"}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 475, "d": "473 ml"}, {"n": "Sumo de Ananás", "m": 475, "d": "473 ml"}, {"n": "Sumo de Maracujá", "m": 475, "d": "473 ml"}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
 
 let KEY="", fora=[];
 const $=id=>document.getElementById(id);
@@ -541,7 +541,7 @@ async function pedir(caminho){
 
 function desenhar(){
  $("lista").innerHTML = MENU.map(([cat,itens],ci) =>
-  `<div class="cat">${cat}</div>` +
+  `<div class="cat">${rotCat(cat)}</div>` +
   itens.map((it,ii)=>{
    const n = it.n, off = fora.includes(n);
    return `<div class="row${off?" off":""}">
@@ -691,7 +691,7 @@ function desenharStock(){
     /* produtos do menu base + os acrescentados no separador Menu, sem os retirados */
     const itens = itensDaCat(ci).filter(it => !(edit.off || []).includes(it.n));
     if(!itens.length) return;
-    h += `<div class="cat">${cat}</div>`;
+    h += `<div class="cat">${rotCat(cat)}</div>`;
     itens.forEach(it => {
       const q = stock[it.n];
       const zero = (q !== undefined && q <= 0);
@@ -961,6 +961,11 @@ function precoDe(nome, base){
 }
 function marcar(){ sujo=true; $("btnGravar").textContent="Guardar alterações •"; }
 
+/* 07-11-2026: a ÁGUA DE COCO saiu do menu. A categoria continua a chamar-se "AÇAÍ & ÁGUA DE COCO" por
+   dentro — é a chave das edições guardadas no servidor (ordem das categorias, produtos acrescentados na
+   Gestão) — mas MOSTRA-SE "AÇAÍ" em todo o lado. Mudar o nome interno faria o açaí perder o lugar no menu. */
+const CAT_ROTULO={"AÇAÍ & ÁGUA DE COCO":"AÇAÍ"};
+function rotCat(n){ const k=String(n==null?"":n).replace(/&amp;/g,"&").trim().toUpperCase(); return CAT_ROTULO[k]||n; }
 const normc=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
 
 /* ---------- CATEGORIAS (17-10-2026): criar, retirar e ordenar ----------
@@ -1062,7 +1067,7 @@ function htmlCats(){
     <button onclick="moverCat(${i},-1)" ${i===0?"disabled":""} aria-label="Subir">▲</button>
     <button onclick="moverCat(${i},1)" ${i===l.length-1?"disabled":""} aria-label="Descer">▼</button>
    </div>
-   <div class="n">${n}${off?"<small>Retirada — não aparece em lado nenhum. Toque no ✕ para repor.</small>"
+   <div class="n">${rotCat(n)}${off?"<small>Retirada — não aparece em lado nenhum. Toque no ✕ para repor.</small>"
      :(nova?`<small>Criada aqui · ${nProd} produto${nProd===1?"":"s"}${nProd?"":" — sem produtos não aparece no site"}</small>`:"")}</div>
    ${nova ? `<button class="x" onclick="apagarCat(${q(n)})" title="Apagar categoria">🗑</button>`
           : `<button class="x ${off?"on":""}" onclick="tglCat(${q(n)})" title="${off?"Repor":"Retirar"} categoria">✕</button>`}
@@ -1190,13 +1195,13 @@ function addComboNovo(){
 function desenharMenu(){
  sincronizarCats();
  const selAnt=$("nCat").value;
- $("nCat").innerHTML=MENU.map(([c],k)=>`<option value="${k}">${c}${catOff(c)?" (retirada)":""}</option>`).join("");
+ $("nCat").innerHTML=MENU.map(([c],k)=>`<option value="${k}">${rotCat(c)}${catOff(c)?" (retirada)":""}</option>`).join("");
  if(selAnt && +selAnt<MENU.length) $("nCat").value=selAnt;
  const q=s=>JSON.stringify(s).replace(/"/g,"&quot;");
  let h=htmlCats();
  MENU.forEach(([cat],ci)=>{
   const l=itensDaCat(ci);
-  h+=`<div class="cat${catOff(cat)?" catoff":""}">${cat}${catOff(cat)?" · RETIRADA":""}</div>
+  h+=`<div class="cat${catOff(cat)?" catoff":""}">${rotCat(cat)}${catOff(cat)?" · RETIRADA":""}</div>
    ${(!l.length&&catNova(cat))?'<div class="vaz">Sem produtos. Acrescente em «Acrescentar produto», no fim desta página.</div>':""}
    ${/MILKSHAKE/i.test(cat)?'<div class="vaz">Tamanho único 473 ml. Enquanto um milkshake aqui tiver preço G, o site e as vendas usam 425 (morango, frutos silvestres), 500 (banana e morango) e 600 (tropical). Para mandar o preço daqui: apague o G e grave.</div>':""}
    <div class="ordbar">
