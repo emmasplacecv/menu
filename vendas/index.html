@@ -64,12 +64,23 @@ h1{font-size:19px;letter-spacing:.5px;}
  color:var(--gold);font-weight:700;margin-bottom:2px;}
 .catrow{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
 /* venda rápida (07-11-2026) */
-.rapidos{margin:12px 0 12px;}
+.rapidos{margin:12px 0 14px;padding:10px 10px 12px;border-radius:16px;background:#EFE3CF;border:1px solid #DCC6A2;}
 .rpt{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink2);margin:0 2px 7px;}
 .rpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px;}   /* tablet: os 5 numa linha · telemóvel: 2 colunas */
 .rp{position:relative;display:flex;flex-direction:column;gap:6px;padding:11px 11px 10px;border-radius:15px;
  background:#fff;border:2px solid var(--gold);box-shadow:0 2px 0 rgba(52,37,29,.14);min-width:0;}
-.rp b{font-size:15px;font-weight:800;line-height:1.2;color:var(--ink);}
+.rp b{font-size:16px;font-weight:800;line-height:1.2;color:var(--ink);}
+.rp{min-height:92px;border-top-width:6px;}
+.rp .rpp{font-size:14px;}
+/* cores por produto — tons claros, sem exagero */
+.rp.c-acai{background:#F6ECF4;border-color:#4A2545;}
+.rp.c-caramelo{background:#FCEEDD;border-color:#C07A2E;}
+.rp.c-cafe{background:#F1E5DA;border-color:#6B4423;}
+.rp.c-frango{background:#FBF3D6;border-color:#B08A12;}
+.rp.c-atum{background:#E4EFF0;border-color:#2F5D62;}
+.rp.c-acai .rpp{color:#4A2545;} .rp.c-caramelo .rpp{color:#8A5214;} .rp.c-cafe .rpp{color:#5A3519;}
+.rp.c-frango .rpp{color:#7A5F0A;} .rp.c-atum .rpp{color:#234A4E;}
+.rp.c-caramelo .rpmg button{background:#8A5214;} .rp.c-cafe .rpmg button{background:#5A3519;}
 .rp .rpb{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:4px;flex:1;-webkit-tap-highlight-color:transparent;}
 .rp .rpb:disabled{cursor:not-allowed;}
 .rp .rpp{font-size:13px;font-weight:700;color:var(--verde2);}
@@ -633,11 +644,13 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
       <div class="pg-met" id="pgMet" role="group" aria-label="Forma de pagamento"></div>
       <div id="pgTroco"></div>
     </div>
-    <textarea class="fld notas" id="fNotas" placeholder="Notas para a cozinha (sem açúcar, para viagem, alergias…)" onchange="guardarNotas(this.value)"></textarea>
+    <!-- 07-11-2026: total e «Enviar» logo a seguir ao pagamento (antes vinham depois das notas e,
+         no tablet, ficavam fora do ecrã). As notas passam para baixo do botão. -->
     <div class="tot"><span>Total</span><b id="total">0 ECV</b></div>
     <button class="envia" id="btnEnviar" onclick="enviar()">Enviar para a cozinha</button>
-    <button class="limpar" id="btnLimpar" onclick="limpar()">Eliminar este pedido</button>
     <div class="msg" id="envMsg"></div>
+    <textarea class="fld notas" id="fNotas" placeholder="Notas para a cozinha — escrever ANTES de enviar (sem açúcar, para viagem, alergias…)" onchange="guardarNotas(this.value)" oninput="guardarNotas(this.value)"></textarea>
+    <button class="limpar" id="btnLimpar" onclick="limpar()">Eliminar este pedido</button>
   </div>
 
   <div class="box" id="boxEnv">
@@ -1169,6 +1182,10 @@ function qtdNoPedido(nome){
    >>> Para mudar a lista: RAPIDOS, por ordem. <<<
    ============================================================ */
 const RAPIDOS=["Açaí","Iced Latte de Caramelo","Frappé de Caramelo","Pão Recheado de Frango","Pão Recheado de Atum"];
+/* 07-11-2026: cada um com a sua cor (fundo claro + contorno + faixa no topo), para se distinguirem
+   de relance entre si e dos cartões brancos das categorias. Produto sem cor → "base". */
+const RAPIDO_COR={"Açaí":"acai","Iced Latte de Caramelo":"caramelo","Frappé de Caramelo":"cafe",
+ "Pão Recheado de Frango":"frango","Pão Recheado de Atum":"atum"};
 function posDe(n){ for(let ci=0;ci<MENU.length;ci++){ if(MENU[ci][0]==="COMBOS") continue;
   const ii=MENU[ci][1].findIndex(v=>v.n===n); if(ii>=0) return [ci,ii]; } return null; }
 /* a última linha de açaí do pedido aberto (é essa que o «＋1 igual» repete) */
@@ -1206,22 +1223,23 @@ function desenharRapidos(){
   const badge=q>0?`<span class="rq">${q}</span>`:"";
   const st=fora?`<span class="rst zero">esgotado</span>`:(r!==null?`<span class="rst${r<=3?" baixo":""}">restam ${r}</span>`:"");
   const nm=`<b>${esc(i.n)}</b>`;
+  const cor=` c-${RAPIDO_COR[i.n]||"base"}`;
   if(i.top){
    const k=ultimoAcaiLinha(), x=k>=0?balcoes[activo].itens[k]:null;
    const det=x?(/\(([^)]*)\)\s*$/.exec(x.nome)||[,""])[1]:"";
-   return `<div class="rp acai${fora?" fora":""}" data-n="${escA(i.n)}">${badge}
+   return `<div class="rp acai${cor}${fora?" fora":""}" data-n="${escA(i.n)}">${badge}
      <button type="button" class="rpb" onclick="rapido(${jsArg(i.n)})" ${fora?"disabled":""}>${nm}<span class="rpp">${i.m} ECV · escolher</span>${st}</button>
      ${x&&!fora?`<button type="button" class="rp1" id="rapAcai1" onclick="maisUmAcai()" title="${escA(x.nome)}">＋1 igual<small>${esc(det||"o mesmo")}</small></button>`:""}
     </div>`;
   }
   if(i.g){
-   return `<div class="rp tam${fora?" fora":""}" data-n="${escA(i.n)}">${badge}${nm}${st}
+   return `<div class="rp tam${cor}${fora?" fora":""}" data-n="${escA(i.n)}">${badge}${nm}${st}
      <div class="rpmg">
       <button type="button" onclick="rapido(${jsArg(i.n)},'M')" ${fora?"disabled":""}>M<small>${i.m}</small></button>
       <button type="button" onclick="rapido(${jsArg(i.n)},'G')" ${fora?"disabled":""}>G<small>${i.g}</small></button>
      </div></div>`;
   }
-  return `<div class="rp${fora?" fora":""}" data-n="${escA(i.n)}">${badge}
+  return `<div class="rp${cor}${fora?" fora":""}" data-n="${escA(i.n)}">${badge}
     <button type="button" class="rpb" onclick="rapido(${jsArg(i.n)})" ${fora?"disabled":""}>${nm}<span class="rpp">${i.m} ECV</span>${st}</button></div>`;
  }).join("");
  alvo.innerHTML = tiles ? `<div class="rpt">⚡ Venda rápida</div><div class="rpg">${tiles}</div>` : "";
@@ -1487,7 +1505,10 @@ function desenharPedido(){
   </div>`).join("") : '<div class="vazio">Toca nos produtos acima para montar o pedido.</div>';
  $("total").textContent=totalBalcao()+" ECV";
  const pago=b.pago===true;
- $("pgMet").innerHTML=Object.keys(MET).map(k=>
+ /* 07-11-2026: ao balcão paga-se sempre antes — «Paga depois» deixa de aparecer num pedido novo.
+    Só fica visível ao editar um pedido que já estava por cobrar (para não o perder). Os pedidos
+    antigos por cobrar continuam na lista vermelha com «Cobrar». */
+ $("pgMet").innerHTML=Object.keys(MET).filter(k=>k!=="depois" || b.met==="depois").map(k=>
   `<button type="button" class="${k==="depois"?"dep":""}${b.met===k?" on":""}" aria-pressed="${b.met===k}" onclick="setMetodo('${k}')"><i>${MET[k].i}</i>${MET[k].t}</button>`).join("");
  $("pagar").classList.toggle("falta", !!b.itens.length && !b.met);
  $("pagar").style.display = b.itens.length ? "" : "none";
