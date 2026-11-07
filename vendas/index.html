@@ -63,6 +63,31 @@ h1{font-size:19px;letter-spacing:.5px;}
 .prod .catnome{display:block;font-size:10px;letter-spacing:1px;text-transform:uppercase;
  color:var(--gold);font-weight:700;margin-bottom:2px;}
 .catrow{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
+/* venda rápida (07-11-2026) */
+.rapidos{margin:12px 0 12px;}
+.rpt{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink2);margin:0 2px 7px;}
+.rpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px;}   /* tablet: os 5 numa linha · telemóvel: 2 colunas */
+.rp{position:relative;display:flex;flex-direction:column;gap:6px;padding:11px 11px 10px;border-radius:15px;
+ background:#fff;border:2px solid var(--gold);box-shadow:0 2px 0 rgba(52,37,29,.14);min-width:0;}
+.rp b{font-size:15px;font-weight:800;line-height:1.2;color:var(--ink);}
+.rp .rpb{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:4px;flex:1;-webkit-tap-highlight-color:transparent;}
+.rp .rpb:disabled{cursor:not-allowed;}
+.rp .rpp{font-size:13px;font-weight:700;color:var(--verde2);}
+.rp .rst{align-self:flex-start;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--cream);color:#3F6B33;}
+.rp .rst.baixo{color:var(--gold);} .rp .rst.zero{color:var(--vermelho);}
+.rp .rpmg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto;}
+.rp .rpmg button{padding:10px 4px 8px;border-radius:11px;border:0;background:var(--ink);color:#F7F1E4;font-family:inherit;font-weight:800;font-size:17px;line-height:1;cursor:pointer;}
+.rp .rpmg button small{display:block;margin-top:3px;font-size:11.5px;font-weight:600;opacity:.85;}
+.rp .rpmg button:active,.rp .rp1:active{transform:scale(.96);}
+.rp.acai{border-color:#4A2545;background:#FBF6FA;}
+.rp .rp1{border:0;border-radius:11px;padding:9px 8px 8px;background:#4A2545;color:#F7F1E4;font-family:inherit;font-weight:800;font-size:15px;line-height:1.1;cursor:pointer;text-align:center;}
+.rp .rp1 small{display:block;margin-top:3px;font-size:10.5px;font-weight:600;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp.fora{opacity:.45;}
+.rp .rq{position:absolute;top:-9px;right:-8px;min-width:24px;height:24px;padding:0 6px;border-radius:12px;background:var(--verde2);color:#fff;
+ font-size:13px;font-weight:800;display:grid;place-items:center;}
+.rp.feito,.rp .feito{animation:rpOk .5s ease;}
+@keyframes rpOk{0%{box-shadow:0 0 0 0 rgba(47,64,41,.55);}100%{box-shadow:0 0 0 12px rgba(47,64,41,0);}}
+@media (prefers-reduced-motion:reduce){.rp.feito,.rp .feito{animation:none;}}
 .catrow::-webkit-scrollbar{display:none;}
 .catrow button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink2);
  border-radius:999px;padding:9px 13px;font:600 12px/1 inherit;cursor:pointer;}
@@ -537,6 +562,7 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
       <input class="fld" id="fBusca" placeholder="Pesquisar produto…" oninput="pesquisar(this.value)">
       <button onclick="limparBusca()" aria-label="Limpar pesquisa">×</button>
     </div>
+    <div class="rapidos" id="rapidos" aria-label="Venda rápida"></div>
     <div class="catrow" id="cats"></div>
     <div class="grid" id="prods" style="display:none"></div>
     <div class="trilho" id="trilho"></div>
@@ -752,8 +778,10 @@ async function entrar(){
  restaurar(); desenharTabs(); desenharCats(); desenharProdutos(); desenharPedido(); desenharHist(); desenharStock();
  $("fDia").value=hojeISO(); carregarFecho(); try{ hvDia(0); }catch(e){}
  setInterval(()=>{ if(document.visibilityState==="visible") carregarPedidos(); }, 7000);
+ /* 07-11-2026: os esgotados (produtos e extras) também se relêem — antes só ao entrar e ao enviar,
+    e um ACABOU marcado na cozinha não bloqueava nada aqui até se reabrir a app */
  setInterval(()=>{ if(document.visibilityState==="visible")
-   carregarStock().then(()=>{desenharStock(); desenharProdutos();}); }, 30000);
+   Promise.all([carregarStock(), carregarEsgotados()]).then(()=>{desenharStock(); desenharProdutos();}); }, 30000);
  document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible") carregarPedidos(); });
  window.addEventListener("focus", carregarPedidos);
  $("somBtn").style.display="block";
@@ -1108,6 +1136,75 @@ function qtdNoPedido(nome){
 }
 /* Um cartão por produto. Nas bebidas com dois tamanhos, o tamanho escolhe-se depois de tocar
    (Médio / Grande). O nome no pedido continua igual: "X" é o médio, "X (Grande)" o grande. */
+/* ============================================================
+   VENDA RÁPIDA (07-11-2026) — os 5 mais vendidos ao balcão, num toque, no topo do painel.
+   · Bebidas com tamanho: dois botões, M e G — juntam ao pedido com leite normal e sem extras,
+     pelo MESMO caminho da folha de opções (escolherTamanho): mesmo nome, preço, stock e esgotados.
+     Para leite de aveia, gengibre, etc., usa-se o cartão normal da categoria.
+   · Pães: um toque.
+   · Açaí: abre a escolha do que leva (como sempre). Depois de haver um açaí no pedido, aparece
+     «＋1 igual»: junta outro exactamente igual, sem voltar a escolher (o último açaí deste pedido).
+   Produto retirado do menu ou com outro nome no /admin → o botão não aparece. Esgotado → bloqueado.
+   >>> Para mudar a lista: RAPIDOS, por ordem. <<<
+   ============================================================ */
+const RAPIDOS=["Açaí","Iced Latte de Caramelo","Frappé de Caramelo","Pão Recheado de Frango","Pão Recheado de Atum"];
+function posDe(n){ for(let ci=0;ci<MENU.length;ci++){ if(MENU[ci][0]==="COMBOS") continue;
+  const ii=MENU[ci][1].findIndex(v=>v.n===n); if(ii>=0) return [ci,ii]; } return null; }
+/* a última linha de açaí do pedido aberto (é essa que o «＋1 igual» repete) */
+function ultimoAcaiLinha(){ const it=balcoes[activo].itens;
+ for(let k=it.length-1;k>=0;k--){ const i=itemPorNome(it[k].base||it[k].nome); if(i&&i.top) return k; } return -1; }
+function rapido(n,sz){
+ const pos=posDe(n); if(!pos) return;
+ const [ci,ii]=pos, i=MENU[ci][1][ii];
+ if(!disponivel(i.n)){ alert("Já não há "+i.n+" para hoje."); return; }
+ if(i.top){ abrirAcai(i); return; }
+ if(i.g || temLeite(ci,i) || extrasDe(ci) || temBaun(i)){
+  /* o mesmo que tocar no tamanho na folha de opções, com o leite normal e sem extras */
+  opc={ci,ii,i,leite:"Normal",ex:[],esc:[],baun:!exOff("sem","Xarope de baunilha")};
+  escolherTamanho(sz==="G"?"G":"M");
+ } else add(ci,ii);
+ const el=document.querySelector(`#rapidos [data-n="${CSS.escape(n)}"]`);
+ if(el){ el.classList.remove("feito"); void el.offsetWidth; el.classList.add("feito"); }
+}
+function maisUmAcai(){
+ const k=ultimoAcaiLinha(); if(k<0) return;
+ const x=balcoes[activo].itens[k];
+ if(!disponivel(x.base||"Açaí")){ alert("Já não há açaí para hoje."); return; }
+ const fora=(x.xk||[]).filter(c=>esgotados.includes(c)).map(c=>c.split(":").slice(2).join(":"));
+ if(fora.length){ alert("Acabou entretanto: "+fora.join(", ")+".\nToca em Açaí para escolher outra vez."); return; }
+ mudarQtd(k,1);
+ const el=$("rapAcai1"); if(el){ el.classList.remove("feito"); void el.offsetWidth; el.classList.add("feito"); }
+}
+function desenharRapidos(){
+ const alvo=$("rapidos"); if(!alvo) return;
+ const tiles=RAPIDOS.map(n=>{
+  const pos=posDe(n); if(!pos) return "";
+  const [ci,ii]=pos, i=MENU[ci][1][ii];
+  const r=restam(i.n), fora=!disponivel(i.n);
+  const q=balcoes[activo].itens.filter(v=>(v.base||v.nome)===i.n).reduce((t,v)=>t+v.q,0);
+  const badge=q>0?`<span class="rq">${q}</span>`:"";
+  const st=fora?`<span class="rst zero">esgotado</span>`:(r!==null?`<span class="rst${r<=3?" baixo":""}">restam ${r}</span>`:"");
+  const nm=`<b>${esc(i.n)}</b>`;
+  if(i.top){
+   const k=ultimoAcaiLinha(), x=k>=0?balcoes[activo].itens[k]:null;
+   const det=x?(/\(([^)]*)\)\s*$/.exec(x.nome)||[,""])[1]:"";
+   return `<div class="rp acai${fora?" fora":""}" data-n="${escA(i.n)}">${badge}
+     <button type="button" class="rpb" onclick="rapido(${jsArg(i.n)})" ${fora?"disabled":""}>${nm}<span class="rpp">${i.m} ECV · escolher</span>${st}</button>
+     ${x&&!fora?`<button type="button" class="rp1" id="rapAcai1" onclick="maisUmAcai()" title="${escA(x.nome)}">＋1 igual<small>${esc(det||"o mesmo")}</small></button>`:""}
+    </div>`;
+  }
+  if(i.g){
+   return `<div class="rp tam${fora?" fora":""}" data-n="${escA(i.n)}">${badge}${nm}${st}
+     <div class="rpmg">
+      <button type="button" onclick="rapido(${jsArg(i.n)},'M')" ${fora?"disabled":""}>M<small>${i.m}</small></button>
+      <button type="button" onclick="rapido(${jsArg(i.n)},'G')" ${fora?"disabled":""}>G<small>${i.g}</small></button>
+     </div></div>`;
+  }
+  return `<div class="rp${fora?" fora":""}" data-n="${escA(i.n)}">${badge}
+    <button type="button" class="rpb" onclick="rapido(${jsArg(i.n)})" ${fora?"disabled":""}>${nm}<span class="rpp">${i.m} ECV</span>${st}</button></div>`;
+ }).join("");
+ alvo.innerHTML = tiles ? `<div class="rpt">⚡ Venda rápida</div><div class="rpg">${tiles}</div>` : "";
+}
 function cartaoProduto(ci,ii,i,catNome){
  const r=restam(i.n);
  const fora=esgotados.includes(i.n) || r===0 || (i.cb && !comboDisponivel(i.cb));
@@ -1132,6 +1229,7 @@ function tirarUm(ci,ii){
 }
 /* Sem pesquisa: uma página por categoria (swipe). A pesquisar: uma grelha só com os resultados. */
 function desenharProdutos(){
+ try{ desenharRapidos(); }catch(e){}
  const tr=$("trilho"), pr=$("prods");
  if(busca){
   tr.style.display="none"; pr.style.display="";
