@@ -128,6 +128,27 @@ h1{font-size:19px;letter-spacing:.5px;}
 .vtops .tp small{font-size:12px;font-weight:700;color:#4A2545;}
 .vtops .tp.xt.on{background:#4A2545;border-color:#4A2545;}
 .vtops .tp.xt.on small{color:#E8D8E6;}
+/* GRANOLA DUBAI (07-11-2026): dourado, com reflexo e brilho — igual ao site */
+.vtops .tp.xt.dubai{flex-basis:100%;width:100%;position:relative;overflow:hidden;isolation:isolate;text-align:left;
+ display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center;padding:12px 14px;border-radius:16px;
+ background:linear-gradient(115deg,#8A6416 0%,#C9A227 22%,#F8E39A 40%,#D4AF37 55%,#9C7A1E 75%,#E6C65A 100%);
+ background-size:260% 100%;color:#2B1D05;border:2px solid #B8901F;
+ animation:dubaiOuro 4s linear infinite,dubaiPulso 2.2s ease-in-out infinite;}
+.vtops .tp.xt.dubai::after{content:"";position:absolute;top:-30%;bottom:-30%;left:-40%;width:28%;z-index:-1;transform:skewX(-20deg);
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);animation:dubaiReflexo 2.6s ease-in-out infinite;}
+.vtops .tp.dubai .dbn{grid-column:1;font-size:16px;font-weight:800;}
+.vtops .tp.dubai .dbd{grid-column:1;font-size:12.5px;font-weight:600;color:#4A3408;margin-top:2px;}
+.vtops .tp.dubai .dbp{grid-column:2;grid-row:1/3;font-size:15px;font-weight:800;padding:6px 11px;border-radius:999px;background:rgba(43,29,5,.88);color:#F8E39A;}
+.vtops .tp.xt.dubai.on{background-image:linear-gradient(115deg,#8A6416 0%,#C9A227 22%,#F8E39A 40%,#D4AF37 55%,#9C7A1E 75%,#E6C65A 100%);
+ background-size:260% 100%;border-color:#4A2545;box-shadow:0 0 0 3px #4A2545,0 0 18px 3px rgba(240,205,100,.8);color:#2B1D05;}
+.vtops .tp.xt.dubai.on .dbn::after{content:"  ✓";}
+.vtops .tp.xt.dubai::before,.vtops .tp.xt.dubai.on::before{content:none;display:none;}
+.vtops .tp.xt.dubai.esg,.vtops .tp.xt.dubai:disabled{animation:none;filter:grayscale(.6);text-decoration:none;}
+.vtops .tp.xt.dubai.esg::after{display:none;}
+@keyframes dubaiOuro{0%{background-position:0% 50%;}100%{background-position:260% 50%;}}
+@keyframes dubaiReflexo{0%{left:-40%;}55%,100%{left:125%;}}
+@keyframes dubaiPulso{0%,100%{box-shadow:0 2px 10px rgba(184,144,31,.35);}50%{box-shadow:0 0 20px 4px rgba(240,205,100,.85);}}
+@media (prefers-reduced-motion:reduce){.vtops .tp.xt.dubai{animation:none;}.vtops .tp.xt.dubai::after{display:none;}}
 .vgrp{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);font-weight:600;margin:8px 0 0;}
 .vgrp em{font-style:normal;letter-spacing:.3px;text-transform:none;font-size:11.5px;padding:2px 8px;border-radius:20px;background:#EAF2E4;color:#2E6B32;}
 .vgrp em.pago{background:#F1EAF0;color:#4A2545;}
@@ -1386,15 +1407,24 @@ let acai=null;
    só açaí, que é o nível caro (i.sp) — mas a falta é nossa, não do cliente, por isso
    mantém-se o preço de baixo (i.m, 950). Com só um dos dois em falta, o cliente escolhe o outro. */
 const vSemBase=i=>!!i.base && i.base.length>0 && i.base.every(s=>exOff("acai",s));
-function vNivel(i,top){
+/* GRANOLA DUBAI (07-11-2026) — igual ao site (ACAI_PREMIUM no index.html): topping especial com preço
+   próprio (+150), a dourado. Vai na lista xt; conta como granola para o nível do copo (fica em i.m). */
+const ACAI_PREMIUM=[{n:"Granola Dubai",p:150,granola:true,d:"granola + pistácios + chocolate + matcha"}];
+const premDe=s=>ACAI_PREMIUM.find(x=>x.n===s);
+const xtTodos=i=>(i.xt||[]).concat(ACAI_PREMIUM.map(x=>x.n));
+const xpDe=(i,s)=>{ const pr=premDe(s); return pr ? pr.p : i.xp; };
+const somaXt=(i,xt)=>(xt||[]).reduce((t,s)=>t+xpDe(i,s),0);
+const temDubaiGranola=xt=>(xt||[]).some(s=>{ const pr=premDe(s); return pr && pr.granola; });
+function vNivel(i,top,xt){
  if(vSemBase(i)) return "m";
+ if(temDubaiGranola(xt)) return "m";
  return top.some(s=>i.base.includes(s)) ? "m" : "sp";
 }
-function vPrecoDe(i,top,xt){ return i[vNivel(i,top)] + (xt?xt.length:0)*i.xp; }
+function vPrecoDe(i,top,xt){ return i[vNivel(i,top,xt)] + somaXt(i,xt); }
 /* texto que segue para a cozinha — igual ao do site */
 function vDetalhe(i,top,xt){
- const o = top.length ? i.top.filter(s=>top.includes(s)) : ["SÓ AÇAÍ"];
- return o.concat(i.xt.filter(s=>xt.includes(s)).map(s=>"topping de "+s.toLowerCase())).join(", ");
+ const o = (top.length || temDubaiGranola(xt)) ? i.top.filter(s=>top.includes(s)) : ["SÓ AÇAÍ"];
+ return o.concat(xtTodos(i).filter(s=>xt.includes(s)).map(s=>premDe(s) ? s : "topping de "+s.toLowerCase())).join(", ");
 }
 function abrirAcai(i){
  acai={i,top:i.base.filter(s=>!exOff("acai",s)),xt:[]};      /* não abre marcado com o que acabou */
@@ -1409,13 +1439,17 @@ function abrirAcai(i){
  $("vPr").innerHTML=(sem?`<div class="vav">Granola e leite em pó esgotados — fica a ${i.m} ECV, sem agravamento.</div>`:"")+
   (sem?[["m","só açaí · ao preço de baixo (falta nossa)"]]:[["m","com granola e/ou leite em pó"],["sp","sem granola nem leite em pó"]])
    .map(([n,txt])=>`<div data-n="${n}"><span>${txt}</span><b>${i[n]}</b></div>`).join("");
+ const dub=pr=>{ const fo=exOff("acaix",pr.n);
+  return `<button type="button" class="tp xt dubai${fo?" esg":""}" data-l="xt" data-s="${esc(pr.n)}"${fo?" disabled":' onclick="vTop(this)"'}>`+
+   `<span class="dbn">✨ ${esc(pr.n)}</span><span class="dbd">${esc(pr.d)}</span><span class="dbp">${fo?"acabou":"+"+pr.p}</span></button>`; };
  $("vTops").innerHTML=g("Clássicos","incluído",i.base,"top")+g("Fruta","incluída",i.fr,"top")+g("Toppings","incluído",i.tp,"top")
+   +`<div class="vgrp"><span>Especial</span><em class="pago">Granola Dubai</em></div>`+ACAI_PREMIUM.map(dub).join("")
    +g("Toppings extra","+"+i.xp+" ECV cada",i.xt,"xt");
  vPreco(); $("acaiBg").classList.add("on");
 }
 function fecharAcai(){ $("acaiBg").classList.remove("on"); acai=null; }
 function vPreco(){
- const i=acai.i, n=vNivel(i,acai.top);
+ const i=acai.i, n=vNivel(i,acai.top,acai.xt);
  document.querySelectorAll("#vPr div").forEach(d=>d.classList.toggle("on",d.dataset.n===n));
  $("vOk").textContent="Adicionar · "+vPrecoDe(i,acai.top,acai.xt)+" ECV";
 }

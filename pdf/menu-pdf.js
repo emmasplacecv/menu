@@ -187,6 +187,9 @@ window.gerarMenuPDF=async function(opc){
    if(i.top){                                                   // açaí: o outro preço e os toppings pagos
     if(i.sp) extra.push(frase(T("acaiN_sp"))+": "+i.sp);
     if(i.xt&&i.xt.length&&i.xp) extra.push(px("topx")+" ("+i.xt.map(D).join(", ")+"): +"+i.xp);
+    /* 07-11-2026: toppings especiais com preço próprio (Granola Dubai) — ACAI_PREMIUM vem do index.html */
+    (typeof ACAI_PREMIUM!=="undefined"?ACAI_PREMIUM:[]).forEach(pr=>
+     extra.push(pr.n+" ("+((pr.d&&(pr.d[(typeof LANG!=="undefined"&&LANG)||"pt"]||pr.d.pt))||"")+"): +"+pr.p));
    }
    rows.push(linhaItem(D(i.n), i.g?[i.p,i.g]:[i.p], i.d?D(i.d):"", extra, {temG}));
   });

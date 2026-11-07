@@ -498,6 +498,27 @@ textarea.fld{min-height:74px;resize:vertical;}
 .opttop.g3{grid-template-columns:repeat(3,1fr);}
 .opttop.g2 .chip,.opttop.g3 .chip{padding:9px 8px;text-align:center;line-height:1.2;min-width:0;}
 .opttop .chip small{display:block;margin-top:2px;font-size:11.5px;font-weight:600;line-height:1.2;}
+/* GRANOLA DUBAI (07-11-2026): dourado, com reflexo a passar e brilho a pulsar */
+.opttop .chip.xt.dubai{grid-column:1/-1;position:relative;overflow:hidden;isolation:isolate;padding:12px 14px;text-align:left;
+ display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;
+ background:linear-gradient(115deg,#8A6416 0%,#C9A227 22%,#F8E39A 40%,#D4AF37 55%,#9C7A1E 75%,#E6C65A 100%);
+ background-size:260% 100%;color:#2B1D05;border:2px solid #B8901F;border-radius:16px;
+ animation:dubaiOuro 4s linear infinite,dubaiPulso 2.2s ease-in-out infinite;}
+.opttop .chip.dubai::before{content:none;}
+.opttop .chip.dubai::after{content:"";position:absolute;top:-30%;bottom:-30%;left:-40%;width:28%;z-index:-1;transform:skewX(-20deg);
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);animation:dubaiReflexo 2.6s ease-in-out infinite;}
+.chip.dubai .dbn{grid-column:1;font-size:15.5px;font-weight:800;letter-spacing:.2px;}
+.chip.dubai .dbd{grid-column:1;font-size:12px;font-weight:600;color:#4A3408;margin-top:2px;}
+.opttop .chip.xt.dubai .dbp,.opttop .chip.xt.dubai .esgx{grid-column:2;grid-row:1/3;font-size:14px;font-weight:800;padding:6px 10px;border-radius:999px;
+ background:rgba(43,29,5,.88);color:#F8E39A;white-space:nowrap;}
+.opttop .chip.xt.dubai.sel{background-size:260% 100%;background-image:linear-gradient(115deg,#8A6416 0%,#C9A227 22%,#F8E39A 40%,#D4AF37 55%,#9C7A1E 75%,#E6C65A 100%);border-color:#4A2545;box-shadow:0 0 0 3px #4A2545,0 0 18px 3px rgba(240,205,100,.8);color:#2B1D05;}
+.opttop .chip.dubai.sel .dbn::after{content:"  ✓";}
+.opttop .chip.xt.dubai.esg{animation:none;filter:grayscale(.6);opacity:.55;}
+.opttop .chip.dubai.esg::after{display:none;}
+@keyframes dubaiOuro{0%{background-position:0% 50%;}100%{background-position:260% 50%;}}
+@keyframes dubaiReflexo{0%{left:-40%;}55%,100%{left:125%;}}
+@keyframes dubaiPulso{0%,100%{box-shadow:0 2px 10px rgba(184,144,31,.35);}50%{box-shadow:0 0 20px 4px rgba(240,205,100,.85);}}
+@media (prefers-reduced-motion:reduce){.opttop .chip.xt.dubai{animation:none;}.opttop .chip.dubai::after{display:none;}}
 .opttop .chip.tl{border-radius:16px;padding:7px 6px;}                 /* toppings: nome + "incluído" ou "+50 ECV" */
 .opttop .chip small.inc{color:#2E6B32;}
 .opttop .chip.sel small.inc{color:#CFE5C4;}
@@ -3034,15 +3055,31 @@ const ACAI_K={p:"Açaí · com granola e/ou leite em pó",sp:"Açaí · sem gran
    cliente — por isso mantém-se o preço de i.p (950) e diz-se porquê na folha do açaí.
    Com só um dos dois esgotado não há nada a fazer: o cliente escolhe o outro e fica em i.p. */
 function acaiBaseToda(i){ return !!i.base && i.base.length>0 && i.base.every(s=>exOff("acai",s)); }
-function nivelAcai(i,top){
+/* ---- GRANOLA DUBAI (07-11-2026) ----
+   Topping especial do açaí, com preço próprio (+150, não os +50 dos outros toppings), mostrado a
+   dourado e a brilhar. Vai na lista dos toppings extra (cur.xt / meta.xt), por isso esgotados
+   (@x:acaix:Granola Dubai), carrinho, "repetir pedido" e descontos funcionam como nos outros.
+   granola:true → conta como granola para o preço do copo: com ela o açaí fica no nível de baixo
+   (i.p), porque leva granola e não mais polpa. O preço está aqui no código (não no /admin),
+   igual nas /vendas (ACAI_PREMIUM). */
+const ACAI_PREMIUM=[{n:"Granola Dubai",p:150,granola:true,
+ d:{pt:"granola + pistácios + chocolate + matcha",en:"granola + pistachios + chocolate + matcha",
+    fr:"granola + pistaches + chocolat + matcha",de:"Granola + Pistazien + Schokolade + Matcha",
+    nl:"granola + pistaches + chocolade + matcha"}}];
+const premDe=s=>ACAI_PREMIUM.find(x=>x.n===s);
+function xtTodos(i){ return (i.xt||[]).concat(ACAI_PREMIUM.map(x=>x.n)); }
+function xpDe(i,s){ const pr=premDe(s); return pr ? pr.p : i.xp; }
+function somaXt(i,xt){ return (xt||[]).reduce((t,s)=>t+xpDe(i,s),0); }
+function nivelAcai(i,top,xt){
  if(acaiBaseToda(i)) return "p";
+ if((xt||[]).some(s=>{ const pr=premDe(s); return pr && pr.granola; })) return "p";
  return top.some(s=>i.base.includes(s)) ? "p" : "sp";
 }
-function precoAcaiDe(i,top,xt){ return i[nivelAcai(i,top)] + (xt?xt.length:0)*i.xp; }
+function precoAcaiDe(i,top,xt){ return i[nivelAcai(i,top,xt)] + somaXt(i,xt); }
 /* o que segue para a cozinha, sempre em português e pela ordem do menu (o mesmo açaí junta-se no carrinho) */
 function optsAcai(i,top,xt){
- const o = top.length ? i.top.filter(s=>top.includes(s)) : ["SÓ AÇAÍ"];
- return o.concat(i.xt.filter(s=>xt.includes(s)).map(s=>"topping de "+s.toLowerCase()));
+ const o = (top.length || (xt||[]).some(s=>premDe(s)&&premDe(s).granola)) ? i.top.filter(s=>top.includes(s)) : ["SÓ AÇAÍ"];
+ return o.concat(xtTodos(i).filter(s=>xt.includes(s)).map(s=>premDe(s) ? s : "topping de "+s.toLowerCase()));
 }
 function acaiHTML(i){
  const q=s=>s.replace(/'/g,"\\'");
@@ -3057,6 +3094,11 @@ function acaiHTML(i){
   return `<button type="button" class="chip xt tl${fo?" esg":""}" aria-pressed="false"`+
    (fo?' disabled aria-disabled="true"':` onclick="tglXt('${q(s)}',this)"`)+
    `>${td(s)}${fo?esg:`<small>+${i.xp} ECV</small>`}</button>`; };
+ const dubai=pr=>{ const s=pr.n, fo=exOff("acaix",s), on=cur.xt.includes(s);
+  return `<button type="button" class="chip xt dubai tl${on?" sel":""}${fo?" esg":""}" aria-pressed="${on}"`+
+   (fo?' disabled aria-disabled="true"':` onclick="tglXt('${q(s)}',this)"`)+
+   `><span class="dbn">✨ ${esc(s)}</span><span class="dbd">${esc(pr.d[LANG]||pr.d.pt)}</span>`+
+   (fo?esg:`<span class="dbp">+${pr.p} ECV</span>`)+`</button>`; };
  const grupo=(n,k,tag,chips)=>`<div class="acai-h"><div class="lbl"><i>${n}</i>${t(k)}</div>${tag?`<em>${tag}</em>`:""}</div>
    <div class="opttop g2">${chips}</div>`;
  const inc=t("acaiInc");
@@ -3067,7 +3109,7 @@ function acaiHTML(i){
    (semBase?["p"]:["p","sp"]).map(n=>`<div data-n="${n}"><span>${semBase?ext("soAcai"):t("acaiN_"+n)}</span><b>${i[n]}<small>ECV</small></b></div>`).join("")+`</div>`+
    grupo(1,"acaiG1",inc,i.base.map(s=>chip(s)).join(""))+
    grupo(2,"acaiG2",inc,i.fr.map(s=>chip(s)).join(""))+
-   grupo(3,"acaiG3","",i.tp.map(s=>chip(s,t("acaiIncC"))).join("")+i.xt.map(extra).join(""));
+   grupo(3,"acaiG3","",ACAI_PREMIUM.map(dubai).join("")+i.tp.map(s=>chip(s,t("acaiIncC"))).join("")+i.xt.map(extra).join(""));
 }
 /* topo da folha: foto (a mesma do destaque, sem pesar na página), nome, tamanho do copo */
 function acaiTopo(i){
@@ -3083,7 +3125,7 @@ function acaiTopo(i){
  }
 }
 function precoAcai(){
- const i=cur.item, n=nivelAcai(i,cur.top), ex=cur.xt.length*i.xp;
+ const i=cur.item, n=nivelAcai(i,cur.top,cur.xt), ex=somaXt(i,cur.xt);
  const folha=$("optSheet"), rod=folha.querySelector(".optfoot"), alt0=rod.offsetHeight;
  document.querySelectorAll("#acaiPr div").forEach(d=>{
   const on=d.dataset.n===n; d.classList.toggle("on",on);
@@ -4290,7 +4332,7 @@ function repetirUltimo(){
   if(mode==="entrega"&&f.item.nd){faltam.push(s.n+" (só no local)");return;}
   if(f.item.top){   // açaí: repõe o que o cliente escolheu e recalcula com os preços de hoje
    if(!Array.isArray(m.top)){ faltam.push(s.n+" (escolha de novo o que leva)"); return; }
-   const top=f.item.top.filter(x=>m.top.includes(x)), xt=f.item.xt.filter(x=>(m.xt||[]).includes(x));
+   const top=f.item.top.filter(x=>m.top.includes(x)), xt=xtTodos(f.item).filter(x=>(m.xt||[]).includes(x));
    for(let k=0;k<s.q;k++) addToCart(f.item.n, precoAcaiDe(f.item,top,xt), optsAcai(f.item,top,xt), f.item.nd, {top,xt}, f.cat.cat, (f.item.pt!=null?f.item.pt:f.cat.pt));
    return;
   }
