@@ -4002,7 +4002,10 @@ async function sendWA(){
    zona:(mode==="entrega"&&zona)?zona.n:"",
    piso:(mode==="entrega")?piso:0, semElevador:!!semElevador, taxaAndar:taxaAndar(),
    itens:cart.map(i=>`${i.q}x ${i.name}${i.opts.length?" ("+i.opts.join(", ")+")":""}`),
-   total:total(), notas:nt, morada:(mode==="entrega"?addr:""), pago:precisa
+   total:total(), notas:nt, morada:(mode==="entrega"?addr:""), pago:precisa,
+   /* 11-11-2026: o servidor refaz as contas do pedido. Para as fazer iguais precisa de saber se a hora foi
+      marcada pelo cliente e que código promocional foi gasto (não muda nada no que o cliente vê). */
+   calc:{v:2, hm:!!(timeMode==="marcada"&&slotVal), promo:(promo&&(promo.tipo==="entrega"||desconto()>0))?promo.c:""}
  });
 
  /* O pedido passa a ser registado só aqui, no site. Como é o único canal,
