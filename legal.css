@@ -1,0 +1,59 @@
+/* Páginas legais (Termos, Privacidade, Cancelamentos e reembolsos) — mesmo visual do site */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Jost:wght@400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--cream:#F7F1E4;--card:#FFFCF6;--line:#E7DCC8;--ink:#34251D;--ink2:#785B42;--gold:#B8783D;--dark:#2F2119;--roxo:#4A2545;--lilas:#E6D2E1;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{background:var(--cream);color:var(--ink);font-family:'Jost',system-ui,sans-serif;font-size:16.5px;line-height:1.65;}
+a{color:var(--roxo);text-underline-offset:3px;}
+a:hover{color:#63345C;}
+
+.lg-top{background:var(--dark);color:var(--cream);}
+.lg-top-in{max-width:820px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.lg-marca{display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;}
+.lg-marca img{width:40px;height:40px;border-radius:50%;border:2px solid var(--gold);background:#fff;object-fit:cover;}
+.lg-marca span{font-family:'Playfair Display',serif;font-weight:800;font-size:19px;white-space:nowrap;}
+.lg-voltar{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid rgba(247,241,228,.55);color:var(--cream);text-decoration:none;font-weight:500;font-size:14.5px;white-space:nowrap;}
+.lg-voltar:hover{color:#fff;border-color:#fff;}
+
+.lg-doc{max-width:820px;margin:0 auto;padding:30px 20px 10px;}
+.lg-doc h1{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(30px,6vw,42px);line-height:1.12;color:var(--dark);}
+.lg-meta{margin-top:8px;color:var(--ink2);font-size:14px;}
+.lg-resumo{margin-top:20px;background:var(--card);border:1px solid var(--line);border-left:0;border-radius:18px;padding:16px 18px;}
+.lg-resumo b{display:block;font-family:'Playfair Display',serif;font-size:18px;color:var(--dark);margin-bottom:6px;}
+.lg-resumo ul{padding-left:20px;}
+.lg-resumo li{margin:3px 0;}
+.lg-indice{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;}
+.lg-indice a{display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:14px;}
+.lg-indice a:hover{border-color:var(--roxo);color:var(--roxo);}
+
+.lg-doc section{margin-top:30px;scroll-margin-top:16px;}
+.lg-doc h2{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;line-height:1.25;color:var(--dark);margin-bottom:8px;}
+.lg-doc h3{font-size:16.5px;font-weight:600;color:var(--dark);margin:14px 0 4px;}
+.lg-doc p{margin:8px 0;}
+.lg-doc ul,.lg-doc ol{margin:8px 0;padding-left:22px;}
+.lg-doc li{margin:5px 0;}
+.lg-tabela{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;background:var(--card);border-radius:14px;overflow:hidden;}
+.lg-tabela-box{overflow-x:auto;}
+.lg-tabela th,.lg-tabela td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line);}
+.lg-tabela th{background:#EFE5D3;color:var(--dark);font-weight:600;}
+.lg-tabela tr:last-child td{border-bottom:0;}
+.lg-nota{background:var(--lilas);color:#371A33;border-radius:14px;padding:12px 14px;margin:12px 0;font-size:15.5px;}
+
+.lg-rodape{max-width:820px;margin:40px auto 0;padding:22px 20px 40px;border-top:1px solid var(--line);color:var(--ink2);font-size:14px;}
+.lg-rodape nav{display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:10px;}
+.lg-rodape nav a{color:var(--ink);font-weight:500;}
+.lg-rodape nav a[aria-current="page"]{color:var(--roxo);font-weight:600;text-decoration:none;}
+
+@media print{
+ .lg-top,.lg-indice,.lg-rodape nav{display:none;}
+ body{background:#fff;font-size:12pt;}
+ .lg-resumo,.lg-tabela{background:#fff;}
+}
+
+/* selector de idioma (as 5 línguas estão na mesma página; o JS mostra a escolhida) */
+.lg-linguas{max-width:820px;margin:0 auto;padding:14px 20px 0;display:flex;flex-wrap:wrap;gap:6px;}
+.lg-linguas button{min-width:44px;min-height:40px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+.lg-linguas button[aria-pressed="true"]{background:var(--roxo);border-color:var(--roxo);color:#FFF8E8;}
+.lg-linguas button:focus-visible{outline:2px solid var(--roxo);outline-offset:2px;}
+.lg-doc{padding-top:18px;}
+[hidden]{display:none !important;}
