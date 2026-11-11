@@ -1,6 +1,7 @@
-/* Páginas legais: Termos, Privacidade e Cancelamentos/Reembolsos.
+/* Páginas legais: Termos, Privacidade e Cancelamentos/Reembolsos, nas 5 línguas.
    - as três abrem, têm título e ligam umas às outras;
-   - o rodapé do site liga às três (com aviso "(PT)" nas outras línguas);
+   - abrem na língua escolhida no site (ep_lang) e o selector muda de língua;
+   - o rodapé do site liga às três, com o nome certo em cada língua;
    - o checkout mostra a nota de aceitação com os três links, a abrir noutro separador (para não perder o carrinho). */
 "use strict";
 const { test } = require("node:test");
@@ -41,11 +42,16 @@ test("rodapé do site liga às três páginas, em todas as línguas", async () =
     await page.waitForFunction(() => document.querySelector(".footer-legal a") && document.querySelector(".footer-legal a").textContent.length > 3);
     const pt = await page.$$eval(".footer-legal a", as => as.map(a => [a.getAttribute("href"), a.textContent.trim()]));
     assert.deepEqual(pt, [["/termos/", "Termos e Condições"], ["/privacidade/", "Política de Privacidade"], ["/reembolsos/", "Cancelamentos e Reembolsos"]]);
-    for (const l of ["en", "fr", "de", "nl"]) {
+    const NOMES = {
+      en: ["Terms and Conditions", "Privacy Policy", "Cancellations and Refunds"],
+      fr: ["Conditions générales", "Politique de confidentialité", "Annulations et remboursements"],
+      de: ["AGB", "Datenschutzerklärung", "Stornierung und Erstattung"],
+      nl: ["Algemene voorwaarden", "Privacybeleid", "Annuleren en terugbetalen"]
+    };
+    for (const l of Object.keys(NOMES)) {
       await page.evaluate(x => setLang(x), l);
       const txt = await page.$$eval(".footer-legal a", as => as.map(a => a.textContent.trim()));
-      assert.equal(txt.length, 3, l);
-      txt.forEach(x => assert.match(x, /\(PT\)$/, l + ": " + x));
+      assert.deepEqual(txt, NOMES[l], l);
     }
   } finally { await amb.fechar(); }
 });
@@ -62,5 +68,42 @@ test("checkout: nota de aceitação com os três links, noutro separador", async
     /* a nota fica logo antes do botão «Confirmar encomenda» */
     const antes = await page.evaluate(() => document.querySelector(".legal-aceito").nextElementSibling.getAttribute("onclick"));
     assert.equal(antes, "sendWA()");
+  } finally { await amb.fechar(); }
+});
+
+test("as páginas legais abrem na língua do site e o selector muda de língua", async () => {
+  const amb = await abrir();
+  try {
+    const page = await amb.context.newPage();
+    const TIT = {
+      pt: ["Termos e Condições", "Política de Privacidade", "Cancelamentos e Reembolsos"],
+      en: ["Terms and Conditions", "Privacy Policy", "Cancellations and Refunds"],
+      fr: ["Conditions générales", "Politique de confidentialité", "Annulations et remboursements"],
+      de: ["Allgemeine Geschäftsbedingungen", "Datenschutzerklärung", "Stornierung und Erstattung"],
+      nl: ["Algemene voorwaarden", "Privacybeleid", "Annuleren en terugbetalen"]
+    };
+    await page.goto(amb.base + "/termos/");
+    for (const l of Object.keys(TIT)) {
+      await page.evaluate(x => localStorage.setItem("ep_lang", x), l);
+      for (let i = 0; i < PAGINAS.length; i++) {
+        await page.goto(amb.base + PAGINAS[i][0]);
+        const h1 = await page.$$eval("h1", hs => hs.filter(h => h.offsetParent !== null).map(h => h.textContent.trim()));
+        assert.deepEqual(h1, [TIT[l][i]], l + " " + PAGINAS[i][0]);
+        assert.equal(await page.evaluate(() => document.documentElement.lang), l);
+        const txt = await page.evaluate(() => document.querySelector(".lg-lang:not([hidden])").innerText);
+        assert.match(txt, /geral@emmasplace\.cv/, l + " sem email");
+        if (PAGINAS[i][0] !== "/privacidade/") assert.match(txt, /30/, l + " sem prazo de 30 min");
+      }
+    }
+    /* selector: carregar em DE muda a página e fica guardado para o site */
+    await page.evaluate(() => localStorage.setItem("ep_lang", "pt"));
+    await page.goto(amb.base + "/reembolsos/");
+    await page.click('[data-ir="de"]');
+    assert.equal(await page.$eval('.lg-lang:not([hidden]) h1', h => h.textContent.trim()), "Stornierung und Erstattung");
+    assert.equal(await page.evaluate(() => localStorage.getItem("ep_lang")), "de");
+    /* link entre páginas com âncora: /termos/#reclamacoes vai para a secção da língua certa */
+    await page.goto(amb.base + "/termos/#reclamacoes");
+    const visivel = await page.evaluate(() => { const r = document.getElementById("reclamacoes-de").getBoundingClientRect(); return r.top >= -5 && r.top < innerHeight; });
+    assert.ok(visivel, "âncora #reclamacoes não foi para a secção em alemão");
   } finally { await amb.fechar(); }
 });
