@@ -1892,11 +1892,13 @@ function recalcularCombos(){
   c.esg = !c.indisp && c.partes.some(op=>op.every(n=>!pm(n)||esgotados.includes(n)));   // esgotado hoje -> aparece bloqueado
  });
 }
-/* 21-10-2026: MILKSHAKES — tamanho único 473 ml, com estes preços.
-   Os milkshakes foram criados no /admin com dois tamanhos (M/G). Enquanto lá estiverem com dois tamanhos,
-   vale esta tabela; quando forem gravados no /admin com um só preço (sem G), passa a valer o do /admin.
-   O mesmo nas /vendas. */
-const SHAKES_16OZ={"Milkshake de morango":425,"Milkshake de Frutos silvestres":425,"Milkshake de banana e morango":500,"Milkshake tropical":600};
+/* 12-11-2026: MILKSHAKES — tamanho único 473 ml, e o PREÇO É O DO /admin (o primeiro preço, M).
+   Até aqui havia uma tabela fixa (425/425/500/600) que passava por cima do /admin enquanto o produto tivesse
+   preço G gravado. Acabou: o G dos milkshakes é ignorado e vale o preço que está na Gestão.
+   SHAKES_16OZ fica vazio de propósito — o servidor (Worker) lê esta tabela em menu-base.json ("shakes16");
+   vazia, o servidor também usa o preço da Gestão. O mesmo nas /vendas. */
+const SHAKES_16OZ={};
+const ehShake=n=>/^milkshake/i.test(String(n||""));
 /* 22-10-2026: sabores novos (framboesa e groselha), postos aqui no código porque a categoria foi criada no /admin.
    Aparecem na mesma categoria; o preço pode ser mudado no /admin (Gestão > Menu) e retirá-los também.
    Os mesmos dois produtos estão nas /vendas, na /cozinha e no /admin: mudar nos quatro sítios. */
@@ -1908,7 +1910,7 @@ function aplicarShakes16oz(ed){
   const o=ed&&ed.p&&ed.p[a.n], novo={n:a.n,d:a.d,p:(o&&o.m>0)?o.m:a.p};
   c.items.push(novo);
  });
- MENU.forEach(c=>c.items.forEach(i=>{ const v=SHAKES_16OZ[i.n]; if(v && i.g){ i.p=v; delete i.g; } }));
+ MENU.forEach(c=>c.items.forEach(i=>{ if(ehShake(i.n) && i.g){ const v=SHAKES_16OZ[i.n]; if(v) i.p=v; delete i.g; } }));   // tamanho único: fica o preço do /admin
  if(c) c.note="Tamanho único (473 ml)";
  shakesBaunilha();
  /* 22-10-2026: medidas sempre em ml (textos vindos do /admin com "oz" passam a ml: 1 oz = 29,57 ml) */
@@ -2643,7 +2645,8 @@ function findMenuItem(nome){
 /* ---------- ORGANIZAÇÃO DO MENU ----------
    ORDEM_CAT  = ordem das categorias na página e na barra (muda-se aqui; as que faltarem vão para o fim).
    DESTAQUE   = produtos com foto no bloco de destaque do topo — não se repetem na lista da categoria. */
-const ORDEM_CAT=["c_acai","c_frias","c_matcha","c_sumos","c_quentes","c_donuts","c_pao","c_tostas","c_almoco"];
+/* 12-11-2026: milkshakes (c_shakes) logo a seguir às bebidas frias. Se a Gestão tiver uma ordem gravada, vale a da Gestão. */
+const ORDEM_CAT=["c_acai","c_frias","c_shakes","c_matcha","c_sumos","c_quentes","c_donuts","c_pao","c_tostas","c_almoco"];
 /* 07-11-2026: a água de coco saiu do destaque «Disponibilidade limitada» (continua no menu) */
 const CAT_DESTAQUE="c_acai", DESTAQUE=["Açaí"];
 const NAV_KEY={c_acai:"navNovo",c_frias:"navCold",c_matcha:"navMatcha",c_sumos:"navJuices",c_quentes:"navHot",c_pao:"navSnacks",c_almoco:"navLunch"};

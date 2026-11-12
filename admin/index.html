@@ -964,7 +964,7 @@ function marcar(){ sujo=true; $("btnGravar").textContent="Guardar alterações �
 /* 07-11-2026: a ÁGUA DE COCO saiu do menu. A categoria continua a chamar-se "AÇAÍ & ÁGUA DE COCO" por
    dentro — é a chave das edições guardadas no servidor (ordem das categorias, produtos acrescentados na
    Gestão) — mas MOSTRA-SE "AÇAÍ" em todo o lado. Mudar o nome interno faria o açaí perder o lugar no menu. */
-const CAT_ROTULO={"AÇAÍ & ÁGUA DE COCO":"AÇAÍ"};
+const CAT_ROTULO={"AÇAÍ & ÁGUA DE COCO":"AÇAÍ","SMOOTHIES/ MILKSHAKE/ BATIDOS":"MILKSHAKES"};   // 12-11: só o nome que se vê; o nome guardado na Gestão não muda
 function rotCat(n){ const k=String(n==null?"":n).replace(/&amp;/g,"&").trim().toUpperCase(); return CAT_ROTULO[k]||n; }
 const normc=s=>String(s||"").replace(/&amp;/g,"&").trim().toUpperCase();
 
@@ -981,7 +981,7 @@ const ITENS_BASE={}; MENU.forEach(([c,l])=>{ ITENS_BASE[normc(c)]=l; });
    Aqui aparecem na categoria dos milkshakes como os produtos de base: o preço muda-se e o ✕ retira-os. */
 ITENS_BASE[normc("SMOOTHIES/ MILKSHAKE/ BATIDOS")]=[{n:"Milkshake de Framboesa",m:400,d:"Leite frio + framboesa"},{n:"Milkshake de Groselha",m:400,d:"Leite frio + groselha"}];
 /* ordem de origem do site (ORDEM_CAT do index.html), usada enquanto não se gravar outra */
-const ORDEM_SITE=["AÇAÍ & ÁGUA DE COCO","BEBIDAS FRIAS","MATCHA & COCO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
+const ORDEM_SITE=["AÇAÍ & ÁGUA DE COCO","BEBIDAS FRIAS","SMOOTHIES/ MILKSHAKE/ BATIDOS","MATCHA & COCO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","MERENDA & PÃO RECHEADO","TOSTAS & WRAPS","ALMOÇO"];
 function catLista(k){ return (edit.ord&&Array.isArray(edit.ord[k]))?edit.ord[k]:[]; }
 function catSet(k,l){ if(l.length) edit.ord[k]=l; else delete edit.ord[k]; }
 function catNova(n){ return !CATS_BASE.some(b=>normc(b)===normc(n)); }
@@ -1203,7 +1203,7 @@ function desenharMenu(){
   const l=itensDaCat(ci);
   h+=`<div class="cat${catOff(cat)?" catoff":""}">${rotCat(cat)}${catOff(cat)?" · RETIRADA":""}</div>
    ${(!l.length&&catNova(cat))?'<div class="vaz">Sem produtos. Acrescente em «Acrescentar produto», no fim desta página.</div>':""}
-   ${/MILKSHAKE/i.test(cat)?'<div class="vaz">Tamanho único 473 ml. Enquanto um milkshake aqui tiver preço G, o site e as vendas usam 425 (morango, frutos silvestres), 500 (banana e morango) e 600 (tropical). Para mandar o preço daqui: apague o G e grave.</div>':""}
+   ${/MILKSHAKE/i.test(cat)?'<div class="vaz">Tamanho único 473 ml. O preço que está aqui é o que vale no site, nas vendas e no servidor.</div>':""}
    <div class="ordbar">
     <button onclick="ordenarPreco(${ci},1)">Preço ↑</button>
     <button onclick="ordenarPreco(${ci},-1)">Preço ↓</button>
@@ -1219,11 +1219,11 @@ function desenharMenu(){
     </div>
     <div class="n">${it.n}${it.d?`<small>${it.d}</small>`:""}</div>
     ${it.novo
-      ? `<input value="${it.m}" inputmode="numeric" onchange="setNovo(${it.k},'m',this.value)">
-         <input value="${it.g||""}" placeholder="G" inputmode="numeric" onchange="setNovo(${it.k},'g',this.value)">
+      ? `<input value="${it.m}" inputmode="numeric" onchange="setNovo(${it.k},'m',this.value)" aria-label="Preço de ${it.n}">
+         ${ehShake(it.n)?'<span class="un">único</span>':`<input value="${it.g||""}" placeholder="G" inputmode="numeric" onchange="setNovo(${it.k},'g',this.value)">`}
          <button class="x" onclick="apagarNovo(${it.k})" title="Apagar">✕</button>`
       : `${it.n===ACAI_NOME?"":`<input value="${pr.m}" inputmode="numeric" onchange="setPreco(${q(it.n)},'m',this.value)">`}
-         ${it.g?`<input value="${pr.g||""}" inputmode="numeric" onchange="setPreco(${q(it.n)},'g',this.value)">`:""}
+         ${(it.g&&!ehShake(it.n))?`<input value="${pr.g||""}" inputmode="numeric" onchange="setPreco(${q(it.n)},'g',this.value)">`:""}
          <button class="x ${rem?"on":""}" onclick="setRem(${q(it.n)})" title="Retirar do menu">✕</button>`}
    </div>`;
    if(it.n===ACAI_NOME && !it.novo) h+=ACAI_LINHAS.map(a=>`<div class="mrow sub${rem?" rem":""}">
@@ -1296,8 +1296,15 @@ function addProduto(){
  $("nNome").value=""; $("nDesc").value=""; $("nM").value=""; $("nG").value="";
  marcar(); desenharMenu();
 }
+/* 12-11-2026: milkshakes = tamanho único. Ao guardar, o G deles vai vazio: o preço é só um, o que está aqui. */
+const ehShake=n=>/^milkshake/i.test(String(n||""));
+function shakesSemG(){
+ (edit.add||[]).forEach(a=>{ if(ehShake(a.n) && a.g!=null) a.g=null; });
+ Object.keys(edit.p||{}).forEach(k=>{ const o=edit.p[k]; if(ehShake(k) && o && o.g!=null) o.g=null; });
+}
 async function gravarMenu(){
  limparAcaiAntigo();
+ shakesSemG();
  /* As opções do dia (chaves __cfg:…) só mudam nos seus interruptores. Ao guardar o menu vão sempre as que
     estão NO SERVIDOR: assim um /admin aberto há dias noutro aparelho não desliga sem querer uma campanha. */
  try{

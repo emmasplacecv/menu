@@ -737,11 +737,11 @@ function precoComboAuto(partes,precoDe){
  for(const op of partes){ const v=op.map(precoDe).filter(x=>x>0); if(!v.length) return 0; soma+=Math.max(...v); }
  return Math.floor(soma*(100-COMBO_DESC)/100/5)*5;
 }
-/* 21-10-2026: MILKSHAKES — tamanho único 473 ml (igual ao site). Vale enquanto no /admin estiverem com dois tamanhos;
-   gravados lá com um só preço (sem G), passa a valer o do /admin. */
+/* 12-11-2026: MILKSHAKES — tamanho único 473 ml e o preço é o do /admin (o primeiro, M), igual ao site.
+   A tabela fixa (425/425/500/600) que passava por cima do /admin foi retirada. */
 /* 22-10-2026: sabores novos (iguais aos do site: SHAKES_NOVOS) — entram na categoria dos milkshakes criada no /admin */
 const SHAKES_NOVOS=[{n:"Milkshake de Framboesa",d:"Leite frio + framboesa",m:400},{n:"Milkshake de Groselha",d:"Leite frio + groselha",m:400}];
-const SHAKES_16OZ={"Milkshake de morango":425,"Milkshake de Frutos silvestres":425,"Milkshake de banana e morango":500,"Milkshake tropical":600};
+const ehShake=n=>/^milkshake/i.test(String(n||""));
 let comboEd={};       // preços (cp), retirados (coff), novos (cadd) e ordem (cord) dos combos, do /admin
 
 let KEY="", cat=0, activo=0, pedidos=[];
@@ -795,7 +795,7 @@ function novoBalcao(){ return {nome:"",itens:[],pago:false,met:null,recebido:nul
 /* 07-11-2026: a ÁGUA DE COCO saiu do menu. A categoria continua a chamar-se "AÇAÍ & ÁGUA DE COCO" por
    dentro — é a chave das edições guardadas no servidor (ordem das categorias, produtos acrescentados na
    Gestão) — mas MOSTRA-SE "AÇAÍ" em todo o lado. Mudar o nome interno faria o açaí perder o lugar no menu. */
-const CAT_ROTULO={"AÇAÍ & ÁGUA DE COCO":"AÇAÍ"};
+const CAT_ROTULO={"AÇAÍ & ÁGUA DE COCO":"AÇAÍ","SMOOTHIES/ MILKSHAKE/ BATIDOS":"MILKSHAKES"};   // 12-11: só o nome que se vê; o nome guardado na Gestão não muda
 function rotCat(n){ const k=String(n==null?"":n).replace(/&amp;/g,"&").trim().toUpperCase(); return CAT_ROTULO[k]||n; }
 let esgotados=[], stock={};
 /* ============================================================
@@ -814,7 +814,7 @@ function modoTag(p,mini){ const e=ehEntrega(p);
 const EX_PRE="@x:";
 const exK=(tipo,nome)=>EX_PRE+tipo+":"+nome;
 const exOff=(tipo,nome)=>esgotados.includes(exK(tipo,nome));
-const ORDEM_CAT=["BEBIDAS FRIAS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO","COMBOS"];
+const ORDEM_CAT=["BEBIDAS FRIAS","SMOOTHIES/ MILKSHAKE/ BATIDOS","AÇAÍ & ÁGUA DE COCO","MERENDA & PÃO RECHEADO","ALMOÇO","SUMOS NATURAIS","BEBIDAS QUENTES","DONUTS & MUFFINS","TOSTAS & WRAPS","MATCHA & COCO","COMBOS"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 /* 04-11-2026: SEGURANÇA — os pedidos lidos do servidor podem ter sido escritos por qualquer pessoa.
@@ -901,7 +901,7 @@ async function aplicarEdicao(){
  });
  { const sc=MENU.find(c=>/MILKSHAKE|SMOOTHIE|BATIDO/i.test(c[0]));
    if(sc) SHAKES_NOVOS.forEach(a=>{ if(sc[1].some(i=>i.n===a.n)) return; const o=ed.p&&ed.p[a.n]; sc[1].push({n:a.n,d:a.d,m:(o&&o.m>0)?o.m:a.m}); }); }
- MENU.forEach(c=>c[1].forEach(i=>{ const v=SHAKES_16OZ[i.n]; if(v && i.g){ i.m=v; delete i.g; } }));   // milkshakes 473 ml
+ MENU.forEach(c=>c[1].forEach(i=>{ if(ehShake(i.n) && i.g) delete i.g; }));   // milkshakes 473 ml: um só preço, o do /admin
  { const L=ed.ord&&ed.ord["__cat:leite"]; if(Array.isArray(L)) CAT_LEITE=L.map(x=>normCat(x)); }   // leite à escolha (Gestão)
  const off=ed.off||[];
  if(off.length) MENU.forEach(c=>{ c[1]=c[1].filter(i=>!off.includes(i.n)); });
@@ -943,7 +943,7 @@ function ordenarProdutos(){
 }
 /* categorias pela ordem que mais vende — menos scroll na hora de ponta */
 function ordenarCategorias(){
- const pos=c=>{ const i=ORDEM_CAT.indexOf(String(c[0]).replace(/&amp;/g,"&").trim()); return i<0?99:i; };
+ const pos=c=>{ const i=ORDEM_CAT.indexOf(String(c[0]).replace(/&amp;/g,"&").trim().toUpperCase()); return i<0?99:i; };   // 12-11: milkshakes logo a seguir às bebidas frias
  MENU.sort((a,b)=>pos(a)-pos(b));
 }
 /* o que uma linha do pedido gasta do stock, por unidade: o próprio produto, ou as partes do combo */

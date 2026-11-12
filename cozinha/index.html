@@ -377,7 +377,7 @@ function modoTag(p,mini){ const e=ehEntrega(p);
 /* 07-11-2026: a ÁGUA DE COCO saiu do menu. A categoria continua a chamar-se "AÇAÍ & ÁGUA DE COCO" por
    dentro — é a chave das edições guardadas no servidor (ordem das categorias, produtos acrescentados na
    Gestão) — mas MOSTRA-SE "AÇAÍ" em todo o lado. Mudar o nome interno faria o açaí perder o lugar no menu. */
-const CAT_ROTULO={"AÇAÍ & ÁGUA DE COCO":"AÇAÍ"};
+const CAT_ROTULO={"AÇAÍ & ÁGUA DE COCO":"AÇAÍ","SMOOTHIES/ MILKSHAKE/ BATIDOS":"MILKSHAKES"};   // 12-11: só o nome que se vê; o nome guardado na Gestão não muda
 function rotCat(n){ const k=String(n==null?"":n).replace(/&amp;/g,"&").trim().toUpperCase(); return CAT_ROTULO[k]||n; }
 const DIAS_FUT=[1,2], FUT_CADA_S=10;
 let _fut={}, _futT=0;                         // dia ISO -> pedidos desse dia
