@@ -154,6 +154,14 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
 .catnova{margin-top:4px;margin-bottom:6px;}
 .catnova .btn{margin-top:8px;}
 .cat.catoff{color:var(--vermelho);}
+/* 12-11-2026: setas no título de cada categoria — sobe/desce a categoria inteira (ordem no site) */
+.cat.cath{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:26px;scroll-margin-top:12px;}
+.cat.cath .catmov{display:flex;gap:6px;flex:none;}
+.cat.cath .catmov button{min-width:44px;height:36px;padding:0 10px;border:1px solid var(--line);background:#fff;border-radius:10px;
+ font:inherit;font-size:13px;letter-spacing:.5px;color:var(--ink);cursor:pointer;}
+.cat.cath .catmov button[disabled]{opacity:.25;cursor:default;}
+.cat.cath.mexeu{animation:catMexeu 1.2s ease-out;}
+@keyframes catMexeu{0%{background:#F3E3C8;}100%{background:transparent;}}
 .vaz{font-size:13px;color:var(--ink2);padding:6px 2px 10px;}
 /* açaí: linhas de preço por baixo do produto */
 .mrow.sub{margin-left:37px;background:#FBF6EC;border-style:dashed;}
@@ -1004,6 +1012,14 @@ function moverCat(i,dir){
  [l[i],l[j]]=[l[j],l[i]];
  catSet(CAT_ORD,l.map(normc)); marcar(); desenharMenu();
 }
+/* 12-11-2026: mexer a categoria a partir do seu título, lá em baixo na lista dos produtos.
+   A categoria fica debaixo do dedo (o ecrã acompanha) e pisca para se ver onde ficou. Guardar continua a ser no botão Guardar. */
+function moverCatAqui(ci,dir){
+ const nome=MENU[ci]&&MENU[ci][0], el0=$("mcat-"+ci), y0=el0?el0.getBoundingClientRect().top:0;
+ moverCat(ci,dir);
+ const j=MENU.findIndex(c=>normc(c[0])===normc(nome)), el=$("mcat-"+j);
+ if(el){ window.scrollBy(0, el.getBoundingClientRect().top-y0); el.classList.add("mexeu"); }
+}
 function reporOrdemCats(){ catSet(CAT_ORD,[]); marcar(); desenharMenu(); }
 function tglCat(n){
  const off=catLista(CAT_OFF);
@@ -1201,7 +1217,8 @@ function desenharMenu(){
  let h=htmlCats();
  MENU.forEach(([cat],ci)=>{
   const l=itensDaCat(ci);
-  h+=`<div class="cat${catOff(cat)?" catoff":""}">${rotCat(cat)}${catOff(cat)?" · RETIRADA":""}</div>
+  h+=`<div class="cat cath${catOff(cat)?" catoff":""}" id="mcat-${ci}"><span>${rotCat(cat)}${catOff(cat)?" · RETIRADA":""}</span>
+   <span class="catmov"><button onclick="moverCatAqui(${ci},-1)" ${ci===0?"disabled":""} aria-label="Subir a categoria ${rotCat(cat)}">▲</button><button onclick="moverCatAqui(${ci},1)" ${ci===MENU.length-1?"disabled":""} aria-label="Descer a categoria ${rotCat(cat)}">▼</button></span></div>
    ${(!l.length&&catNova(cat))?'<div class="vaz">Sem produtos. Acrescente em «Acrescentar produto», no fim desta página.</div>':""}
    ${/MILKSHAKE/i.test(cat)?'<div class="vaz">Tamanho único 473 ml. O preço que está aqui é o que vale no site, nas vendas e no servidor.</div>':""}
    <div class="ordbar">
