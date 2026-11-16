@@ -420,6 +420,16 @@ body{padding-bottom:76px;}
   </div>
 
   <div id="abaHis" style="display:none">
+    <!-- 16-11-2026: contas de clientes (cartão de bebidas) -->
+    <div class="aviso" id="ctBox" style="margin-bottom:12px">
+      <b>Contas de clientes</b> — ver o cartão de um cliente ou dar-lhe uma password provisória (se a esqueceu).
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <input id="ctTel" inputmode="tel" placeholder="Telemóvel do cliente" style="flex:1;min-width:150px;padding:10px;border:1px solid #cbb693;border-radius:10px;font:inherit">
+        <button type="button" onclick="ctVer()" style="padding:10px 14px;border-radius:10px;border:1px solid #2F2119;background:#fff;font:inherit;font-weight:600">Ver</button>
+        <button type="button" onclick="ctRepor()" style="padding:10px 14px;border-radius:10px;border:0;background:#2F2119;color:#fff;font:inherit;font-weight:600">Password provisória</button>
+      </div>
+      <div id="ctMsg" style="margin-top:8px;line-height:1.5"></div>
+    </div>
     <div class="aviso" id="hisAviso">
       O servidor guarda os pedidos <b>70 dias</b> e os comprovativos <b>60 dias</b>. Cada dia que abre aqui fica também <b>copiado neste aparelho</b>.
       Uma vez por semana, carregue em <b>Guardar cópia completa</b>: descarrega um ficheiro ZIP com a lista
@@ -2077,6 +2087,46 @@ function botaoNotificacoes(){
   btn.textContent = jaActivo ? "🔔 Testar notificação" : "🔔 Activar notificações";
 }
 
+</script>
+<script>
+/* 16-11-2026: CONTAS DE CLIENTES. A password provisória é transformada aqui numa "prova", igual à do site
+   (conta.js): o servidor nunca recebe passwords. Só dê uma provisória a quem prove que o número é seu
+   (por exemplo, mostrando o telemóvel no balcão ou escrevendo desse número). */
+function ctTelLimpo(v){ let d=String(v==null?"":v).replace(/\D/g,""); if(d.indexOf("00")===0) d=d.slice(2); if(d.length===10&&d.indexOf("238")===0) d=d.slice(3); return (d.length>=7&&d.length<=15)?d:""; }
+async function ctProva(tel,senha){
+ const enc=new TextEncoder();
+ const k=await crypto.subtle.importKey("raw",enc.encode(senha),"PBKDF2",false,["deriveBits"]);
+ const b=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:enc.encode("emmasplace.cv|conta|v1|"+tel),iterations:600000},k,256);
+ return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function ctEsc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+async function ctPedir(acao,corpo){
+ try{ const r=await fetch(PROMO_API+"/"+acao+"?key="+encodeURIComponent(KEY),{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(corpo)}); return await r.json(); }
+ catch(e){ return {erro:"Sem ligação. Tente outra vez."}; }
+}
+const CT_NOMES={q:"Quentes",f:"Frias",m:"Matcha & coco",s:"Sumos",k:"Milkshakes"};
+async function ctVer(){
+ const tel=ctTelLimpo(document.getElementById("ctTel").value), m=document.getElementById("ctMsg");
+ if(!tel){ m.textContent="Escreva o telemóvel do cliente."; return; }
+ m.textContent="A procurar…";
+ const d=await ctPedir("conta-ver",{tel:tel});
+ if(!d.ok){ m.textContent=d.erro||"Não foi possível."; return; }
+ const c=d.conta;
+ m.innerHTML="<b>"+ctEsc(c.nome)+"</b> · "+ctEsc(c.tel)+" · "+c.pedidos+" pedido(s) com conta<br>Cartão: "+
+  Object.keys(c.cartao).map(k=>(CT_NOMES[k]||k)+" "+c.cartao[k].n+"/9").join(" · ")+
+  (c.ofertas.length?"<br>🎁 Bebidas grátis por usar: "+c.ofertas.map(o=>ctEsc(CT_NOMES[o.k]||o.k)+(o.v?" (até "+o.v+" ECV)":"")).join(", "):"");
+}
+async function ctRepor(){
+ const tel=ctTelLimpo(document.getElementById("ctTel").value), m=document.getElementById("ctMsg");
+ if(!tel){ m.textContent="Escreva o telemóvel do cliente."; return; }
+ if(!confirm("Dar uma password provisória à conta "+tel+"?\n\nSó o faça se tiver a certeza de que o número é desta pessoa.")) return;
+ const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789", b=new Uint8Array(8); crypto.getRandomValues(b);
+ const senha=Array.from(b).map(x=>A[x%A.length]).join("");
+ m.textContent="A preparar…";
+ let d; try{ d=await ctPedir("conta-repor",{tel:tel,prova:await ctProva(tel,senha)}); }catch(e){ d={erro:"Este aparelho não consegue gerar a password."}; }
+ if(!d.ok){ m.textContent=d.erro||"Não foi possível."; return; }
+ m.innerHTML="Password provisória de <b>"+ctEsc(d.nome)+"</b>: <b style=\"font-size:19px;letter-spacing:2px;user-select:all\">"+senha+"</b><br>Diga-a ao cliente. Ao entrar, o site pede-lhe logo uma password nova. Esta não fica guardada em lado nenhum: se fechar este ecrã, gere outra.";
+}
 </script>
 </body>
 </html>

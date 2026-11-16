@@ -61,6 +61,7 @@ function novoServidorFalso(opc) {
     const precisaChave = ["/orders", "/order-status", "/order-del", "/order-pago", "/order-visto", "/stock-baixa", "/stock-item",
       "/stock-set", "/soldout-set", "/menu-set", "/estado-set", "/entregas-set", "/renovar", "/push-sub", "/push-teste", "/push-log"];
     if (precisaChave.includes(cam) && !temChave) return { erro: "Chave errada." };
+    if (opc.extra) { const r = opc.extra(metodo, cam, corpo, s); if (r) return r; }   // respostas próprias de um teste
     switch (cam) {
       case "/menu-edit": return { edit: s.edit };
       case "/estado": return s.estado;

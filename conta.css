@@ -1,0 +1,55 @@
+/* CONTA DE CLIENTE E CARTÃO DE BEBIDAS (16-11-2026) — usado por conta.js. Vale no desenho antigo e no novo. */
+.conta-btn{flex:none;margin-left:auto;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);
+ color:var(--dark);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;position:relative;padding:0;}
+.conta-btn svg{width:21px;height:21px;}
+.conta-btn.dentro{background:#4A2545;border-color:#4A2545;color:#FBF4E6;}
+.conta-btn i{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#FFC736;color:#34251D;
+ font:700 11px/18px inherit;font-style:normal;text-align:center;display:none;}
+.conta-btn.oferta i{display:block;}
+.sitebar>.conta-btn+.topcart{margin-left:8px;}
+html.nv .sitebar>.conta-btn~.nv-lang{margin-left:8px;}
+#contaSheet h3{margin-bottom:6px;}
+#contaSheet .sd a,#contaSheet .cpriv a{color:inherit;}
+.c-abas{display:flex;gap:8px;margin:4px 0 6px;}
+.c-abas button{flex:1;padding:11px 8px;border-radius:30px;border:2px solid var(--line);background:var(--card);font:600 14.5px inherit;color:var(--ink);cursor:pointer;}
+.c-abas button.sel{background:var(--dark);border-color:var(--dark);color:#F7F1E4;}
+.c-msg{margin-top:12px;padding:11px 13px;border-radius:12px;font-size:14px;background:#F6E9E6;color:#8C2F2F;border:1px solid #E5C4BD;}
+.c-msg.ok{background:#E9F3E4;color:#2E6B32;border-color:#C4DDB9;}
+.c-senha{position:relative;}
+.c-senha button{position:absolute;right:8px;top:50%;transform:translateY(-42%);border:0;background:none;color:#8B5E3C;font:600 13px inherit;padding:8px;cursor:pointer;}
+.c-senha .fld{padding-right:92px;}
+.c-nota{font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.45;}
+.cpriv{font-size:12.5px;color:var(--ink2);margin-top:12px;}
+.c-cartoes{display:grid;gap:10px;}
+.c-cartao{border-radius:18px;padding:14px 14px 12px;background:#4A2545;color:#FBF4E6;}
+.c-cartao.z{background:var(--card);color:var(--ink);border:1.5px solid var(--line);padding:11px 14px;}
+.c-cartao.z .c-selos{display:none;}
+.c-cartao.z p{margin-top:4px;}
+.c-cartao b{font:600 16px 'Playfair Display',serif;}
+.c-cartao small{float:right;font-size:13px;opacity:.85;margin-top:3px;}
+.c-selos{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin:11px 0 8px;}
+.c-selos span{aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(251,244,230,.45);display:flex;align-items:center;justify-content:center;font-size:11px;}
+.c-selos span.on{background:#FFC736;border-color:#FFC736;color:#34251D;font-weight:700;}
+.c-selos span.pr{border-style:dashed;font-size:13px;}
+.c-cartao p{font-size:12.5px;opacity:.85;margin:0;line-height:1.4;}
+.c-oferta{margin-top:10px;padding:13px;border-radius:16px;border:2px solid #FFC736;background:#FFF8E1;}
+.c-oferta b{display:block;font-size:15.5px;}
+.c-oferta span{display:block;font-size:13px;color:var(--ink2);margin-top:2px;}
+.c-oferta button{margin-top:10px;width:100%;padding:12px;border-radius:30px;border:0;background:#4A2545;color:#FBF4E6;font:700 14.5px inherit;cursor:pointer;}
+.c-oferta button[disabled]{background:#2E6B32;opacity:1;}
+.c-piso{display:flex;align-items:center;gap:12px;}
+.c-piso button{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-size:20px;color:var(--ink);cursor:pointer;}
+.c-piso b{min-width:26px;text-align:center;font-size:17px;}
+.c-ped{padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;}
+.c-ped:last-child{border-bottom:0;}
+.c-ped div{display:flex;justify-content:space-between;gap:10px;font-weight:600;}
+.c-ped p{margin:3px 0 0;color:var(--ink2);font-size:13px;line-height:1.4;}
+.c-ped em{font-style:normal;font-size:12px;padding:2px 8px;border-radius:10px;background:#EFE6D4;color:#6B5137;}
+.c-ped em.confirmado{background:#E9F3E4;color:#2E6B32;}
+.c-ped em.cancelado{background:#F6E9E6;color:#8C2F2F;}
+.c-links{margin-top:18px;display:flex;flex-wrap:wrap;gap:6px 18px;}
+.c-links button{border:0;background:none;padding:8px 0;font:600 14px inherit;color:#8B5E3C;text-decoration:underline;cursor:pointer;}
+.c-links button.per{color:#8C2F2F;}
+.conta-chk{margin:0 0 6px;padding:12px 13px;border-radius:14px;background:#F3E9F1;border:1px solid #DCC6D8;font-size:13.5px;color:#4A2545;line-height:1.45;}
+.conta-chk button{border:0;background:none;padding:0;font:700 13.5px inherit;color:#4A2545;text-decoration:underline;cursor:pointer;}
+.conta-chk .of{display:block;margin-top:8px;padding:10px;border-radius:24px;background:#4A2545;color:#FBF4E6;text-decoration:none;text-align:center;width:100%;}
