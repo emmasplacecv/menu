@@ -1401,6 +1401,23 @@ textarea.fld{min-height:74px;resize:vertical;}
 }
 @media(prefers-reduced-motion:reduce){ .eb-pill i{animation:none;opacity:1;} }
 </style>
+<!-- 16-11-2026: DESENHO NOVO DA VERSÃO DE TELEMÓVEL (movel.css + movel.js).
+     Liga-se e desliga-se em desenho.js ("novo" / "antigo"). Só entra em ecrãs de telemóvel; no computador o site fica igual.
+     Para experimentar sem mexer em nada: emmasplace.cv/?desenho=novo ou ?desenho=antigo (vale só nesse separador).
+     Se movel.js ou movel.css não carregarem, fica o desenho antigo. -->
+<script src="desenho.js"></script>
+<link rel="stylesheet" href="movel.css">
+<script>
+(function(){try{
+ var H=document.documentElement, q=null, g=null;
+ try{ q=new URLSearchParams(location.search).get("desenho"); }catch(e){}
+ try{ if(q==="novo"||q==="antigo") sessionStorage.setItem("ep_desenho",q); g=sessionStorage.getItem("ep_desenho"); }catch(e){ g=(q==="novo"||q==="antigo")?q:null; }
+ var ligado = g ? g==="novo" : window.EP_DESENHO==="novo";
+ var tel = matchMedia("(max-width:719px)").matches || (matchMedia("(pointer:coarse)").matches && Math.min(screen.width,screen.height)<=719);
+ if(ligado && tel) H.classList.add("nv");
+ window.addEventListener("load",function(){ if(H.classList.contains("nv") && !window.EP_NV_OK) H.classList.remove("nv"); });
+}catch(e){}})();
+</script>
 </head>
 <body>
 <div class="wrap" data-clarity-unmask="true">
@@ -1756,6 +1773,8 @@ textarea.fld{min-height:74px;resize:vertical;}
   </div>
 </div>
 
+<!-- desenho novo do telemóvel: arruma a página antes de o menu ser desenhado (ver movel.js) -->
+<script src="movel.js"></script>
 <script>
 /* ============================================================
    MÉTRICAS (Microsoft Clarity) — 10-10-2026
@@ -3238,7 +3257,7 @@ function custoPrep(){
 
 /* ---------- CARRINHO ---------- */
 function renderCart(){
- if(!cart.length){$("cartBody").innerHTML='<div class="empty">${t("vazio")}</div>';
+ if(!cart.length){$("cartBody").innerHTML='<div class="empty">'+t("vazio")+'</div>';
   $("toCheckout").disabled=true;return;}
  $("toCheckout").disabled=false;
  $("cartBody").innerHTML=cart.map(i=>`<div class="crow">
