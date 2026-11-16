@@ -1,0 +1,138 @@
+/* movel.css — DESENHO NOVO DA VERSÃO DE TELEMÓVEL (16-11-2026)
+   Tudo aqui só vale com a classe "nv" no <html> (posta pelo index.html quando desenho.js diz "novo"
+   e o ecrã é de telemóvel). Sem essa classe, este ficheiro não muda nada. Cores: as do site. */
+:root{--nv-ok:1;--nv-am:#FFC736;}
+html.nv{--topo:64px;--salto:126px;}
+
+html.nv body{padding-bottom:calc(104px + env(safe-area-inset-bottom));}
+html.nv .wrap{padding:8px 12px 18px;}
+
+/* ---------- TOPO: marca + aberto/fechado + idioma ---------- */
+html.nv .sitebar{min-height:62px;padding:8px 10px 8px 12px;margin-bottom:10px;border-radius:0 0 20px 20px;gap:10px;}
+html.nv .sitebar .topcart,html.nv .brand-lockup small{display:none;}
+html.nv .brand-lockup{min-width:0;}
+html.nv .brand-lockup img{width:42px;height:42px;}
+html.nv .nv-status{display:flex;align-items:center;gap:6px;margin-top:3px;font:500 12.5px/1.2 'Jost',system-ui,sans-serif;
+ color:var(--ink);letter-spacing:0;text-transform:none;white-space:nowrap;}
+html.nv .nv-status i{flex:none;width:8px;height:8px;border-radius:50%;background:#2E7D4F;}
+html.nv .nv-status.off i{background:#B3261E;}
+html.nv .nv-status b{font-weight:500;overflow:hidden;text-overflow:ellipsis;}
+html.nv .nv-lang{flex:none;margin-left:auto;min-width:52px;height:44px;padding:0 14px;border-radius:999px;background:#FFFCF6;
+ border:1px solid var(--line);color:var(--ink);font:600 14px/1 'Jost',system-ui,sans-serif;cursor:pointer;}
+html.nv .langs{display:none;position:fixed;top:70px;right:12px;z-index:75;flex-direction:column;flex-wrap:nowrap;gap:4px;margin:0;padding:8px;
+ background:#FFFCF6;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(47,33,25,.22);}
+html.nv.nv-lg .langs{display:flex;animation:nvCai .18s ease;}
+html.nv .langs button{min-width:68px;min-height:44px;font-size:14px;border-width:1.5px;}
+
+/* ---------- CAPA: foto com a frase ---------- */
+html.nv .nv-hero{position:relative;height:304px;border-radius:26px;overflow:hidden;background:var(--roxo3);}
+html.nv .nv-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:70% 22%;}
+html.nv .nv-hero-g{position:absolute;inset:0;background:linear-gradient(180deg,rgba(55,26,51,0) 30%,rgba(55,26,51,.5) 100%);}
+/* o escurecido acompanha a altura do texto (noutras línguas o texto é mais alto) */
+html.nv .nv-hero-t{position:absolute;left:0;right:0;bottom:0;padding:64px 18px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+ background:linear-gradient(180deg,rgba(55,26,51,0) 0,rgba(55,26,51,.72) 64px,rgba(55,26,51,.97) 100%);}
+html.nv .nv-hero-b{background:var(--nv-am);color:#2F2119;font:700 12px/1.2 'Jost',system-ui,sans-serif;letter-spacing:.4px;padding:5px 10px;border-radius:999px;}
+html.nv .nv-hero-b[hidden]{display:none;}
+html.nv .nv-hero-h{margin:0;font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(25px,7.6vw,30px);line-height:1.1;color:#FFF8E8;text-wrap:balance;}
+html.nv .nv-hero-h span{display:block;}
+html.nv .nv-hero-h.k #nvHeroA{margin-bottom:6px;font:600 13px/1.3 'Jost',system-ui,sans-serif;letter-spacing:.6px;color:#E6D2E1;}
+html.nv .nv-hero-c{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
+html.nv .nv-hero-c button{min-height:48px;padding:0 18px;border-radius:999px;font:600 15px/1.15 'Jost',system-ui,sans-serif;cursor:pointer;transition:transform .15s;}
+html.nv .nv-hero-c button:active{transform:scale(.96);}
+html.nv .nv-hero-c .c1{background:#FFF8E8;color:var(--roxo);border:1.5px solid #FFF8E8;}
+html.nv .nv-hero-c .c2{background:transparent;color:#FFF8E8;border:1.5px solid rgba(255,248,232,.8);}
+html.nv .nv-hero-c button[hidden]{display:none;}
+html.nv .again{margin-top:12px;}
+
+/* ---------- MAIS PEDIDOS: dois por linha, logo a seguir às categorias ---------- */
+html.nv .catnav{margin-top:12px;}
+html.nv .best-section{margin:0 0 16px;}
+html.nv .best-section .section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;max-width:none;margin:8px 2px 10px;text-align:left;}
+html.nv .best-section .section-heading h2{margin:0;font-size:23px;}
+html.nv .best-section .section-heading h2:after,html.nv .best-section .section-heading p{display:none;}
+html.nv .nv-vertudo{flex:none;background:none;border:0;padding:8px 0;font:600 14px/1 'Jost',system-ui,sans-serif;color:var(--roxo);
+ text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+html.nv .best-grid{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;overflow:visible;
+ padding:0;scroll-snap-type:none;}
+html.nv .best-card{border-radius:20px;}
+html.nv .best-info{grid-template-columns:minmax(0,1fr) 44px;padding:10px 10px 10px 12px;}
+html.nv .best-add{width:44px;height:44px;}
+html.nv .best-card:last-child:nth-child(odd){grid-column:1/-1;display:grid;grid-template-columns:44% minmax(0,1fr);}
+html.nv .best-card:last-child:nth-child(odd) .best-media{height:100%;}
+html.nv .best-card:last-child:nth-child(odd) .best-media>img:first-child{height:100%;min-height:112px;aspect-ratio:auto;}
+html.nv .best-card:last-child:nth-child(odd) .best-info{align-items:center;}
+html.nv .best-card:last-child:nth-child(odd) .best-name{min-height:0;}
+
+/* ---------- DESCONTOS (a capa animada) e LEVANTAR/ENTREGA, antes do menu ---------- */
+html.nv .nv-promo{margin:0 0 12px;}
+html.nv .order-panel{margin:0 0 6px;}
+html.nv .modebox{margin-top:0;}
+html.nv .nv-menu-h h2{margin:18px 2px 10px;font-family:'Playfair Display',serif;font-weight:800;font-size:28px;color:var(--ink);
+ scroll-margin-top:calc(var(--topo) + 64px);}
+html.nv .msearch-in{min-height:48px;border-radius:999px;padding-left:44px;}
+
+/* ---------- BARRA DE BAIXO ---------- */
+html.nv .bar{display:none !important;}
+html.nv .nv-nav{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;height:66px;padding:6px;
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.5fr);gap:4px;background:#FFFCF6;border:1px solid var(--line);
+ border-radius:24px;box-shadow:0 10px 28px rgba(47,33,25,.18);}
+html.nv .nv-nav.dois{grid-template-columns:1fr 1fr;}
+html.nv .nv-nav button{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+ border:0;border-radius:18px;background:transparent;color:#785B42;font:500 12.5px/1.15 'Jost',system-ui,sans-serif;cursor:pointer;
+ transition:background .2s,color .2s,transform .15s;-webkit-tap-highlight-color:transparent;}
+html.nv .nv-nav button[hidden]{display:none;}
+html.nv .nv-nav button:active{transform:scale(.95);}
+html.nv .nv-nav button.on{color:var(--roxo);font-weight:700;}
+html.nv .nv-nav svg{width:23px;height:23px;flex:none;}
+html.nv .nv-nav span{max-width:100%;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+html.nv .nv-nav .nv-b{position:absolute;top:3px;left:50%;margin-left:7px;min-width:19px;height:19px;padding:0 4px;border-radius:999px;
+ background:var(--nv-am);color:#2F2119;font-size:12px;font-weight:700;display:none;align-items:center;justify-content:center;}
+html.nv .nv-nav button.tem{background:var(--roxo);color:#FFF8E8;font-weight:600;}
+html.nv .nv-nav button.tem .nv-b{display:flex;}
+html.nv .musicbtn{bottom:calc(92px + env(safe-area-inset-bottom));}
+
+/* ---------- PAINÉIS QUE SOBEM (produto, pedido, finalizar) ---------- */
+html.nv .sheet{border-radius:28px 28px 0 0;}
+html.nv .sheet.on{animation:nvSobe .34s cubic-bezier(.22,.8,.2,1);}
+html.nv .ov.on{animation:nvFade .25s ease;}
+@keyframes nvSobe{from{transform:translateY(56px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes nvFade{from{opacity:0}to{opacity:1}}
+@keyframes nvCai{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------- FINALIZAR: passos, resumo e total sempre à vista ---------- */
+html.nv #chkSheet{padding-bottom:0;}
+html.nv .nv-steps{display:flex;align-items:center;gap:8px;margin:0 0 14px;}
+html.nv .nv-steps span{display:flex;align-items:center;gap:7px;color:#785B42;font:500 13.5px/1 'Jost',system-ui,sans-serif;white-space:nowrap;}
+html.nv .nv-steps em{font-style:normal;}
+html.nv .nv-steps i{flex:none;width:24px;height:24px;box-sizing:border-box;border-radius:50%;border:1.5px solid #B8A584;display:flex;
+ align-items:center;justify-content:center;font-style:normal;font-size:13px;font-weight:600;}
+html.nv .nv-steps i svg{width:13px;height:13px;}
+html.nv .nv-steps .ok{color:var(--ink);}
+html.nv .nv-steps .now{color:#2F2119;font-weight:700;}
+html.nv .nv-steps .ok i,html.nv .nv-steps .now i{background:var(--roxo);border-color:var(--roxo);color:#FFF8E8;}
+html.nv .nv-steps u{flex:1;min-width:6px;height:1.5px;background:#D9C9AE;text-decoration:none;}
+html.nv .nv-res{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;margin:4px 0 2px;padding:10px 14px;
+ background:#FFFCF6;border:1px solid var(--line);border-radius:16px;color:var(--ink);font:600 15px/1.2 'Jost',system-ui,sans-serif;text-align:left;cursor:pointer;}
+html.nv .nv-res b{flex:none;color:var(--roxo);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;}
+html.nv #chkSheet button.go[onclick="sendWA()"]{display:none;}
+html.nv .nv-pay{position:sticky;bottom:0;z-index:3;display:flex;align-items:center;gap:14px;margin:14px -16px 0;
+ padding:12px 16px calc(16px + env(safe-area-inset-bottom));background:#FFFCF6;border-top:1px solid var(--line);}
+html.nv .nv-pay small{display:block;font-size:12.5px;color:#785B42;white-space:nowrap;}
+html.nv .nv-pay b{display:block;font-family:'Playfair Display',serif;font-weight:800;font-size:23px;line-height:1.15;color:#2F2119;white-space:nowrap;}
+html.nv .nv-pay .go{flex:1;width:auto;min-height:54px;margin:0;padding:10px 14px;}
+
+/* ---------- MOVIMENTO: os cartões entram ao deslizar (só onde o telemóvel sabe e o cliente não pediu menos animação) ---------- */
+html.nv .pc,html.nv .best-card{transition:transform .15s;}
+html.nv .pc:active,html.nv .best-card:active{transform:scale(.985);}
+@keyframes nvEntra{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+@supports (animation-timeline: view()){
+ @media (prefers-reduced-motion: no-preference){
+  html.nv #menuCards .pc,html.nv .best-card,html.nv .nv-promo{animation:nvEntra linear both;animation-timeline:view();animation-range:entry 0% entry 60%;}
+ }
+}
+html.nv button:focus-visible,html.nv a:focus-visible{outline:2px solid var(--roxo);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){
+ html.nv .sheet.on,html.nv .ov.on,html.nv.nv-lg .langs{animation:none;}
+ html.nv .nv-nav button,html.nv .nv-hero-c button,html.nv .pc,html.nv .best-card{transition:none;}
+}
+html.nv .nv-res span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
