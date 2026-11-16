@@ -17,6 +17,7 @@ test("cartão desligado: checkout igual ao de sempre", async () => {
     const chips = await page.evaluate(() => [...document.querySelectorAll("#bankChips .chip")].map(c => c.textContent.trim()));
     assert.equal(chips.length, 2); assert.ok(!chips.join().includes("Cartão"));
     assert.ok(await page.evaluate(() => /Emma's Place, Lda\..*NIF 210436336/.test(document.querySelector(".site-footer").textContent)));
+    assert.ok(await page.evaluate(() => !!document.querySelector('.site-footer a[href="tel:+2389895324"]')));
     assert.deepEqual(erros, []);
   } finally { await amb.fechar(); }
 });
@@ -29,9 +30,13 @@ test("cartão ligado: opção em primeiro, pedido leva pag:cartao; sem endereço
     const chips = await page.evaluate(() => [...document.querySelectorAll("#bankChips .chip")].map(c => ({ t: c.textContent.trim(), sel: c.classList.contains("sel") })));
     assert.equal(chips.length, 3); assert.ok(chips[0].t.startsWith("Cartão") && chips[0].sel);
     assert.match(await page.textContent("#bankCard"), /SISP/);
+    await page.tap("#nvPayB"); await page.waitForTimeout(400);                          // falta o email: não envia
+    assert.equal(amb.falso.chamadas.filter(c => c.caminho === "/order").length, 0);
+    await page.fill("#cfEmail", "cliente@example.com"); await page.fill("#cfMorada", "Rua 5, Palmarejo");
     await page.tap("#nvPayB"); await page.waitForSelector("#doneSheet.on");            // o servidor de teste não dá endereço para pagar
     const p = JSON.parse(amb.falso.chamadas.filter(c => c.caminho === "/order")[0].corpo);
     assert.equal(p.pag, "cartao");
+    assert.deepEqual(p.fat, { email: "cliente@example.com", morada: "Rua 5, Palmarejo", cidade: "Praia", cp: "7600" });
     assert.match(await page.textContent("#okPay"), /BCA/);
     assert.deepEqual(erros, []);
   } finally { await amb.fechar(); }

@@ -1607,7 +1607,7 @@ textarea.fld{min-height:74px;resize:vertical;}
     <a href="/privacidade/" data-i18n="lgPriv">Política de Privacidade</a>
     <a href="/reembolsos/" data-i18n="lgReemb">Cancelamentos e Reembolsos</a>
   </nav>
-  <div class="footer-emp" style="grid-column:1/-1;font-size:12.5px;line-height:1.5;opacity:.85">Emma's Place, Lda. · NIF 210436336 · Palmarejo Grande, Praia, Cabo Verde · <a href="mailto:geral@emmasplace.cv" style="color:inherit">geral@emmasplace.cv</a></div>
+  <div class="footer-emp" style="grid-column:1/-1;font-size:12.5px;line-height:1.5;opacity:.85">Emma's Place, Lda. · NIF 210436336 · Palmarejo Grande, Praia, Cabo Verde · <a href="tel:+2389895324" style="color:inherit">+238 989 53 24</a> · <a href="mailto:geral@emmasplace.cv" style="color:inherit">geral@emmasplace.cv</a></div>
   <div class="footer-bottom"><span data-i18n="rodape"></span></div>
   <div class="footer-priv" id="privBox"></div>
 </footer>
@@ -3892,6 +3892,7 @@ async function sendWA(){
  if(mode==="entrega"&&!addr&&!geo){avisar("avmorada");return;}
  const precisa=pagaAntes();
  if(precisa&&!banco){avisar("avbanco");return;}
+ if(precisa&&banco.cartao&&window.EP_CARTAO&&!window.EP_CARTAO.dadosOk()) return;   // email e morada pedidos pelo banco (3-D Secure)
  enviando=true;
  /* 03-11-2026: algum extra escolhido acabou entretanto? O cliente tem de o ver antes de enviar
     (e antes de transferir): retira-se do pedido, corrige-se o preço e pede-se confirmação. */
@@ -4037,7 +4038,7 @@ async function sendWA(){
    calc:{v:2, hm:!!(timeMode==="marcada"&&slotVal), promo:(promo&&(promo.tipo==="entrega"||desconto()>0))?promo.c:""},
    /* 16-11-2026: pedido feito com a conta aberta — conta para o cartão de bebidas e fica no histórico do cliente */
    sessao:(window.EP_CONTA?window.EP_CONTA.sessao():""),
-   pag:comCartao?"cartao":""
+   pag:comCartao?"cartao":"", fat:(comCartao&&window.EP_CARTAO)?window.EP_CARTAO.dados():null
  });
 
  /* O pedido passa a ser registado só aqui, no site. Como é o único canal,
