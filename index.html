@@ -1407,6 +1407,7 @@ textarea.fld{min-height:74px;resize:vertical;}
      Se movel.js ou movel.css não carregarem, fica o desenho antigo. -->
 <script src="desenho.js"></script>
 <link rel="stylesheet" href="movel.css">
+<link rel="stylesheet" href="conta.css">
 <script>
 (function(){try{
  var H=document.documentElement, q=null, g=null;
@@ -3497,6 +3498,7 @@ function textoPromo(p){
 function descPromoBruto(){
  if(!promo) return 0;
  const uma=PROMO_UMA_UNIDADE.includes(promo.cat);
+ if(promo.tipo==="oferta") return Math.min(maisCaraDaCat(promo.cat), promo.v>0?promo.v:1e9);   // 16-11-2026: bebida grátis do cartão (conta.js)
  if(promo.tipo==="pct")  return Math.round(sub()*promo.v/100);
  if(promo.tipo==="fixo") return Math.min(promo.v, sub());
  if(promo.tipo==="catfree")
@@ -4027,7 +4029,9 @@ async function sendWA(){
    total:total(), notas:nt, morada:(mode==="entrega"?addr:""), pago:precisa,
    /* 11-11-2026: o servidor refaz as contas do pedido. Para as fazer iguais precisa de saber se a hora foi
       marcada pelo cliente e que código promocional foi gasto (não muda nada no que o cliente vê). */
-   calc:{v:2, hm:!!(timeMode==="marcada"&&slotVal), promo:(promo&&(promo.tipo==="entrega"||desconto()>0))?promo.c:""}
+   calc:{v:2, hm:!!(timeMode==="marcada"&&slotVal), promo:(promo&&(promo.tipo==="entrega"||desconto()>0))?promo.c:""},
+   /* 16-11-2026: pedido feito com a conta aberta — conta para o cartão de bebidas e fica no histórico do cliente */
+   sessao:(window.EP_CONTA?window.EP_CONTA.sessao():"")
  });
 
  /* O pedido passa a ser registado só aqui, no site. Como é o único canal,
@@ -4056,6 +4060,7 @@ async function sendWA(){
  mtr("pedido_submetido");
  const info={code:codigo, nome:nome, tel:tel, total:total(), banco:banco, resumo:L.join("\n")};
  cart=[]; promo=null; codigo=""; horaDoCliente=false;
+ if(window.EP_CONTA) window.EP_CONTA.depoisDoPedido();
  refresh(); renderCart(); mostrarRepetir();
  mostrarConfirmacao(precisa, info);
 }
@@ -4282,7 +4287,7 @@ function refreshChk(){
    promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: só válido para '+(promo&&promo.modo==="entrega"?"entregas":"levantamento no local")+'.</span>';
   } else if(promo.min && sub()<promo.min){
    promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: precisa de '+ (promo?promo.min:0) +' ECV em produtos.</span>';
-  } else if((promo.tipo==="catfree"||promo.tipo==="pctcat") && !temCategoria(promo.cat)){
+  } else if((promo.tipo==="catfree"||promo.tipo==="pctcat"||promo.tipo==="oferta") && !temCategoria(promo.cat)){
    promo=null; $("promoMsg").innerHTML='<span class="pbad">Código removido: sem produtos dessa categoria no pedido.</span>';
   }
  }
@@ -5020,5 +5025,7 @@ async function menuPDF(ev){
  }
 }
 </script>
+<!-- 16-11-2026: conta de cliente e cartão de bebidas -->
+<script src="conta.js"></script>
 </body>
 </html>
