@@ -1473,7 +1473,8 @@ textarea.fld{min-height:74px;resize:vertical;}
  try{ q=new URLSearchParams(location.search).get("desenho"); }catch(e){}
  try{ if(q==="novo"||q==="antigo") sessionStorage.setItem("ep_desenho",q); g=sessionStorage.getItem("ep_desenho"); }catch(e){ g=(q==="novo"||q==="antigo")?q:null; }
  var ligado = g ? g==="novo" : window.EP_DESENHO==="novo";
- var tel = matchMedia("(max-width:719px)").matches || (matchMedia("(pointer:coarse)").matches && Math.min(screen.width,screen.height)<=719);
+ /* 16-11-2026: só em telemóveis verdadeiros (ecrã de toque). Uma janela estreita no computador fica com o site de sempre. */
+ var tel = matchMedia("(pointer:coarse)").matches && (matchMedia("(max-width:719px)").matches || Math.min(screen.width,screen.height)<=719);
  if(ligado && tel) H.classList.add("nv");
  window.addEventListener("load",function(){ if(H.classList.contains("nv") && !window.EP_NV_OK) H.classList.remove("nv"); });
 }catch(e){}})();
