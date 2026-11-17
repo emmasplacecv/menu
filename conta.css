@@ -53,3 +53,15 @@ html.nv .sitebar>.conta-btn~.nv-lang{margin-left:8px;}
 .conta-chk{margin:0 0 6px;padding:12px 13px;border-radius:14px;background:#F3E9F1;border:1px solid #DCC6D8;font-size:13.5px;color:#4A2545;line-height:1.45;}
 .conta-chk button{border:0;background:none;padding:0;font:700 13.5px inherit;color:#4A2545;text-decoration:underline;cursor:pointer;}
 .conta-chk .of{display:block;margin-top:8px;padding:10px;border-radius:24px;background:#4A2545;color:#FBF4E6;text-decoration:none;text-align:center;width:100%;}
+
+/* 17-11-2026: duas moradas no perfil e escolha da morada no checkout */
+.c-morada{margin:14px 0 0;padding:4px 14px 14px;border:1.5px solid var(--line,#E5D9C6);border-radius:16px;min-width:0;}
+.c-morada legend{padding:0 8px;font:700 13px/1.2 'Jost',sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:#4A2545;}
+.c-geo{margin-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:14px;}
+.c-geo .gs{width:100%;}
+.c-geo.ok b{color:#2E6B32;}
+.c-geo.ok a{color:inherit;}
+.c-geo.ok button{padding:6px 2px;border:0;background:none;color:#B3261E;font:inherit;text-decoration:underline;cursor:pointer;}
+.conta-moradas:empty{display:none;}
+.conta-moradas{margin-bottom:6px;}
+.conta-moradas .chip small{display:block;margin-top:2px;font-size:11.5px;font-weight:400;opacity:.8;}
