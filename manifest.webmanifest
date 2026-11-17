@@ -1,0 +1,25 @@
+{
+  "id": "/?app=1",
+  "name": "Emma's Place — Coffee & More",
+  "short_name": "Emma's Place",
+  "description": "Menu e encomendas da Emma's Place, Plateau, Praia. Funciona sem rede.",
+  "lang": "pt",
+  "dir": "ltr",
+  "start_url": "/?app=1",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F1E4",
+  "theme_color": "#34251D",
+  "categories": ["food", "shopping"],
+  "icons": [
+    { "src": "/app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/app/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Os meus pedidos", "short_name": "Pedidos", "url": "/?app=1#pedidos", "icons": [{ "src": "/app/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Menu", "short_name": "Menu", "url": "/?app=1#menu", "icons": [{ "src": "/app/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

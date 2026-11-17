@@ -1,0 +1,94 @@
+/* APP DE CLIENTE da Emma's Place (17-11-2026): os meus pedidos, seguir o pedido, sem rede, instalar */
+
+/* ---- faixa sem rede ---- */
+.ep-semrede{position:fixed;left:0;right:0;top:0;z-index:120;padding:calc(8px + env(safe-area-inset-top)) 16px 8px;
+ background:#34251D;color:#FFF6E8;font:500 13.5px/1.35 'Jost',system-ui,sans-serif;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.18);}
+.ep-semrede[hidden]{display:none;}
+html.ep-semrede body{padding-top:44px;}
+
+/* ---- pedido em curso (botão flutuante) ---- */
+.ep-pill{position:fixed;z-index:65;right:18px;bottom:calc(84px + env(safe-area-inset-bottom));max-width:380px;
+ display:flex;align-items:center;gap:12px;padding:10px 12px 10px 16px;border:0;border-radius:18px;cursor:pointer;
+ background:#4A2545;color:#fff;font:inherit;text-align:left;box-shadow:0 12px 30px rgba(52,37,29,.32);}
+.ep-pill[hidden]{display:none;}
+html.nv .ep-pill{left:12px;right:12px;max-width:none;bottom:calc(88px + env(safe-area-inset-bottom));}
+.ep-pill .ep-pt{flex:1;min-width:0;display:flex;flex-direction:column;}
+.ep-pill .ep-pt b{font:700 14px/1.2 'Jost',sans-serif;letter-spacing:.3px;}
+.ep-pill .ep-pt small{margin-top:2px;font-size:12.5px;opacity:.88;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ep-pill .ep-pv{flex:none;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.16);font-weight:600;font-size:13.5px;}
+.ep-pill.pronto{background:#2E6B32;animation:epPulso 1.6s ease-in-out infinite;}
+@keyframes epPulso{0%,100%{box-shadow:0 12px 30px rgba(46,107,50,.35);}50%{box-shadow:0 12px 30px rgba(46,107,50,.35),0 0 0 7px rgba(46,107,50,.25);}}
+
+/* ---- folha «Os meus pedidos» ---- */
+.ep-folha{max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.ep-folha .ep-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.ep-folha .ep-cab h3{margin:0;}
+.ep-folha .ep-x{width:44px;height:44px;border:0;border-radius:50%;background:rgba(52,37,29,.08);font-size:17px;color:inherit;cursor:pointer;}
+.ep-folha .ep-vazio{margin:18px 0;font-size:15px;color:var(--ink2,#6B5A4E);}
+.ep-folha .ep-sec{margin:18px 0 8px;font:600 12px/1 'Jost',sans-serif;letter-spacing:1.6px;text-transform:uppercase;color:#8A6E55;}
+.ep-folha h3{margin:0 0 10px;}
+.ep-folha p{font-size:15px;line-height:1.5;margin:0 0 14px;}
+.ep-pc{margin:0 0 12px;padding:14px;border:1.5px solid var(--line,#E7DCC8);border-radius:18px;background:var(--card,#FFFCF6);}
+.ep-pc.ativo{border-color:#4A2545;}
+.ep-pc.pronto{border-color:#2E6B32;box-shadow:0 0 0 3px rgba(46,107,50,.14);}
+.ep-pc-cab{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px;}
+.ep-pc-cab b{font:700 16px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.6px;}
+.ep-pc-cab span{font-size:13px;color:var(--ink2,#6B5A4E);}
+.ep-passos{list-style:none;margin:14px 0 6px;padding:0;display:grid;grid-template-columns:repeat(5,1fr);position:relative;}
+.ep-passos::before{content:"";position:absolute;left:10%;right:10%;top:10px;height:3px;border-radius:3px;background:#E7DCC8;}
+.ep-passos::after{content:"";position:absolute;left:10%;top:10px;height:3px;border-radius:3px;background:#4A2545;width:calc(var(--n) * 20%);transition:width .4s;}
+.ep-passos li{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
+.ep-passos i{width:23px;height:23px;border-radius:50%;background:#FFFCF6;border:3px solid #E7DCC8;box-sizing:border-box;}
+.ep-passos li.feito i{background:#4A2545;border-color:#4A2545;}
+.ep-passos li.agora i{background:#FFC736;border-color:#4A2545;box-shadow:0 0 0 4px rgba(255,199,54,.35);}
+.ep-passos span{font-size:11.5px;line-height:1.2;color:#8A7A6C;}
+.ep-passos li.feito span,.ep-passos li.agora span{color:#34251D;font-weight:600;}
+.ep-pc.pronto .ep-passos li.agora i{background:#2E6B32;border-color:#2E6B32;box-shadow:0 0 0 4px rgba(46,107,50,.25);}
+.ep-sub{margin-top:8px;font-size:14.5px;line-height:1.4;font-weight:500;}
+.ep-hora{margin-top:6px;font-size:13.5px;}
+.ep-upd{margin-top:6px;font-size:12px;color:#8A7A6C;}
+.ep-upd:empty{display:none;}
+.ep-canc{margin-top:10px;padding:10px 12px;border-radius:12px;background:#FBE9E7;color:#8C1D18;}
+.ep-canc b{display:block;margin-bottom:2px;}
+.ep-canc small{font-size:13px;}
+.ep-fim{margin-top:8px;font-size:14px;font-weight:600;color:#2E6B32;}
+.ep-itens{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line,#E7DCC8);font-size:13.5px;line-height:1.5;color:var(--ink2,#6B5A4E);}
+.ep-bts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.ep-bts:empty{display:none;}
+.ep-rep{min-height:44px;padding:0 18px;border:0;border-radius:999px;background:#34251D;color:#fff;font:600 14px 'Jost',sans-serif;cursor:pointer;}
+.ep-tira{min-height:44px;padding:0 10px;border:0;background:none;color:#8A6E55;font:inherit;font-size:13.5px;text-decoration:underline;cursor:pointer;}
+.ep-nocarrinho{display:block;width:100%;margin:0 0 12px;min-height:46px;padding:0 16px;border:1.5px solid #4A2545;border-radius:14px;
+ background:rgba(74,37,69,.06);color:#4A2545;font:600 14.5px 'Jost',sans-serif;text-align:left;cursor:pointer;}
+
+/* ---- aviso «pronto» ---- */
+.ep-torrada{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));z-index:130;transform:translate(-50%,-140%);
+ width:calc(100% - 32px);max-width:420px;padding:14px 18px;border-radius:16px;background:#2E6B32;color:#fff;
+ font:600 15px/1.35 'Jost',sans-serif;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.25);transition:transform .35s cubic-bezier(.22,.8,.2,1);}
+.ep-torrada.on{transform:translate(-50%,0);}
+
+/* ---- instalar ---- */
+.ep-inst{position:relative;display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:4px 12px;margin:12px 16px;padding:12px 40px 12px 12px;border-radius:18px;
+ background:#FFFCF6;border:1.5px solid #E7DCC8;box-shadow:0 8px 22px rgba(52,37,29,.08);}
+.ep-inst img{width:48px;height:48px;border-radius:12px;}
+.ep-inst div{min-width:0;}
+@media (max-width:460px){.ep-inst{grid-template-columns:48px 1fr;}.ep-inst .ep-ib{grid-column:2;justify-self:start;margin-top:6px;}}
+.ep-inst b{display:block;font:700 14.5px/1.25 'Jost',sans-serif;}
+.ep-inst small{display:block;margin-top:2px;font-size:12.5px;line-height:1.35;color:#6B5A4E;}
+.ep-inst .ep-ib{flex:none;min-height:44px;padding:0 16px;border:0;border-radius:999px;background:#4A2545;color:#fff;font:600 14px 'Jost',sans-serif;cursor:pointer;}
+.ep-inst .ep-ix{position:absolute;top:4px;right:4px;width:36px;height:36px;border:0;background:none;color:#8A7A6C;font-size:15px;cursor:pointer;}
+.ep-instrod{display:inline-block;margin:6px 0 10px;min-height:44px;padding:0 18px;border:1.5px solid currentColor;border-radius:999px;
+ background:none;color:inherit;font:600 14px 'Jost',sans-serif;cursor:pointer;}
+.ep-instrod[hidden]{display:none;}
+.ep-ios{margin:0 0 16px;padding-left:22px;font-size:15px;line-height:1.5;}
+.ep-ios li{margin-bottom:10px;}
+.ep-share{display:inline-block;width:18px;height:20px;margin-right:6px;vertical-align:-3px;border:2px solid #0A84FF;border-top:0;border-radius:0 0 3px 3px;position:relative;}
+.ep-share::before{content:"";position:absolute;left:50%;top:-7px;width:2px;height:14px;margin-left:-1px;background:#0A84FF;}
+.ep-share::after{content:"";position:absolute;left:50%;top:-8px;width:7px;height:7px;margin-left:-4.5px;border-left:2px solid #0A84FF;border-top:2px solid #0A84FF;transform:rotate(45deg);}
+
+/* ---- dentro da app (aberta pelo ícone): sem margem para a barra do navegador ---- */
+html.ep-app .ep-inst,html.ep-app .ep-instrod{display:none;}
+@media (prefers-reduced-motion:reduce){.ep-pill.pronto{animation:none;}.ep-torrada{transition:none;}}
+/* com uma janela aberta, o botão do pedido em curso sai do caminho */
+body:has(.sheet.on) .ep-pill,body:has(.ov.on) .ep-pill{display:none;}
+/* o botão da música sobe para não ficar por baixo do pedido em curso */
+body:has(.ep-pill:not([hidden])) #musicBtn{transform:translateY(-66px);}

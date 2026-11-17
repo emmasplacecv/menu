@@ -24,6 +24,15 @@
 </script>
 
 <link rel="icon" href="img/logo.webp">
+<!-- 17-11-2026: APP DE CLIENTE — instalável no telemóvel, abre sem rede (app.js, sw.js, pedidos.js) -->
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#34251D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Emma's Place">
+<link rel="apple-touch-icon" href="/app/apple-touch-icon.png">
+<script src="/app.js"></script>
 <link rel="preload" as="image" href="img/capa-1.webp">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"CafeOrCoffeeShop","name":"Emma's Place | Coffee & More",
@@ -1467,6 +1476,7 @@ textarea.fld{min-height:74px;resize:vertical;}
 <link rel="stylesheet" href="movel.css">
 <link rel="stylesheet" href="conta.css">
 <link rel="stylesheet" href="cartao.css">
+<link rel="stylesheet" href="app.css">
 <script>
 (function(){try{
  var H=document.documentElement, q=null, g=null;
@@ -3984,6 +3994,7 @@ let enviando=false;
 async function sendWA(){
  if(enviando) return;
  mtr("pedido_tentativa");
+ if(navigator.onLine===false && window.EP_PEDIDOS){ window.EP_PEDIDOS.avisoSemRede(); return; }   // 17-11-2026: sem rede o pedido fica no carrinho
  if(lojaFechada){avisar("avfechado");return;}
  if(entregasOff && mode==="entrega"){avisar("entsusp");return;}
  if(!cart.length){avisar("avvazio");return;}
@@ -4157,7 +4168,7 @@ async function sendWA(){
   const r=await fetch(PROMO_API+"/order",{method:"POST",
    headers:{"Content-Type":"text/plain;charset=UTF-8"}, body:dadosPedido});
   registado = r.ok;
-  if(comCartao){ try{ respPedido=await r.json(); }catch(e){} }
+  try{ respPedido=await r.json(); }catch(e){}            // 17-11-2026: traz a senha para seguir o pedido
  }catch(e){}
  if(!registado){
   try{
@@ -4176,6 +4187,11 @@ async function sendWA(){
  mtrTag("pedido_campanha", descCamp() ? (escCalc().v ? (escCalc().n>=3 ? "acai3" : "acai2") : "acai_antiga") : "nao");
  mtr("pedido_submetido");
  const info={code:codigo, nome:nome, tel:tel, total:total(), banco:banco, resumo:L.join("\n")};
+ /* 17-11-2026: guarda o pedido no telemóvel (Os meus pedidos, seguir o estado, repetir) */
+ if(window.EP_PEDIDOS) try{ window.EP_PEDIDOS.novo(info, respPedido, { modo:mode, prePaga:!!precisa,
+   slot:(timeMode==="marcada"&&slotVal)?slotVal:"", quando:(!slotHoje&&slotQuando)?slotQuando:"",
+   itens:cart.map(i=>`${i.q}x ${td(i.name)}${i.opts.length?" ("+i.opts.join(", ")+")":""}`),
+   items:cart.map(i=>({n:i.name,m:i.meta,q:i.q})) }); }catch(e){}
  cart=[]; promo=null; codigo=""; horaDoCliente=false;
  if(window.EP_CONTA) window.EP_CONTA.depoisDoPedido();
  refresh(); renderCart(); mostrarRepetir();
@@ -5177,5 +5193,6 @@ async function menuPDF(ev){
 </script>
 <script src="conta.js"></script>
 <script src="cartao.js"></script>
+<script src="pedidos.js"></script>
 </body>
 </html>

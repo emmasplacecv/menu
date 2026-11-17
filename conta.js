@@ -12,7 +12,7 @@
   var E = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
   var LS = "ep_conta", VOLTAS = 600000;
   var moradasEl = null, sessao = "", conta = null, nomeGuardado = "", aba = "entrar", vista = "", msg = null, ocupado = false, ed = null, prefsPostas = false, trocar = false, geoA = -1, qualM = 0;
-  try { var g = JSON.parse(localStorage.getItem(LS) || "null"); if (g && /^[0-9a-f]{64}$/.test(g.s)) { sessao = g.s; nomeGuardado = String(g.n || ""); } } catch (e) { }
+  try { var g = JSON.parse(localStorage.getItem(LS) || "null"); if (g && /^[0-9a-f]{64}$/.test(g.s)) { sessao = g.s; nomeGuardado = String(g.n || ""); if (g.c && typeof g.c === "object" && g.c.tel) conta = g.c; } } catch (e) { }
 
   var TX = {
     pt: { mPrinc: "Morada principal", mSec: "Morada secundária (opcional)", geoBt: "Usar a minha localização actual", geoOk: "Localização guardada ✓", geoVer: "Ver no mapa", geoTira: "Remover", geoA: "A obter localização…", geoErr: "Não foi possível obter a localização. Veja se o telemóvel tem a localização ligada e autorizada.", qual: "ENTREGAR EM", cPrinc: "Principal", cSec: "Secundária", cOutra: "Outra morada",
@@ -138,7 +138,7 @@
       return await r.json();
     } catch (e) { return { erro: "rede" }; }
   }
-  function guardarLocal() { try { if (sessao) localStorage.setItem(LS, JSON.stringify({ s: sessao, n: conta ? conta.nome : nomeGuardado })); else localStorage.removeItem(LS); } catch (e) { } }
+  function guardarLocal() { try { if (sessao) localStorage.setItem(LS, JSON.stringify({ s: sessao, n: conta ? conta.nome : nomeGuardado, c: conta || null }));   /* 17-11-2026: a conta fica no telemóvel (abre sem rede) */ else localStorage.removeItem(LS); } catch (e) { } }
   function entrou(d) { sessao = d.sessao || sessao; if (d.conta) conta = d.conta; trocar = !!d.trocar; nomeGuardado = conta ? conta.nome : ""; ed = null; prefsPostas = false; guardarLocal(); vista = trocar ? "senha" : ""; }
   function saiu() {
     sessao = ""; conta = null; nomeGuardado = ""; ed = null; trocar = false; vista = ""; guardarLocal();
