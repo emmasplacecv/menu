@@ -139,3 +139,14 @@ html.nv button:focus-visible,html.nv a:focus-visible{outline:2px solid var(--rox
  html.nv .nv-nav button,html.nv .nv-hero-c button,html.nv .pc,html.nv .best-card{transition:none;}
 }
 html.nv .nv-res span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* 16-11-2026: a capa animada dos descontos volta ao topo; a capa com foto não se mostra. */
+html.nv .nv-hero{display:none;}
+html.nv .nv-promo{margin:0 0 4px;animation:none;}
+/* telemóvel deitado ou ecrã largo: mais colunas, para as fotos não ficarem esticadas */
+@media (min-width:520px){
+ html.nv .best-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+ html.nv .best-card:last-child:nth-child(odd){grid-column:auto;display:block;}
+ html.nv .best-card:last-child:nth-child(odd) .best-media>img:first-child{height:auto;min-height:0;aspect-ratio:4/3;}
+}
+@media (min-width:680px){ html.nv .best-grid{grid-template-columns:repeat(4,minmax(0,1fr));} }

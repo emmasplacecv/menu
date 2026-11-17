@@ -1466,13 +1466,15 @@ textarea.fld{min-height:74px;resize:vertical;}
 <script src="desenho.js"></script>
 <link rel="stylesheet" href="movel.css">
 <link rel="stylesheet" href="conta.css">
+<link rel="stylesheet" href="cartao.css">
 <script>
 (function(){try{
  var H=document.documentElement, q=null, g=null;
  try{ q=new URLSearchParams(location.search).get("desenho"); }catch(e){}
  try{ if(q==="novo"||q==="antigo") sessionStorage.setItem("ep_desenho",q); g=sessionStorage.getItem("ep_desenho"); }catch(e){ g=(q==="novo"||q==="antigo")?q:null; }
  var ligado = g ? g==="novo" : window.EP_DESENHO==="novo";
- var tel = matchMedia("(max-width:719px)").matches || (matchMedia("(pointer:coarse)").matches && Math.min(screen.width,screen.height)<=719);
+ /* 16-11-2026: só em telemóveis verdadeiros (ecrã de toque). Uma janela estreita no computador fica com o site de sempre. */
+ var tel = matchMedia("(pointer:coarse)").matches && (matchMedia("(max-width:719px)").matches || Math.min(screen.width,screen.height)<=719);
  if(ligado && tel) H.classList.add("nv");
  window.addEventListener("load",function(){ if(H.classList.contains("nv") && !window.EP_NV_OK) H.classList.remove("nv"); });
 }catch(e){}})();
@@ -1704,6 +1706,7 @@ textarea.fld{min-height:74px;resize:vertical;}
     <a href="/privacidade/" data-i18n="lgPriv">Política de Privacidade</a>
     <a href="/reembolsos/" data-i18n="lgReemb">Cancelamentos e Reembolsos</a>
   </nav>
+  <div class="footer-emp" style="grid-column:1/-1;font-size:12.5px;line-height:1.5;opacity:.85">Emma's Place, Lda. · NIF 210436336 · Palmarejo Grande, Praia, Cabo Verde · <a href="tel:+2389895324" style="color:inherit">+238 989 53 24</a> · <a href="mailto:geral@emmasplace.cv" style="color:inherit">geral@emmasplace.cv</a></div>
   <div class="footer-bottom"><span data-i18n="rodape"></span></div>
   <div class="footer-priv" id="privBox"></div>
 </footer>
@@ -3997,6 +4000,7 @@ async function sendWA(){
  if(mode==="entrega"&&!addr&&!geo){avisar("avmorada");return;}
  const precisa=pagaAntes();
  if(precisa&&!banco){avisar("avbanco");return;}
+ if(precisa&&banco.cartao&&window.EP_CARTAO&&!window.EP_CARTAO.dadosOk()) return;   // email e morada pedidos pelo banco (3-D Secure)
  enviando=true;
  /* 03-11-2026: algum extra escolhido acabou entretanto? O cliente tem de o ver antes de enviar
     (e antes de transferir): retira-se do pedido, corrige-se o preço e pede-se confirmação. */
@@ -4103,7 +4107,10 @@ async function sendWA(){
  const nt=$("fNotes").value.trim();
  if(nt) L.push("Notas: "+nt);
  L.push("");
- if(precisa){
+ const comCartao=!!(precisa && banco && banco.cartao);
+ if(comCartao){
+  L.push("*PAGAMENTO — CARTÃO (vinti4)*");
+ }else if(precisa){
   L.push("*PAGAMENTO — TRANSFERÊNCIA*");
   L.push("Banco: "+banco.b);
   L.push("Titular: "+banco.t);
@@ -4138,17 +4145,19 @@ async function sendWA(){
       marcada pelo cliente e que código promocional foi gasto (não muda nada no que o cliente vê). */
    calc:{v:2, hm:!!(timeMode==="marcada"&&slotVal), promo:(promo&&(promo.tipo==="entrega"||desconto()>0))?promo.c:""},
    /* 16-11-2026: pedido feito com a conta aberta — conta para o cartão de bebidas e fica no histórico do cliente */
-   sessao:(window.EP_CONTA?window.EP_CONTA.sessao():"")
+   sessao:(window.EP_CONTA?window.EP_CONTA.sessao():""),
+   pag:comCartao?"cartao":"", fat:(comCartao&&window.EP_CARTAO)?window.EP_CARTAO.dados():null
  });
 
  /* O pedido passa a ser registado só aqui, no site. Como é o único canal,
     esperamos pela resposta do servidor antes de dizer ao cliente que ficou feito. */
- let registado=false;
+ let registado=false, respPedido=null;
  try{
   /* text/plain evita o pedido CORS preflight — menos uma coisa a falhar em rede fraca */
   const r=await fetch(PROMO_API+"/order",{method:"POST",
    headers:{"Content-Type":"text/plain;charset=UTF-8"}, body:dadosPedido});
   registado = r.ok;
+  if(comCartao){ try{ respPedido=await r.json(); }catch(e){} }
  }catch(e){}
  if(!registado){
   try{
@@ -4161,6 +4170,7 @@ async function sendWA(){
  /* métricas: só características do pedido — nunca nome, contacto, morada ou código */
  mtrTag("pedido_modo",mode); mtrTag("pedido_pagamento",precisa?"transferencia":"balcao");
  if(precisa&&banco) mtrTag("pedido_banco",banco.id);
+ if(comCartao) mtrTag("pedido_pagamento","cartao");
  mtrTag("pedido_hora",(timeMode==="marcada"&&slotVal)?"marcada":"assim que possivel");
  mtrTag("pedido_promo",promo?"sim":"nao"); mtrTag("pedido_valor",mtrValor(total()));
  mtrTag("pedido_campanha", descCamp() ? (escCalc().v ? (escCalc().n>=3 ? "acai3" : "acai2") : "acai_antiga") : "nao");
@@ -4169,6 +4179,12 @@ async function sendWA(){
  cart=[]; promo=null; codigo=""; horaDoCliente=false;
  if(window.EP_CONTA) window.EP_CONTA.depoisDoPedido();
  refresh(); renderCart(); mostrarRepetir();
+ /* cartão: segue para a página segura da SISP. Se o servidor não deu endereço para pagar
+    (cartão desligado entretanto, ou pedido com valor a confirmar), fica a transferência. */
+ if(comCartao && window.EP_CARTAO){
+  if(respPedido && respPedido.pagar && window.EP_CARTAO.ir(respPedido.pagar, info)) return;
+  window.EP_CARTAO.paraTransferencia(info); return;
+ }
  mostrarConfirmacao(precisa, info);
 }
 
@@ -4409,22 +4425,25 @@ function refreshChk(){
  $("payBox").style.display=precisa?"block":"none";
  $("noPayBox").style.display=precisa?"none":"block";
  if(precisa){
-  if(!banco) banco=BANCOS.find(b=>b.pref)||null;   // o banco preferido já vem escolhido; o cliente pode mudar
-  $("bankChips").innerHTML=BANCOS.map(b=>
+  if(!banco) banco=bancosDeAgora().find(b=>b.pref)||null;   // o preferido já vem escolhido; o cliente pode mudar
+  $("bankChips").innerHTML=bancosDeAgora().map(b=>
    `<button class="chip${b.pref?" pref":""}${banco&&banco.id===b.id?" sel":""}" onclick="setBanco('${b.id}',this)"><span>${b.chipK?t(b.chipK):b.b}${b.pref?ESTRELA_BANCO:""}${b.subK?`<small class="sub">${t(b.subK)}</small>`:""}</span></button>`).join("");
   drawBank();
  }
 }
 function setBanco(id,el){
- banco=BANCOS.find(b=>b.id===id);
+ banco=bancosDeAgora().find(b=>b.id===id);
  el.parentNode.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel"));
  el.classList.add("sel");
  drawBank();
 }
 function drawBank(){
  const box=$("bankCard");
+ $("chkSheet").classList.toggle("com-cartao", !!(banco && banco.cartao));
+ if(cartaoOn && window.EP_CARTAO){ const pb=$("payBox"); pb.querySelector(".lbl").textContent=window.EP_CARTAO.tx("pagTit"); pb.querySelector(".paynote").textContent=window.EP_CARTAO.tx("pagNota"); }
  if(!banco){box.style.display="none";return;}
  box.style.display="block";
+ if(banco.cartao){ box.innerHTML=window.EP_CARTAO.caixa(total()); return; }
  const nota=banco.notaK?t(banco.notaK):banco.nota;
  box.innerHTML=`<div class="bk">${banco.b}</div>
   <div class="ln"><span>${t("titular")}</span><b>${banco.t}${banco.titK?`<small class="tsub">${t(banco.titK)}</small>`:""}</b></div>
@@ -4522,12 +4541,16 @@ function repetirUltimo(){
 }
 
 let esgotados=[], lojaFechada=false, msgFechada="", entregasOff=false;
+/* 16-11-2026: pagamento por cartão (SISP/vinti4). Só aparece quando o servidor diz que está ligado. */
+let cartaoOn=false;
+const CARTAO_OPC={id:"cartao", cartao:true, pref:true, get b(){ return window.EP_CARTAO?window.EP_CARTAO.tx("chip"):"Cartão"; }};
+function bancosDeAgora(){ return (cartaoOn && window.EP_CARTAO) ? [CARTAO_OPC].concat(BANCOS.map(b=>Object.assign({},b,{pref:false}))) : BANCOS; }
 
 async function carregarEstado(){
  try{
   const r=await fetch(PROMO_API+"/estado");
   const d=await r.json();
-  if(!d.erro){ lojaFechada=!!d.fechado; msgFechada=d.msg||""; entregasOff=!!d.entregasOff; }
+  if(!d.erro){ lojaFechada=!!d.fechado; msgFechada=d.msg||""; entregasOff=!!d.entregasOff; cartaoOn=!!d.cartao; if(!cartaoOn && banco && banco.cartao) banco=null; }
  }catch(e){}
  mtrTag("loja",lojaFechada?"fechada":"aberta"); if(entregasOff) mtrTag("entregas","suspensas");
  // entregas suspensas: forçar levantamento e assinalar
@@ -5153,5 +5176,6 @@ async function menuPDF(ev){
 })();
 </script>
 <script src="conta.js"></script>
+<script src="cartao.js"></script>
 </body>
 </html>

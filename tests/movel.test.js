@@ -28,7 +28,7 @@ test("telemóvel: desenho novo ligado e página pela ordem nova", async () => {
       const vis = s => { const e = document.querySelector(s); return !!e && getComputedStyle(e).display !== "none"; };
       return {
         nv: document.documentElement.classList.contains("nv"),
-        ordem: ["#nvHero", "#catNav", "#mais-pedidos", "#nvPromo", "#nvMenuT", ".msearch", "#menuCards"].map(y),
+        ordem: ["#nvPromo", "#catNav", "#mais-pedidos", "#nvMenuT", ".msearch", "#menuCards"].map(y), fotoCapa: vis("#nvHero"), capaTopo: y("#nvPromo .home-hero") < 200 && vis("#nvPromo .home-hero"),
         barraVelha: vis(".bar"), carrinhoTopo: vis(".topcart"), nav: vis("#nvNav"), linguas: vis("#langs"),
         cats: [...document.querySelectorAll("#catNav button")].slice(0, 2).map(b => b.dataset.alvo),
         estado: document.querySelector("#nvStatus b").textContent, frase: document.querySelector("#nvHeroT").textContent,
@@ -63,7 +63,7 @@ test("telemóvel: pedido com toques verdadeiros chega ao servidor com o total qu
   const amb = await abrir(TEL);
   try {
     const { page, erros } = await pagina(amb);
-    await page.tap("#nvHeroC1");                                   // «Montar o meu açaí»
+    await page.tap("#bestGrid .best-card .best-add");                 // o «+» do primeiro dos mais pedidos (açaí)
     await page.waitForSelector("#optSheet.on");
     await page.tap("#optAdd");
     await page.waitForSelector("#cartSheet.on");                   // o site abre o pedido depois de adicionar
@@ -119,4 +119,25 @@ test("interruptor: «antigo» no telemóvel, e computador, ficam com o site como
     assert.equal(await page.evaluate(() => document.documentElement.classList.contains("nv") || !!document.getElementById("nvNav")), false);
     assert.deepEqual(erros, []);
   } finally { await pc.fechar(); }
+});
+
+test("capa dos descontos no topo no telemóvel; janela estreita no computador fica com o site de sempre", async () => {
+  let amb = await abrir(TEL);
+  try {
+    const { page, erros } = await pagina(amb);
+    const d = await page.evaluate(() => {
+      const c = document.querySelector(".home-hero.capa").getBoundingClientRect(), b = document.getElementById("mais-pedidos").getBoundingClientRect();
+      return { topo: Math.round(c.top + scrollY), alt: Math.round(c.height), antesDosPedidos: c.bottom <= b.top + 1,
+        foto: getComputedStyle(document.getElementById("nvHero")).display, nav: getComputedStyle(document.getElementById("nvNav")).display !== "none" };
+    });
+    assert.ok(d.topo < 140 && d.alt > 100, JSON.stringify(d));
+    assert.ok(d.antesDosPedidos && d.nav); assert.equal(d.foto, "none");
+    assert.deepEqual(erros, []);
+  } finally { await amb.fechar(); }
+  amb = await abrir({ contexto: { viewport: { width: 600, height: 900 } } });            // computador com a janela estreita (rato, sem toque)
+  try {
+    const { page, erros } = await pagina(amb);
+    assert.deepEqual(await page.evaluate(() => [document.documentElement.classList.contains("nv"), !!document.getElementById("nvNav")]), [false, false]);
+    assert.deepEqual(erros, []);
+  } finally { await amb.fechar(); }
 });

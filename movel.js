@@ -77,10 +77,12 @@
 
   /* ordem nova dentro do menu: categorias → mais pedidos → descontos → levantar/entrega → Menu + pesquisa → resto */
   var promo = el('<div class="nv-promo" id="nvPromo"></div>');
+  /* 16-11-2026 (pedido do Miguel): a capa animada dos descontos fica SEMPRE no topo da página, como antes.
+     A capa com foto (nv-hero) deixa de se mostrar; fica no código só para não partir o resto. */
   promo.appendChild(capa);
+  main.insertBefore(promo, main.firstChild);
   nav.parentNode.insertBefore(best, nav.nextSibling);
-  best.parentNode.insertBefore(promo, best.nextSibling);
-  if (painel) promo.parentNode.insertBefore(painel, promo.nextSibling);
+  if (painel) best.parentNode.insertBefore(painel, best.nextSibling);
   var menuT = el('<div class="nv-menu-h"><h2 id="nvMenuT">Menu</h2></div>');
   if (busca) busca.parentNode.insertBefore(menuT, busca); else zona.insertBefore(menuT, (painel || promo).nextSibling);
   var cabBest = best.querySelector(".section-heading");
