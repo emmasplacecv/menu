@@ -69,7 +69,7 @@ test("criar conta: a password não sai do telemóvel; perfil, checkout e pedido 
     await page.tap('#contaSheet [data-a="piso"][data-v="1"]');
     await page.tap('#contaSheet form[data-f="guardar"] button[type="submit"]');
     await page.waitForSelector("#contaSheet .c-msg.ok");
-    assert.deepEqual(conta.prefs, { modo: "entrega", zona: "Palmarejo", morada: "Rua 5", piso: 1, semElevador: false });
+    assert.deepEqual(conta.prefs, { modo: "entrega", zona: "Palmarejo", morada: "Rua 5", piso: 1, semElevador: false, geo: "", m2: { zona: "", morada: "", piso: 0, semElevador: false, geo: "" } });
     /* checkout preenchido e pedido com a sessão */
     await page.evaluate(() => { closeAll(); abrirProduto("Iced Latte"); confirmAdd(); closeAll(); openCheckout(); });
     await page.waitForSelector("#chkSheet.on");

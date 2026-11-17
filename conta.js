@@ -11,11 +11,12 @@
   var $ = function (id) { return document.getElementById(id); };
   var E = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
   var LS = "ep_conta", VOLTAS = 600000;
-  var sessao = "", conta = null, nomeGuardado = "", aba = "entrar", vista = "", msg = null, ocupado = false, ed = null, prefsPostas = false, trocar = false;
+  var moradasEl = null, sessao = "", conta = null, nomeGuardado = "", aba = "entrar", vista = "", msg = null, ocupado = false, ed = null, prefsPostas = false, trocar = false, geoA = -1, qualM = 0;
   try { var g = JSON.parse(localStorage.getItem(LS) || "null"); if (g && /^[0-9a-f]{64}$/.test(g.s)) { sessao = g.s; nomeGuardado = String(g.n || ""); } } catch (e) { }
 
   var TX = {
-    pt: { conta: "A minha conta", entrar: "Entrar", criar: "Criar conta", nome: "O SEU NOME", tel: "TELEMÓVEL", senha: "PASSWORD", senha8: "Mínimo 8 caracteres. Fica só consigo: nem nós a conseguimos ler.",
+    pt: { mPrinc: "Morada principal", mSec: "Morada secundária (opcional)", geoBt: "Usar a minha localização actual", geoOk: "Localização guardada ✓", geoVer: "Ver no mapa", geoTira: "Remover", geoA: "A obter localização…", geoErr: "Não foi possível obter a localização. Veja se o telemóvel tem a localização ligada e autorizada.", qual: "ENTREGAR EM", cPrinc: "Principal", cSec: "Secundária", cOutra: "Outra morada",
+      conta: "A minha conta", entrar: "Entrar", criar: "Criar conta", nome: "O SEU NOME", tel: "TELEMÓVEL", senha: "PASSWORD", senha8: "Mínimo 8 caracteres. Fica só consigo: nem nós a conseguimos ler.",
       criarBtn: "Criar a minha conta", pq: "Com conta, os seus dados ficam guardados, vê os seus pedidos e, a cada 9 bebidas, a 10.ª é grátis.",
       priv: 'Ao criar conta aceita a <a href="privacidade/" target="_blank" rel="noopener">Política de Privacidade</a>.',
       esqueci: "Esqueceu a password? Peça uma provisória no balcão ou por mensagem no Instagram @emmasplace.cv.",
@@ -33,7 +34,8 @@
       mudar: "Mudar a password", atual: "PASSWORD ACTUAL", nova: "NOVA PASSWORD", mudarBtn: "Guardar nova password", mudada: "Password mudada ✓", trocar: "Entrou com uma password provisória. Escolha agora a sua.",
       sair: "Sair", apagar: "Apagar a minha conta", apagarQ: "Apaga a conta, o cartão e o histórico. Não dá para desfazer. Escreva a sua password para confirmar.", apagarBtn: "Apagar definitivamente", voltar: "Voltar",
       chkFora: "A cada 9 bebidas da mesma categoria, a 10.ª é grátis.", chkEntrar: "Entrar ou criar conta", chkDentro: "Conta de {n}: este pedido conta para o cartão.", ver: "Ver", mostrar: "mostrar", esconder: "esconder", aguarde: "Um momento…", sempiso: "R/C" },
-    en: { conta: "My account", entrar: "Sign in", criar: "Create account", nome: "YOUR NAME", tel: "MOBILE NUMBER", senha: "PASSWORD", senha8: "At least 8 characters. It stays with you: not even we can read it.",
+    en: { mPrinc: "Main address", mSec: "Second address (optional)", geoBt: "Use my current location", geoOk: "Location saved ✓", geoVer: "View on map", geoTira: "Remove", geoA: "Getting location…", geoErr: "Could not get your location. Check that location is on and allowed on your phone.", qual: "DELIVER TO", cPrinc: "Main", cSec: "Second", cOutra: "Another address",
+      conta: "My account", entrar: "Sign in", criar: "Create account", nome: "YOUR NAME", tel: "MOBILE NUMBER", senha: "PASSWORD", senha8: "At least 8 characters. It stays with you: not even we can read it.",
       criarBtn: "Create my account", pq: "With an account your details are saved, you see your orders and, after every 9 drinks, the 10th is free.",
       priv: 'By creating an account you accept the <a href="privacidade/" target="_blank" rel="noopener">Privacy Policy</a>.',
       esqueci: "Forgot your password? Ask for a temporary one at the counter or by message on Instagram @emmasplace.cv.",
@@ -51,7 +53,8 @@
       mudar: "Change password", atual: "CURRENT PASSWORD", nova: "NEW PASSWORD", mudarBtn: "Save new password", mudada: "Password changed ✓", trocar: "You signed in with a temporary password. Choose your own now.",
       sair: "Sign out", apagar: "Delete my account", apagarQ: "This deletes the account, the card and the history. It cannot be undone. Type your password to confirm.", apagarBtn: "Delete permanently", voltar: "Back",
       chkFora: "After every 9 drinks, the 10th is free.", chkEntrar: "Sign in or create account", chkDentro: "{n}'s account: this order counts towards the card.", ver: "View", mostrar: "show", esconder: "hide", aguarde: "One moment…", sempiso: "Ground" },
-    fr: { conta: "Mon compte", entrar: "Se connecter", criar: "Créer un compte", nome: "VOTRE NOM", tel: "TÉLÉPHONE PORTABLE", senha: "MOT DE PASSE", senha8: "Au moins 8 caractères. Il reste avec vous : même nous ne pouvons pas le lire.",
+    fr: { mPrinc: "Adresse principale", mSec: "Adresse secondaire (facultatif)", geoBt: "Utiliser ma position actuelle", geoOk: "Position enregistrée ✓", geoVer: "Voir sur la carte", geoTira: "Supprimer", geoA: "Recherche de la position…", geoErr: "Impossible d'obtenir la position. Vérifiez que la localisation est activée et autorisée sur votre téléphone.", qual: "LIVRER À", cPrinc: "Principale", cSec: "Secondaire", cOutra: "Autre adresse",
+      conta: "Mon compte", entrar: "Se connecter", criar: "Créer un compte", nome: "VOTRE NOM", tel: "TÉLÉPHONE PORTABLE", senha: "MOT DE PASSE", senha8: "Au moins 8 caractères. Il reste avec vous : même nous ne pouvons pas le lire.",
       criarBtn: "Créer mon compte", pq: "Avec un compte, vos données sont enregistrées, vous voyez vos commandes et, toutes les 9 boissons, la 10e est offerte.",
       priv: 'En créant un compte, vous acceptez la <a href="privacidade/" target="_blank" rel="noopener">Politique de confidentialité</a>.',
       esqueci: "Mot de passe oublié ? Demandez-en un provisoire au comptoir ou par message sur Instagram @emmasplace.cv.",
@@ -69,7 +72,8 @@
       mudar: "Changer le mot de passe", atual: "MOT DE PASSE ACTUEL", nova: "NOUVEAU MOT DE PASSE", mudarBtn: "Enregistrer le nouveau mot de passe", mudada: "Mot de passe changé ✓", trocar: "Vous êtes entré avec un mot de passe provisoire. Choisissez le vôtre maintenant.",
       sair: "Se déconnecter", apagar: "Supprimer mon compte", apagarQ: "Supprime le compte, la carte et l'historique. Irréversible. Saisissez votre mot de passe pour confirmer.", apagarBtn: "Supprimer définitivement", voltar: "Retour",
       chkFora: "Toutes les 9 boissons, la 10e est offerte.", chkEntrar: "Se connecter ou créer un compte", chkDentro: "Compte de {n} : cette commande compte pour la carte.", ver: "Voir", mostrar: "afficher", esconder: "masquer", aguarde: "Un instant…", sempiso: "RDC" },
-    de: { conta: "Mein Konto", entrar: "Anmelden", criar: "Konto erstellen", nome: "IHR NAME", tel: "HANDYNUMMER", senha: "PASSWORT", senha8: "Mindestens 8 Zeichen. Es bleibt bei Ihnen: Auch wir können es nicht lesen.",
+    de: { mPrinc: "Hauptadresse", mSec: "Zweite Adresse (optional)", geoBt: "Meinen aktuellen Standort verwenden", geoOk: "Standort gespeichert ✓", geoVer: "Auf der Karte ansehen", geoTira: "Entfernen", geoA: "Standort wird ermittelt…", geoErr: "Der Standort konnte nicht ermittelt werden. Prüfen Sie, ob die Ortung auf Ihrem Handy aktiviert und erlaubt ist.", qual: "LIEFERN AN", cPrinc: "Hauptadresse", cSec: "Zweite", cOutra: "Andere Adresse",
+      conta: "Mein Konto", entrar: "Anmelden", criar: "Konto erstellen", nome: "IHR NAME", tel: "HANDYNUMMER", senha: "PASSWORT", senha8: "Mindestens 8 Zeichen. Es bleibt bei Ihnen: Auch wir können es nicht lesen.",
       criarBtn: "Mein Konto erstellen", pq: "Mit Konto bleiben Ihre Daten gespeichert, Sie sehen Ihre Bestellungen und nach je 9 Getränken ist das 10. gratis.",
       priv: 'Mit dem Erstellen des Kontos akzeptieren Sie die <a href="privacidade/" target="_blank" rel="noopener">Datenschutzerklärung</a>.',
       esqueci: "Passwort vergessen? Fragen Sie an der Theke oder per Nachricht auf Instagram @emmasplace.cv nach einem vorläufigen.",
@@ -87,7 +91,8 @@
       mudar: "Passwort ändern", atual: "AKTUELLES PASSWORT", nova: "NEUES PASSWORT", mudarBtn: "Neues Passwort speichern", mudada: "Passwort geändert ✓", trocar: "Sie haben sich mit einem vorläufigen Passwort angemeldet. Wählen Sie jetzt Ihr eigenes.",
       sair: "Abmelden", apagar: "Mein Konto löschen", apagarQ: "Löscht Konto, Karte und Verlauf. Nicht rückgängig zu machen. Zur Bestätigung Passwort eingeben.", apagarBtn: "Endgültig löschen", voltar: "Zurück",
       chkFora: "Nach je 9 Getränken ist das 10. gratis.", chkEntrar: "Anmelden oder Konto erstellen", chkDentro: "Konto von {n}: Diese Bestellung zählt für die Karte.", ver: "Ansehen", mostrar: "zeigen", esconder: "verbergen", aguarde: "Einen Moment…", sempiso: "EG" },
-    nl: { conta: "Mijn account", entrar: "Inloggen", criar: "Account aanmaken", nome: "UW NAAM", tel: "MOBIEL NUMMER", senha: "WACHTWOORD", senha8: "Minstens 8 tekens. Het blijft bij u: zelfs wij kunnen het niet lezen.",
+    nl: { mPrinc: "Hoofdadres", mSec: "Tweede adres (optioneel)", geoBt: "Mijn huidige locatie gebruiken", geoOk: "Locatie opgeslagen ✓", geoVer: "Bekijk op kaart", geoTira: "Verwijderen", geoA: "Locatie ophalen…", geoErr: "De locatie kon niet worden opgehaald. Controleer of locatie op uw telefoon aan staat en is toegestaan.", qual: "BEZORGEN OP", cPrinc: "Hoofdadres", cSec: "Tweede", cOutra: "Ander adres",
+      conta: "Mijn account", entrar: "Inloggen", criar: "Account aanmaken", nome: "UW NAAM", tel: "MOBIEL NUMMER", senha: "WACHTWOORD", senha8: "Minstens 8 tekens. Het blijft bij u: zelfs wij kunnen het niet lezen.",
       criarBtn: "Mijn account aanmaken", pq: "Met een account blijven uw gegevens bewaard, ziet u uw bestellingen en is na elke 9 drankjes het 10e gratis.",
       priv: 'Door een account aan te maken accepteert u het <a href="privacidade/" target="_blank" rel="noopener">Privacybeleid</a>.',
       esqueci: "Wachtwoord vergeten? Vraag een tijdelijk wachtwoord aan de balie of via een bericht op Instagram @emmasplace.cv.",
@@ -187,9 +192,39 @@
         '<button type="button" data-a="usar" data-c="' + E(o.c) + '"' + (ofertaEmUso(o) ? " disabled" : "") + '>' + T(ofertaEmUso(o) ? "emuso" : "usar") + '</button></div>';
     }).join("");
   }
+  /* 17-11-2026: duas moradas de entrega (principal e secundária), cada uma com localização captada pelo telemóvel */
+  function moradasDe(p) {
+    var um = function (m) { m = m || {}; return { zona: m.zona || "", morada: m.morada || "", piso: m.piso || 0, semElevador: !!m.semElevador, geo: m.geo || "" }; };
+    return [um(p), um(p && p.m2)];
+  }
+  function temMorada(m) { return !!(m && (m.zona || m.morada || m.geo)); }
+  function htmlMorada(i) {
+    var m = ed.ms[i], x = i ? "2" : "", zs = "";
+    try { zs = ZONAS.map(function (z) { return '<option' + (z.n === m.zona ? " selected" : "") + '>' + E(z.n) + '</option>'; }).join(""); } catch (e) { }
+    return '<fieldset class="c-morada"><legend>' + T(i ? "mSec" : "mPrinc") + '</legend>' +
+      '<div class="lbl">' + TS("zonal") + '</div><select class="fld" id="pZona' + x + '"><option value="">—</option>' + zs + '</select>' +
+      '<div class="lbl">' + TS("moradal") + '</div><input class="fld" id="pMorada' + x + '" maxlength="160" autocomplete="' + (i ? "off" : "street-address") + '" value="' + E(m.morada) + '">' +
+      (m.geo ? '<div class="c-geo ok"><b>' + T("geoOk") + '</b><a href="https://maps.google.com/?q=' + E(m.geo) + '" target="_blank" rel="noopener">' + T("geoVer") + '</a><button type="button" data-a="geox" data-i="' + i + '">' + T("geoTira") + '</button></div>'
+        : '<div class="c-geo"><button type="button" class="gs" data-a="geo" data-i="' + i + '"' + (geoA === i ? " disabled" : "") + '>📍 ' + T(geoA === i ? "geoA" : "geoBt") + '</button></div>') +
+      '<div class="lbl">' + TS("pisol") + '</div><div class="c-piso"><button type="button" data-a="piso" data-i="' + i + '" data-v="-1" aria-label="−">−</button><b id="pPiso' + x + '">' + (m.piso || T("sempiso")) + '</b><button type="button" data-a="piso" data-i="' + i + '" data-v="1" aria-label="+">+</button></div>' +
+      (m.piso >= 4 ? '<div class="lbl">' + TS("elevp") + '</div><div class="chips"><button type="button" class="chip' + (!m.semElevador ? " sel" : "") + '" data-a="elev" data-i="' + i + '" data-v="1">' + TS("sim") + '</button><button type="button" class="chip' + (m.semElevador ? " sel" : "") + '" data-a="elev" data-i="' + i + '" data-v="0">' + TS("nao") + '</button></div>' : "") +
+      '</fieldset>';
+  }
+  function lerCampos() {
+    if (!ed) return;
+    if ($("pNome")) ed.nome = $("pNome").value;
+    ["", "2"].forEach(function (x, i) { if ($("pZona" + x)) ed.ms[i].zona = $("pZona" + x).value; if ($("pMorada" + x)) ed.ms[i].morada = $("pMorada" + x).value.trim(); });
+  }
+  function captar(i) {
+    lerCampos(); msg = null;
+    if (!navigator.geolocation) { msg = { t: T("geoErr") }; return desenhar(); }
+    geoA = i; desenhar();
+    navigator.geolocation.getCurrentPosition(function (p) {
+      geoA = -1; if (ed) { lerCampos(); ed.ms[i].geo = p.coords.latitude.toFixed(6) + "," + p.coords.longitude.toFixed(6); } desenhar();
+    }, function () { geoA = -1; lerCampos(); msg = { t: T("geoErr") }; desenhar(); }, { enableHighAccuracy: true, timeout: 9000 });
+  }
   function htmlDentro() {
-    if (!ed) { var p = conta.prefs || {}; ed = { nome: conta.nome, modo: p.modo || "recolha", zona: p.zona || "", morada: p.morada || "", piso: p.piso || 0, semElevador: !!p.semElevador }; }
-    var zs = ""; try { zs = ZONAS.map(function (z) { return '<option' + (z.n === ed.zona ? " selected" : "") + '>' + E(z.n) + '</option>'; }).join(""); } catch (e) { }
+    if (!ed) { var p = conta.prefs || {}; ed = { nome: conta.nome, modo: p.modo || "recolha", ms: moradasDe(p) }; }
     var h = '<h3>' + T("ola").replace("{n}", E(conta.nome.split(" ")[0])) + '</h3>' + htmlMsg() +
       '<div class="lbl">' + T("cartao") + '</div><div class="c-cartoes">' + Object.keys(conta.cartao || {}).sort(function (a, b) { return conta.cartao[b].n - conta.cartao[a].n; }).map(htmlCartao).join("") + '</div>' + htmlOfertas() +
       '<div class="c-nota">' + T("regra") + ' ' + T("regra2") + ((conta.regras && conta.regras.teto === "media") ? " " + T("teto") : "") + '</div>' +
@@ -198,10 +233,7 @@
       '<input class="fld" value="' + E(conta.tel) + '" disabled aria-label="' + T("tel") + '" style="margin-top:8px;opacity:.7">' +
       '<div class="lbl">' + TS("comorec2") + '</div><div class="chips"><button type="button" class="chip' + (ed.modo === "recolha" ? " sel" : "") + '" data-a="modo" data-v="recolha">' + TS("recolha") + '</button><button type="button" class="chip' + (ed.modo === "entrega" ? " sel" : "") + '" data-a="modo" data-v="entrega">' + TS("entrega") + '</button></div>' +
       '<div id="pEnt" style="display:' + (ed.modo === "entrega" ? "block" : "none") + '">' +
-      '<div class="lbl">' + TS("zonal") + '</div><select class="fld" id="pZona"><option value="">—</option>' + zs + '</select>' +
-      '<div class="lbl">' + TS("moradal") + '</div><input class="fld" id="pMorada" maxlength="160" autocomplete="street-address" value="' + E(ed.morada) + '">' +
-      '<div class="lbl">' + TS("pisol") + '</div><div class="c-piso"><button type="button" data-a="piso" data-v="-1" aria-label="−">−</button><b id="pPiso">' + (ed.piso || T("sempiso")) + '</b><button type="button" data-a="piso" data-v="1" aria-label="+">+</button></div>' +
-      (ed.piso >= 4 ? '<div class="lbl">' + TS("elevp") + '</div><div class="chips"><button type="button" class="chip' + (!ed.semElevador ? " sel" : "") + '" data-a="elev" data-v="1">' + TS("sim") + '</button><button type="button" class="chip' + (ed.semElevador ? " sel" : "") + '" data-a="elev" data-v="0">' + TS("nao") + '</button></div>' : "") +
+      htmlMorada(0) + htmlMorada(1) +
       '</div><button class="go" type="submit"' + (ocupado ? " disabled" : "") + '>' + (ocupado ? T("aguarde") : T("guardar")) + '</button></form>' +
       '<div class="lbl">' + T("hist") + '</div>';
     var hs = conta.hist || [];
@@ -255,6 +287,7 @@
       });
     }
     chk.innerHTML = h;
+    desenharMoradas();
   }
   function tudo() { desenhar(); desenharBotao(); desenharChk(); }
 
@@ -278,10 +311,10 @@
     var tipo = f.getAttribute("data-f"), d, v = function (id) { return $(id) ? $(id).value : ""; };
     msg = null;
     if (tipo === "guardar") {
-      ed.nome = v("pNome").trim(); if ($("pZona")) ed.zona = v("pZona"); if ($("pMorada")) ed.morada = v("pMorada").trim();
+      lerCampos(); ed.nome = ed.nome.trim();
       if (ed.nome.length < 2) { msg = { t: T("e_nome") }; return desenhar(); }
       ocupado = true; desenhar();
-      d = await pedir("conta-guardar", { sessao: sessao, nome: ed.nome, prefs: { modo: ed.modo, zona: ed.zona, morada: ed.morada, piso: ed.piso, semElevador: ed.semElevador } });
+      d = await pedir("conta-guardar", { sessao: sessao, nome: ed.nome, prefs: { modo: ed.modo, zona: ed.ms[0].zona, morada: ed.ms[0].morada, piso: ed.ms[0].piso, semElevador: ed.ms[0].semElevador, geo: ed.ms[0].geo, m2: ed.ms[1] } });
       ocupado = false;
       if (d.ok) { conta = d.conta; nomeGuardado = conta.nome; ed = null; prefsPostas = false; guardarLocal(); msg = { ok: 1, t: T("guardado") }; }
       else if (d.erro === "sessao") { saiu(); msg = { t: T("e_sessao") }; } else msg = { t: erroTxt(d.erro) };
@@ -335,11 +368,15 @@
     if (a === "aba") { aba = v; msg = null; return desenhar(); }
     if (a === "vista") { vista = v; msg = null; desenhar(); folha.scrollTop = 0; return; }
     if (a === "sair") { var s = sessao; saiu(); msg = null; tudo(); if (s) pedir("conta-sair", { sessao: s }); return; }
-    if (ed && (a === "modo" || a === "piso" || a === "elev")) {
-      ed.nome = $("pNome").value; if ($("pMorada")) ed.morada = $("pMorada").value; if ($("pZona")) ed.zona = $("pZona").value;
+    if (a === "morada") { return escolherMorada(v === "x" ? -1 : +v); }
+    if (ed && a === "geo") return captar(+b.getAttribute("data-i") || 0);
+    if (ed && (a === "modo" || a === "piso" || a === "elev" || a === "geox")) {
+      lerCampos();
+      var m = ed.ms[+b.getAttribute("data-i") || 0];
       if (a === "modo") ed.modo = v;
-      if (a === "piso") { ed.piso = Math.max(0, Math.min(30, ed.piso + (+v))); if (ed.piso < 4) ed.semElevador = false; }
-      if (a === "elev") ed.semElevador = v === "0";
+      if (a === "piso") { m.piso = Math.max(0, Math.min(30, m.piso + (+v))); if (m.piso < 4) m.semElevador = false; }
+      if (a === "elev") m.semElevador = v === "0";
+      if (a === "geox") m.geo = "";
       desenhar();
     }
   }
@@ -354,10 +391,41 @@
       if (p.zona && !zona) escolherZona(p.zona);
       var a = $("fAddr"); if (a && !a.value.trim() && p.morada) a.value = p.morada;
       if (p.piso > 0 && piso === 0) { for (var k = 0; k < p.piso; k++) mudarPiso(1); if (p.piso >= 4) setElevador(!p.semElevador); }
+      if (p.geo && !geo) porGeo(p.geo);
+      qualM = 0;
       if (p.modo === "entrega" && mode !== "entrega" && !modoEscolhido && !entregasOff && !cart.some(function (i) { return i.nd; })) setMode("entrega", false);
     } catch (e) { }
   }
 
+  function porGeo(g) {
+    try { geo = g || null; var gm = $("geoMsg"); if (gm) gm.innerHTML = g ? '<span class="geo-ok">' + T("geoOk") + '</span>' : ""; } catch (e) { }
+  }
+  /* no checkout: trocar entre a morada principal, a secundária ou escrever outra (−1) */
+  function escolherMorada(i) {
+    if (!conta) return;
+    try {
+      var m = i < 0 ? { zona: "", morada: "", piso: 0, semElevador: false, geo: "" } : moradasDe(conta.prefs || {})[i];
+      qualM = i;
+      if (i >= 0 || zona) escolherZona(m.zona);
+      var a = $("fAddr"); if (a) a.value = m.morada;
+      var g = 0; while (piso < m.piso && g++ < 40) mudarPiso(1); while (piso > m.piso && g++ < 80) mudarPiso(-1);
+      if (m.piso >= 4) setElevador(!m.semElevador);
+      porGeo(m.geo);
+      refreshChk();
+    } catch (e) { }
+    desenharMoradas();
+    if (i < 0) { try { $("fZona").focus(); } catch (e) { } }
+  }
+  function desenharMoradas() {
+    if (!moradasEl) return;
+    var ms = conta ? moradasDe(conta.prefs || {}) : [], h = "";
+    if (temMorada(ms[0])) {
+      var curta = function (m) { var t = m.morada || m.zona || "📍"; return E(t.length > 26 ? t.slice(0, 25) + "…" : t); };
+      var bt = function (i, k, sub) { return '<button type="button" class="chip' + (qualM === i ? " sel" : "") + '" data-a="morada" data-v="' + (i < 0 ? "x" : i) + '">' + T(k) + (sub ? '<small>' + sub + '</small>' : "") + '</button>'; };
+      h = '<div class="lbl">' + T("qual") + '</div><div class="chips">' + bt(0, "cPrinc", curta(ms[0])) + (temMorada(ms[1]) ? bt(1, "cSec", curta(ms[1])) : "") + bt(-1, "cOutra", "") + '</div>';
+    }
+    moradasEl.innerHTML = h;
+  }
   function montar() {
     var barra = document.querySelector(".sitebar"), cs = $("chkSheet"), ov = $("ov");
     if (!barra || !cs || !ov) return;
@@ -372,6 +440,8 @@
     folha.addEventListener("submit", function (ev) { ev.preventDefault(); submeter(ev.target); });
     chk = document.createElement("div"); chk.className = "conta-chk"; chk.id = "contaChk"; chk.addEventListener("click", clique);
     var antes = cs.querySelector(".lbl"); if (antes) cs.insertBefore(chk, antes);
+    var db = $("deliveryBox");
+    if (db) { moradasEl = document.createElement("div"); moradasEl.className = "conta-moradas"; moradasEl.id = "contaMoradas"; moradasEl.addEventListener("click", clique); db.insertBefore(moradasEl, db.firstChild); }
     /* fechar tudo também fecha a conta; abrir o checkout preenche-o com a conta */
     var fechar0 = window.closeAll; window.closeAll = function () { folha.classList.remove("on"); return fechar0.apply(this, arguments); };
     var chk0 = window.openCheckout; window.openCheckout = function () { porNoCheckout(); var r = chk0.apply(this, arguments); desenharChk(); return r; };
