@@ -1400,6 +1400,64 @@ textarea.fld{min-height:74px;resize:vertical;}
  .eb-tx small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:11.5px;line-height:1.3;color:#6E5468;margin-top:2px;}
 }
 @media(prefers-reduced-motion:reduce){ .eb-pill i{animation:none;opacity:1;} }
+
+/* ============ O NOSSO CAFÉ (16-11-2026) — subsecção de «A nossa história» ============
+   Texto + filme da torrefação em colunas no computador; em coluna única no telemóvel.
+   O filme só é descarregado quando o visitante toca em «Ver o filme» (preload="none"; a capa é uma <img> preguiçosa). */
+.coffee-story{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);grid-template-areas:"head film" "facts film";
+ column-gap:56px;row-gap:30px;align-items:start;margin:24px 0;padding:48px;border:1px solid var(--line);border-radius:22px;
+ background:var(--card);box-shadow:0 12px 30px rgba(52,37,29,.07);scroll-margin-top:96px;text-align:left;}
+.coffee-head{grid-area:head;}
+.coffee-head .eyebrow,.coffee-facts dt{color:#9A6230;font-size:10.5px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;}
+.coffee-head h2{font-family:'Playfair Display',serif;font-size:clamp(29px,3.3vw,42px);line-height:1.08;margin-top:8px;text-wrap:balance;}
+.coffee-head p{max-width:56ch;color:var(--ink2);font-size:15px;line-height:1.7;margin-top:16px;}
+.coffee-film{grid-area:film;justify-self:center;width:100%;max-width:340px;margin:0;}
+.coffee-player{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:18px;background:var(--dark);
+ box-shadow:0 14px 34px rgba(52,37,29,.16);}
+.coffee-player video{display:block;width:100%;height:100%;object-fit:cover;background:var(--dark);}
+.coffee-play{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;border:0;background:var(--dark);cursor:pointer;
+ color:#FFF8E8;font-family:inherit;text-align:left;}
+.coffee-play[hidden]{display:none;}
+.coffee-play>img{display:block;width:100%;height:100%;object-fit:cover;}
+.coffee-play::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;
+ background:linear-gradient(180deg,rgba(47,33,25,0),rgba(47,33,25,.82));}
+.coffee-play-b{position:absolute;left:18px;right:18px;bottom:18px;z-index:1;display:grid;grid-template-columns:auto 1fr;
+ column-gap:14px;align-items:center;}
+.coffee-play-b i{grid-row:1/3;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--roxo);
+ box-shadow:0 6px 18px rgba(0,0,0,.3);}
+.coffee-play-b svg{width:20px;height:20px;margin-left:3px;}
+.coffee-play-b b{align-self:end;font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1.15;}
+.coffee-play-b small{align-self:start;margin-top:3px;font-size:12.5px;font-weight:500;letter-spacing:.3px;color:#EAD9BE;}
+.coffee-play:focus-visible,.coffee-cta:focus-visible{outline:3px solid var(--gold);outline-offset:3px;}
+.coffee-film figcaption{margin-top:12px;color:var(--ink2);font-size:12.5px;line-height:1.5;}
+.coffee-facts{grid-area:facts;}
+.coffee-facts h3{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;line-height:1.2;}
+.coffee-facts dl{margin-top:12px;border-bottom:1px solid var(--line);}
+.coffee-facts dl>div{padding:14px 0;border-top:1px solid var(--line);}
+.coffee-facts dd{margin-top:4px;color:var(--ink);font-size:15px;line-height:1.5;}
+.coffee-facts dl>.coffee-miguel{display:grid;grid-template-columns:132px minmax(0,1fr);gap:18px;align-items:center;}
+.coffee-miguel img{display:block;width:132px;height:165px;border-radius:14px;object-fit:cover;background:var(--line);}
+.coffee-miguel small{display:block;margin-top:8px;color:var(--ink2);font-size:12.5px;line-height:1.45;}
+.coffee-cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;margin-top:24px;padding:14px 26px;
+ border-radius:999px;background:var(--roxo);color:#FFF8E8;font:600 12.5px/1.2 'Jost',sans-serif;letter-spacing:.8px;
+ text-transform:uppercase;text-decoration:none;}
+.coffee-sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+@media(hover:hover){.coffee-cta:hover{background:var(--roxo2);}}
+@media(prefers-reduced-motion:no-preference){
+ .coffee-play-b i{transition:transform .18s ease;}
+ .coffee-cta{transition:background-color .18s ease;}
+ @media(hover:hover){.coffee-play:hover .coffee-play-b i{transform:scale(1.06);}}
+}
+@media(max-width:860px){
+ .coffee-story{grid-template-columns:1fr;grid-template-areas:"head" "film" "facts";row-gap:26px;padding:36px 30px;}
+}
+@media(max-width:719px){
+ .coffee-story{padding:28px 22px;}
+ .coffee-head p{font-size:14.5px;line-height:1.65;}
+ .coffee-facts dl>.coffee-miguel{grid-template-columns:108px minmax(0,1fr);gap:14px;}
+ .coffee-miguel img{width:108px;height:135px;}
+ .coffee-cta{width:100%;}
+}
 </style>
 <!-- 16-11-2026: DESENHO NOVO DA VERSÃO DE TELEMÓVEL (movel.css + movel.js).
      Liga-se e desliga-se em desenho.js ("novo" / "antigo"). Só entra em ecrãs de telemóvel; no computador o site fica igual.
@@ -1580,6 +1638,46 @@ textarea.fld{min-height:74px;resize:vertical;}
     <h2 data-home-i18n="storyTitle"></h2>
     <p data-home-i18n="storySub"></p>
     <a href="#menu" data-home-i18n="storyCta"></a>
+  </div>
+</section>
+
+<!-- O NOSSO CAFÉ (16-11-2026): subsecção de «A nossa história». Só factos confirmados (composição e torra).
+     O perfil sensorial (notas de prova, intensidade, acidez) ainda não foi fornecido: não acrescentar sem dados reais.
+     As imagens são da torrefação onde o café é comprado e torrado — não é um espaço da Emma's Place. -->
+<section class="coffee-story" id="nosso-cafe" aria-labelledby="cafe-title">
+  <div class="coffee-head">
+    <span class="eyebrow" data-home-i18n="cafeKicker"></span>
+    <h2 id="cafe-title" data-home-i18n="cafeTitle"></h2>
+    <p data-home-i18n="cafeText"></p>
+  </div>
+  <figure class="coffee-film">
+    <div class="coffee-player">
+      <video id="cafeVideo" playsinline preload="none" width="720" height="1280" aria-describedby="cafeVidDesc">
+        <source src="media/o-nosso-cafe.mp4" type="video/mp4">
+      </video>
+      <button type="button" class="coffee-play" id="cafePlay" aria-describedby="cafeVidDesc">
+        <img src="img/cafe-capa.jpg" alt="" width="720" height="1280" loading="lazy" decoding="async">
+        <span class="coffee-play-b">
+          <i aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 3.5v17a1 1 0 0 0 1.53.85l13.5-8.5a1 1 0 0 0 0-1.7L7.53 2.65A1 1 0 0 0 6 3.5Z"/></svg></i>
+          <b data-home-i18n="cafePlay"></b><small data-home-i18n="cafeDur"></small>
+        </span>
+      </button>
+    </div>
+    <figcaption data-home-i18n="cafeNota"></figcaption>
+    <p class="coffee-sr" id="cafeVidDesc" data-home-i18n="cafeVidDesc"></p>
+  </figure>
+  <div class="coffee-facts">
+    <h3 data-home-i18n="cafePerfil"></h3>
+    <dl>
+      <div><dt data-home-i18n="cafeF1k"></dt><dd data-home-i18n="cafeF1"></dd></div>
+      <div><dt data-home-i18n="cafeF2k"></dt><dd data-home-i18n="cafeF2"></dd></div>
+      <div class="coffee-miguel">
+        <img src="img/cafe-miguel-420.jpg" srcset="img/cafe-miguel-420.jpg 420w, img/cafe-miguel.jpg 840w" sizes="132px"
+             width="420" height="525" loading="lazy" decoding="async" alt="" data-home-i18n-alt="cafeFotoAlt">
+        <div><dt data-home-i18n="cafeF3k"></dt><dd data-home-i18n="cafeF3"></dd><small data-home-i18n="cafeFotoCap"></small></div>
+      </div>
+    </dl>
+    <a class="coffee-cta" id="cafeCta" href="#menu" onclick="irCafes(event)" data-home-i18n="cafeCta"></a>
   </div>
 </section>
 
@@ -2031,11 +2129,11 @@ const I18N={"pt": {"tag": "Coffee & More — sabores que acolhem, momentos que f
   "Door te bevestigen aanvaardt u onze "+A("/termos/","algemene voorwaarden")+" en ons "+A("/reembolsos/","annulerings- en terugbetalingsbeleid")+". Wij verwerken uw gegevens volgens ons "+A("/privacidade/","privacybeleid")+"."));
 })();
 const HOME_I18N={
- pt:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Mais pedidos",navAbout:"A nossa história",navContact:"Contactos",hours:"Hoje",openHours:"Seg–Sex 08h–17h · Sáb 09h–15h",order:"Meu pedido",heroKicker:"Coffee & More · feito com carinho",heroTitle:"O teu momento favorito começa aqui.",heroSub:"Cafés, matcha e frappés feitos na hora · comida fresca do dia",viewMenu:"Ver menu",orderNow:"Encomendar agora",madeFresh:"Preparado na hora",freeDelivery:"Entrega grátis acima de 750$",navNovo:"Açaí & Coco",navHot:"Quentes",navCold:"Geladas",navMatcha:"Matcha & Coco",navJuices:"Sumos",navSnacks:"Lanches",navLunch:"Almoço",bestKicker:"Os favoritos da Emma's",bestTitle:"Os mais pedidos",bestSub:"Os sabores que os clientes repetem.",menuKicker:"Descobre o menu",menuTitle:"Escolhe o teu favorito",menuSub:"Preços e disponibilidade atualizados diretamente pela equipa Emma's Place.",orderKicker:"PEDIDOS",orderTitle:"Levantamento ou entrega?",storyKicker:"Feito na Praia",storyTitle:"Um lugar pequeno com muito sabor.",storySub:"Ingredientes frescos e atenção ao detalhe, no coração do Plateau.",storyCta:"Explorar o menu →",footerSlogan:"Café, cor e carinho no coração do Plateau.",footerHours:"Horário & localização",footerContact:"Contactos",unavailable:"Indisponível"},
- en:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Best sellers",navAbout:"Our story",navContact:"Contact",hours:"Today",openHours:"Mon–Fri 08:00–17:00 · Sat 09:00–15:00",order:"My order",heroKicker:"Coffee & More · made with care",heroTitle:"Your favourite moment starts here.",heroSub:"Coffee, matcha and frappés made to order · fresh food daily",viewMenu:"View menu",orderNow:"Order now",madeFresh:"Made to order",freeDelivery:"Free delivery over 750$",navNovo:"Açaí & Coconut",navHot:"Hot drinks",navCold:"Iced drinks",navMatcha:"Matcha & Coconut",navJuices:"Juices",navSnacks:"Snacks",navLunch:"Lunch",bestKicker:"Emma's favourites",bestTitle:"Best sellers",bestSub:"The flavours our customers repeat.",menuKicker:"Discover the menu",menuTitle:"Choose your favourite",menuSub:"Prices and availability updated directly by the Emma's Place team.",orderKicker:"ORDERS",orderTitle:"Pick-up or delivery?",storyKicker:"Made in Praia",storyTitle:"A small place with plenty of flavour.",storySub:"Fresh ingredients and attention to detail, in the heart of Plateau.",storyCta:"Explore the menu →",footerSlogan:"Coffee, colour and care in the heart of Plateau.",footerHours:"Hours & location",footerContact:"Contact"},
- fr:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Meilleures ventes",navAbout:"Notre histoire",navContact:"Contact",hours:"Aujourd'hui",openHours:"Lun–Ven 08h–17h · Sam 09h–15h",order:"Ma commande",heroKicker:"Coffee & More · préparé avec soin",heroTitle:"Votre moment préféré commence ici.",heroSub:"Cafés, matcha et frappés préparés à la minute · cuisine fraîche du jour",viewMenu:"Voir le menu",orderNow:"Commander",madeFresh:"Préparé à la commande",freeDelivery:"Livraison offerte dès 750$",navNovo:"Açaí & Coco",navHot:"Boissons chaudes",navCold:"Boissons glacées",navMatcha:"Matcha & Coco",navJuices:"Jus",navSnacks:"En-cas",navLunch:"Déjeuner",bestKicker:"Les favoris d'Emma's",bestTitle:"Les plus commandés",bestSub:"Les saveurs que nos clients redemandent.",menuKicker:"Découvrez le menu",menuTitle:"Choisissez votre favori",menuSub:"Prix et disponibilité mis à jour par l'équipe Emma's Place.",orderKicker:"COMMANDES",orderTitle:"Retrait ou livraison ?",storyKicker:"Préparé à Praia",storyTitle:"Un petit lieu plein de saveurs.",storySub:"Ingrédients frais et souci du détail, au cœur du Plateau.",storyCta:"Explorer le menu →",footerSlogan:"Café, couleur et attention au cœur du Plateau.",footerHours:"Horaires & adresse",footerContact:"Contact"},
- de:{plateau:"Plateau · Praia",navMenu:"Menü",navBest:"Bestseller",navAbout:"Über uns",navContact:"Kontakt",hours:"Heute",openHours:"Mo–Fr 08–17 Uhr · Sa 09–15 Uhr",order:"Meine Bestellung",heroKicker:"Coffee & More · mit Liebe gemacht",heroTitle:"Dein Lieblingsmoment beginnt hier.",heroSub:"Kaffee, Matcha und Frappés frisch zubereitet · frische Speisen des Tages",viewMenu:"Menü ansehen",orderNow:"Jetzt bestellen",madeFresh:"Frisch zubereitet",freeDelivery:"Gratis-Lieferung ab 750$",navNovo:"Açaí & Kokos",navHot:"Heißgetränke",navCold:"Kaltgetränke",navMatcha:"Matcha & Kokos",navJuices:"Säfte",navSnacks:"Snacks",navLunch:"Mittagessen",bestKicker:"Emma's Favoriten",bestTitle:"Unsere Bestseller",bestSub:"Die Favoriten unserer Gäste.",menuKicker:"Menü entdecken",menuTitle:"Wähle deinen Favoriten",menuSub:"Preise und Verfügbarkeit werden direkt vom Emma's Place Team aktualisiert.",orderKicker:"BESTELLUNGEN",orderTitle:"Abholung oder Lieferung?",storyKicker:"In Praia gemacht",storyTitle:"Ein kleiner Ort mit viel Geschmack.",storySub:"Frische Zutaten und Liebe zum Detail, im Herzen von Plateau.",storyCta:"Menü entdecken →",footerSlogan:"Kaffee, Farbe und Herzlichkeit im Plateau.",footerHours:"Öffnungszeiten & Ort",footerContact:"Kontakt"},
- nl:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Best verkocht",navAbout:"Ons verhaal",navContact:"Contact",hours:"Vandaag",openHours:"Ma–vr 08–17 u · Za 09–15 u",order:"Mijn bestelling",heroKicker:"Coffee & More · met zorg gemaakt",heroTitle:"Jouw favoriete moment begint hier.",heroSub:"Koffie, matcha en frappés vers bereid · verse gerechten van de dag",viewMenu:"Bekijk menu",orderNow:"Bestel nu",madeFresh:"Vers bereid",freeDelivery:"Gratis bezorging vanaf 750$",navNovo:"Açaí & Kokos",navHot:"Warme dranken",navCold:"Koude dranken",navMatcha:"Matcha & Kokos",navJuices:"Sappen",navSnacks:"Snacks",navLunch:"Lunch",bestKicker:"Emma's favorieten",bestTitle:"Meest besteld",bestSub:"De smaken die klanten blijven kiezen.",menuKicker:"Ontdek het menu",menuTitle:"Kies jouw favoriet",menuSub:"Prijzen en beschikbaarheid rechtstreeks bijgewerkt door het Emma's Place-team.",orderKicker:"BESTELLINGEN",orderTitle:"Afhalen of bezorgen?",storyKicker:"Gemaakt in Praia",storyTitle:"Een kleine plek met veel smaak.",storySub:"Verse ingrediënten en oog voor detail, in hart van Plateau.",storyCta:"Ontdek het menu →",footerSlogan:"Koffie, kleur en zorg in het hart van Plateau.",footerHours:"Openingstijden & locatie",footerContact:"Contact"}
+ pt:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Mais pedidos",navAbout:"A nossa história",navContact:"Contactos",hours:"Hoje",openHours:"Seg–Sex 08h–17h · Sáb 09h–15h",order:"Meu pedido",heroKicker:"Coffee & More · feito com carinho",heroTitle:"O teu momento favorito começa aqui.",heroSub:"Cafés, matcha e frappés feitos na hora · comida fresca do dia",viewMenu:"Ver menu",orderNow:"Encomendar agora",madeFresh:"Preparado na hora",freeDelivery:"Entrega grátis acima de 750$",navNovo:"Açaí & Coco",navHot:"Quentes",navCold:"Geladas",navMatcha:"Matcha & Coco",navJuices:"Sumos",navSnacks:"Lanches",navLunch:"Almoço",bestKicker:"Os favoritos da Emma's",bestTitle:"Os mais pedidos",bestSub:"Os sabores que os clientes repetem.",menuKicker:"Descobre o menu",menuTitle:"Escolhe o teu favorito",menuSub:"Preços e disponibilidade atualizados diretamente pela equipa Emma's Place.",orderKicker:"PEDIDOS",orderTitle:"Levantamento ou entrega?",storyKicker:"Feito na Praia",storyTitle:"Um lugar pequeno com muito sabor.",storySub:"Ingredientes frescos e atenção ao detalhe, no coração do Plateau.",storyCta:"Explorar o menu →",cafeKicker:"O nosso café",cafeTitle:"Blend próprio. Torra ao nosso padrão.",cafeText:"O café da Emma's Place tem a nossa assinatura. Definimos a combinação de Arábica e Robusta e controlamos o tempo e a temperatura de torrefação segundo o perfil que queremos servir. Miguel acompanha este processo pessoalmente, antes de o café chegar à nossa cafetaria.",cafePerfil:"Perfil de composição e torra",cafeF1k:"Composição",cafeF1:"Blend próprio de Arábica e Robusta.",cafeF2k:"Torrefação",cafeF2:"Tempo e temperatura definidos segundo o nosso padrão.",cafeF3k:"Acompanhamento",cafeF3:"Participação direta de Miguel.",cafeFotoCap:"Miguel junto do torrador, com o grão acabado de torrar.",cafeFotoAlt:"Miguel junto do torrador, com o tabuleiro de arrefecimento cheio de grão torrado",cafeNota:"Imagens reais, captadas na torrefação onde compramos o café e acompanhamos a torra.",cafePlay:"Ver o filme",cafeDur:"35 s · som ambiente",cafeVidDesc:"Filme de 35 segundos, sem narração, com legendas em português: grão verde, pesagem, chama do torrador, grão a arrefecer depois da torra e Miguel junto da máquina.",cafeCta:"Explorar os nossos cafés",footerSlogan:"Café, cor e carinho no coração do Plateau.",footerHours:"Horário & localização",footerContact:"Contactos",unavailable:"Indisponível"},
+ en:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Best sellers",navAbout:"Our story",navContact:"Contact",hours:"Today",openHours:"Mon–Fri 08:00–17:00 · Sat 09:00–15:00",order:"My order",heroKicker:"Coffee & More · made with care",heroTitle:"Your favourite moment starts here.",heroSub:"Coffee, matcha and frappés made to order · fresh food daily",viewMenu:"View menu",orderNow:"Order now",madeFresh:"Made to order",freeDelivery:"Free delivery over 750$",navNovo:"Açaí & Coconut",navHot:"Hot drinks",navCold:"Iced drinks",navMatcha:"Matcha & Coconut",navJuices:"Juices",navSnacks:"Snacks",navLunch:"Lunch",bestKicker:"Emma's favourites",bestTitle:"Best sellers",bestSub:"The flavours our customers repeat.",menuKicker:"Discover the menu",menuTitle:"Choose your favourite",menuSub:"Prices and availability updated directly by the Emma's Place team.",orderKicker:"ORDERS",orderTitle:"Pick-up or delivery?",storyKicker:"Made in Praia",storyTitle:"A small place with plenty of flavour.",storySub:"Fresh ingredients and attention to detail, in the heart of Plateau.",storyCta:"Explore the menu →",cafeKicker:"Our coffee",cafeTitle:"Our own blend. Roasted to our standard.",cafeText:"Emma's Place coffee carries our signature. We define the combination of Arabica and Robusta and control the roasting time and temperature according to the profile we want to serve. Miguel follows this process in person, before the coffee reaches our café.",cafePerfil:"Blend and roast profile",cafeF1k:"Composition",cafeF1:"Our own blend of Arabica and Robusta.",cafeF2k:"Roasting",cafeF2:"Time and temperature set to our standard.",cafeF3k:"Oversight",cafeF3:"Miguel's direct involvement.",cafeFotoCap:"Miguel by the roaster, with freshly roasted beans.",cafeFotoAlt:"Miguel by the roaster, with the cooling tray full of roasted beans",cafeNota:"Real footage, filmed at the roastery where we buy our coffee and follow the roast.",cafePlay:"Watch the film",cafeDur:"35 s · ambient sound",cafeVidDesc:"35-second film with no narration and Portuguese captions: green beans, weighing, the roaster's flame, beans cooling after roasting and Miguel by the machine.",cafeCta:"Explore our coffees",footerSlogan:"Coffee, colour and care in the heart of Plateau.",footerHours:"Hours & location",footerContact:"Contact"},
+ fr:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Meilleures ventes",navAbout:"Notre histoire",navContact:"Contact",hours:"Aujourd'hui",openHours:"Lun–Ven 08h–17h · Sam 09h–15h",order:"Ma commande",heroKicker:"Coffee & More · préparé avec soin",heroTitle:"Votre moment préféré commence ici.",heroSub:"Cafés, matcha et frappés préparés à la minute · cuisine fraîche du jour",viewMenu:"Voir le menu",orderNow:"Commander",madeFresh:"Préparé à la commande",freeDelivery:"Livraison offerte dès 750$",navNovo:"Açaí & Coco",navHot:"Boissons chaudes",navCold:"Boissons glacées",navMatcha:"Matcha & Coco",navJuices:"Jus",navSnacks:"En-cas",navLunch:"Déjeuner",bestKicker:"Les favoris d'Emma's",bestTitle:"Les plus commandés",bestSub:"Les saveurs que nos clients redemandent.",menuKicker:"Découvrez le menu",menuTitle:"Choisissez votre favori",menuSub:"Prix et disponibilité mis à jour par l'équipe Emma's Place.",orderKicker:"COMMANDES",orderTitle:"Retrait ou livraison ?",storyKicker:"Préparé à Praia",storyTitle:"Un petit lieu plein de saveurs.",storySub:"Ingrédients frais et souci du détail, au cœur du Plateau.",storyCta:"Explorer le menu →",cafeKicker:"Notre café",cafeTitle:"Assemblage maison. Torréfaction selon nos critères.",cafeText:"Le café d'Emma's Place porte notre signature. Nous définissons l'assemblage d'Arabica et de Robusta et contrôlons le temps et la température de torréfaction selon le profil que nous voulons servir. Miguel suit ce processus personnellement, avant que le café n'arrive chez nous.",cafePerfil:"Profil d'assemblage et de torréfaction",cafeF1k:"Composition",cafeF1:"Assemblage maison d'Arabica et de Robusta.",cafeF2k:"Torréfaction",cafeF2:"Temps et température définis selon nos critères.",cafeF3k:"Suivi",cafeF3:"Participation directe de Miguel.",cafeFotoCap:"Miguel près du torréfacteur, avec le café tout juste torréfié.",cafeFotoAlt:"Miguel près du torréfacteur, le bac de refroidissement rempli de grains torréfiés",cafeNota:"Images réelles, tournées dans la torréfaction où nous achetons le café et suivons la torréfaction.",cafePlay:"Voir le film",cafeDur:"35 s · son d'ambiance",cafeVidDesc:"Film de 35 secondes, sans narration, sous-titré en portugais : grains verts, pesée, flamme du torréfacteur, grains qui refroidissent après la torréfaction et Miguel près de la machine.",cafeCta:"Découvrir nos cafés",footerSlogan:"Café, couleur et attention au cœur du Plateau.",footerHours:"Horaires & adresse",footerContact:"Contact"},
+ de:{plateau:"Plateau · Praia",navMenu:"Menü",navBest:"Bestseller",navAbout:"Über uns",navContact:"Kontakt",hours:"Heute",openHours:"Mo–Fr 08–17 Uhr · Sa 09–15 Uhr",order:"Meine Bestellung",heroKicker:"Coffee & More · mit Liebe gemacht",heroTitle:"Dein Lieblingsmoment beginnt hier.",heroSub:"Kaffee, Matcha und Frappés frisch zubereitet · frische Speisen des Tages",viewMenu:"Menü ansehen",orderNow:"Jetzt bestellen",madeFresh:"Frisch zubereitet",freeDelivery:"Gratis-Lieferung ab 750$",navNovo:"Açaí & Kokos",navHot:"Heißgetränke",navCold:"Kaltgetränke",navMatcha:"Matcha & Kokos",navJuices:"Säfte",navSnacks:"Snacks",navLunch:"Mittagessen",bestKicker:"Emma's Favoriten",bestTitle:"Unsere Bestseller",bestSub:"Die Favoriten unserer Gäste.",menuKicker:"Menü entdecken",menuTitle:"Wähle deinen Favoriten",menuSub:"Preise und Verfügbarkeit werden direkt vom Emma's Place Team aktualisiert.",orderKicker:"BESTELLUNGEN",orderTitle:"Abholung oder Lieferung?",storyKicker:"In Praia gemacht",storyTitle:"Ein kleiner Ort mit viel Geschmack.",storySub:"Frische Zutaten und Liebe zum Detail, im Herzen von Plateau.",storyCta:"Menü entdecken →",cafeKicker:"Unser Kaffee",cafeTitle:"Eigene Mischung. Nach unserem Standard geröstet.",cafeText:"Der Kaffee von Emma's Place trägt unsere Handschrift. Wir legen die Mischung aus Arabica und Robusta fest und steuern Röstzeit und Rösttemperatur nach dem Profil, das wir servieren möchten. Miguel begleitet diesen Prozess persönlich, bevor der Kaffee zu uns kommt.",cafePerfil:"Misch- und Röstprofil",cafeF1k:"Zusammensetzung",cafeF1:"Eigene Mischung aus Arabica und Robusta.",cafeF2k:"Röstung",cafeF2:"Zeit und Temperatur nach unserem Standard festgelegt.",cafeF3k:"Begleitung",cafeF3:"Miguel ist direkt beteiligt.",cafeFotoCap:"Miguel am Röster, mit frisch gerösteten Bohnen.",cafeFotoAlt:"Miguel am Röster, das Kühlsieb voller gerösteter Bohnen",cafeNota:"Echte Aufnahmen aus der Rösterei, in der wir unseren Kaffee kaufen und die Röstung begleiten.",cafePlay:"Film ansehen",cafeDur:"35 s · Originalton",cafeVidDesc:"35-Sekunden-Film ohne Sprecher, mit portugiesischen Texteinblendungen: Rohkaffee, Abwiegen, Flamme des Rösters, abkühlende Bohnen nach der Röstung und Miguel an der Maschine.",cafeCta:"Unsere Kaffees entdecken",footerSlogan:"Kaffee, Farbe und Herzlichkeit im Plateau.",footerHours:"Öffnungszeiten & Ort",footerContact:"Kontakt"},
+ nl:{plateau:"Plateau · Praia",navMenu:"Menu",navBest:"Best verkocht",navAbout:"Ons verhaal",navContact:"Contact",hours:"Vandaag",openHours:"Ma–vr 08–17 u · Za 09–15 u",order:"Mijn bestelling",heroKicker:"Coffee & More · met zorg gemaakt",heroTitle:"Jouw favoriete moment begint hier.",heroSub:"Koffie, matcha en frappés vers bereid · verse gerechten van de dag",viewMenu:"Bekijk menu",orderNow:"Bestel nu",madeFresh:"Vers bereid",freeDelivery:"Gratis bezorging vanaf 750$",navNovo:"Açaí & Kokos",navHot:"Warme dranken",navCold:"Koude dranken",navMatcha:"Matcha & Kokos",navJuices:"Sappen",navSnacks:"Snacks",navLunch:"Lunch",bestKicker:"Emma's favorieten",bestTitle:"Meest besteld",bestSub:"De smaken die klanten blijven kiezen.",menuKicker:"Ontdek het menu",menuTitle:"Kies jouw favoriet",menuSub:"Prijzen en beschikbaarheid rechtstreeks bijgewerkt door het Emma's Place-team.",orderKicker:"BESTELLINGEN",orderTitle:"Afhalen of bezorgen?",storyKicker:"Gemaakt in Praia",storyTitle:"Een kleine plek met veel smaak.",storySub:"Verse ingrediënten en oog voor detail, in hart van Plateau.",storyCta:"Ontdek het menu →",cafeKicker:"Onze koffie",cafeTitle:"Eigen blend. Gebrand volgens onze standaard.",cafeText:"De koffie van Emma's Place draagt onze signatuur. Wij bepalen de combinatie van Arabica en Robusta en sturen de brandtijd en -temperatuur volgens het profiel dat we willen serveren. Miguel volgt dit proces persoonlijk, voordat de koffie bij ons aankomt.",cafePerfil:"Blend- en brandprofiel",cafeF1k:"Samenstelling",cafeF1:"Eigen blend van Arabica en Robusta.",cafeF2k:"Branden",cafeF2:"Tijd en temperatuur bepaald volgens onze standaard.",cafeF3k:"Begeleiding",cafeF3:"Directe betrokkenheid van Miguel.",cafeFotoCap:"Miguel bij de brander, met vers gebrande bonen.",cafeFotoAlt:"Miguel bij de brander, met de koelzeef vol gebrande bonen",cafeNota:"Echte beelden, gefilmd in de branderij waar we onze koffie kopen en het branden volgen.",cafePlay:"Bekijk de film",cafeDur:"35 s · omgevingsgeluid",cafeVidDesc:"Film van 35 seconden zonder voice-over, met Portugese tekst in beeld: groene bonen, wegen, de vlam van de brander, bonen die afkoelen na het branden en Miguel bij de machine.",cafeCta:"Ontdek onze koffies",footerSlogan:"Koffie, kleur en zorg in het hart van Plateau.",footerHours:"Openingstijden & locatie",footerContact:"Contact"}
 };
 const LANGS=[["pt","PT"],["en","EN"],["fr","FR"],["de","DE"],["nl","NL"]];
 let LANG="pt";
@@ -2784,6 +2882,15 @@ function buildBestsellers(){
    <button class="best-add" type="button" ${blocked?"disabled":`onclick="pick(${f.ci},${f.ii})"`} aria-label="+ ${esc(td(f.item.n))}">+</button></div>
   </article>`;
  }).join("");
+}
+/* O NOSSO CAFÉ: «Explorar os nossos cafés» leva à categoria das bebidas quentes (espresso, latte, cappuccino…),
+   procurada pela chave "c_quentes" — a ordem das categorias pode mudar no /admin. Sem ela, fica o salto para o menu. */
+function irCafes(ev){
+ const ci=MENU.findIndex(c=>c.tk==="c_quentes");
+ const e=ci<0?null:alvoCat(ci);
+ if(!e || e.offsetParent===null) return;
+ if(ev) ev.preventDefault();
+ irPara(e.id);
 }
 function scrollHome(id){const e=$(id);if(e)e.scrollIntoView({behavior:"smooth",block:"start"});}
 function scrollCategory(ci){const e=alvoCat(ci);if(e)e.scrollIntoView({behavior:"smooth",block:"start"});}
@@ -4588,6 +4695,7 @@ function traduzir(){
  // textos fixos marcados com data-i18n
  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.innerHTML=t(el.dataset.i18n); });
  document.querySelectorAll("[data-home-i18n]").forEach(el=>{ el.textContent=ht(el.dataset.homeI18n); });
+ document.querySelectorAll("[data-home-i18n-alt]").forEach(el=>{ el.alt=ht(el.dataset.homeI18nAlt); });
  if(typeof _capaPronta!=="undefined" && _capaPronta){ desenharCapa(false); capaMedir(); }
  // campos de texto
  const ph=[["fName","nomeph"],["fAddr","moradaph"],["fNotes","notasph"],["fPromo","promoph"],["fZona","zonaph"]];
@@ -5048,6 +5156,24 @@ async function menuPDF(ev){
 }
 </script>
 <!-- 16-11-2026: conta de cliente e cartão de bebidas -->
+<script>
+/* O NOSSO CAFÉ — filme: só começa (e só é descarregado) quando o visitante toca na capa.
+   Enquanto o filme toca, a música ambiente do site fica calada; volta quando o filme pára. */
+(function(){
+ var v=document.getElementById("cafeVideo"), b=document.getElementById("cafePlay"), m=document.getElementById("bgm");
+ if(!v||!b) return;
+ b.addEventListener("click",function(){
+  b.hidden=true; v.controls=true;
+  try{ var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
+  try{ v.focus({preventScroll:true}); }catch(e){}
+ });
+ function calar(sim){ if(m) m.muted=sim; }
+ v.addEventListener("play",function(){ calar(true); });
+ v.addEventListener("pause",function(){ calar(false); });
+ v.addEventListener("ended",function(){ calar(false); });
+ v.addEventListener("error",function(){ calar(false); },true);
+})();
+</script>
 <script src="conta.js"></script>
 <script src="cartao.js"></script>
 </body>
