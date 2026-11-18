@@ -492,6 +492,9 @@ textarea.fld{min-height:74px;resize:vertical;}
  font-style:normal;font-size:11.5px;font-weight:600;letter-spacing:0;}
 .acai-h em{font-style:normal;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap;background:#EAF2E4;color:#2E6B32;}
 .acai-h em.pago{background:#F1EAF0;color:#4A2545;}
+/* 18-11-2026: molho das saladas — aviso quando falta escolher */
+.chips.molho.falta{outline:2px solid #B3261E;outline-offset:4px;border-radius:14px;}
+.molho-av{color:#B3261E;font-weight:600;}
 /* escolhas em grelha: alvos grandes e alinhados */
 .opttop.g2,.opttop.g3{display:grid;gap:8px;}
 .opttop.g2{grid-template-columns:1fr 1fr;}
@@ -3150,6 +3153,21 @@ function exLimparCarrinho(){
 
 /* ---------- ESCOLHA DE OPÇÕES ---------- */
 let cur=null;
+/* 18-11-2026: MOLHO DAS SALADAS — grátis, escolha obrigatória entre os dois molhos ou «sem molho».
+   Vale para todos os produtos cujo nome começa por «Salada» (também os criados na Gestão).
+   Os nomes vão sempre em PT para o pedido (cozinha/WhatsApp); sem vírgulas, porque a cozinha separa os detalhes por vírgula.
+   Mudar também em /vendas (MOLHOS_SALADA). */
+const MOLHOS_SALADA=["Mostarda e mel","Iogurte natural com maionese e mostarda","Sem molho"];
+const temMolho=i=>!!i && /^salada/i.test(String(i.n||""));
+const MOLHO_TX={
+ pt:{lbl:"Molho · grátis",esc:"Escolha o molho (ou «sem molho»).",m:["Mostarda e mel","Iogurte natural com maionese e mostarda","Sem molho"]},
+ en:{lbl:"Dressing · free",esc:"Choose the dressing (or “no dressing”).",m:["Honey mustard","Plain yogurt with mayonnaise and mustard","No dressing"]},
+ fr:{lbl:"Sauce · offerte",esc:"Choisissez la sauce (ou « sans sauce »).",m:["Moutarde et miel","Yaourt nature, mayonnaise et moutarde","Sans sauce"]},
+ de:{lbl:"Dressing · gratis",esc:"Wählen Sie das Dressing (oder „ohne Dressing“).",m:["Senf und Honig","Naturjoghurt mit Mayonnaise und Senf","Ohne Dressing"]},
+ nl:{lbl:"Dressing · gratis",esc:"Kies de dressing (of ‘zonder dressing’).",m:["Mosterd en honing","Naturel yoghurt met mayonaise en mosterd","Zonder dressing"]}};
+const molhoTx=()=>MOLHO_TX[LANG]||MOLHO_TX.pt;
+function setMolho(k,el){ cur.molho=MOLHOS_SALADA[k]; el.parentNode.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel")); el.classList.add("sel");
+ const g=$("molhoC"); if(g) g.classList.remove("falta"); const a=$("molhoAv"); if(a) a.hidden=true; }
 function pick(ci,ii){
  const c=MENU[ci], i=c.items[ii];
  mtrTag("produto_visto",i.n); mtr("ver_produto");
@@ -3157,7 +3175,7 @@ function pick(ci,ii){
     e um xarope esgotado entra logo como "sem" (o cliente não o pode escolher) */
  cur={cat:c,item:i,size:i.g?"M":null,milk:"Normal",extras:[],
       sem:(i.sem?i.sem.filter(s=>exOff("sem",s)):[]),
-      top:(i.top?i.base.filter(s=>!exOff("acai",s)):[]),xt:[]};
+      top:(i.top?i.base.filter(s=>!exOff("acai",s)):[]),xt:[],molho:null};
  $("optAdd").textContent=t("adicionar");
  $("optSheet").classList.toggle("acai",!!i.top);
  const topo=$("optTop"), nomeEl=$("optName"), descEl=$("optDesc");   // desfaz o topo com foto do açaí
@@ -3185,6 +3203,10 @@ function pick(ci,ii){
     return `<button class="chip tl${fo?" out esg":" sel"}" ${fo?'disabled aria-disabled="true"':`onclick="tglSem('${s.replace(/'/g,"\\'")}',this)"`}>${td(s)}${fo?esg:""}</button>`;
    }).join("")+
    `</div><div class="semnota">${i._baun?t("baunNota"):t("semnota")}</div>`;
+ if(temMolho(i)){ const mt=molhoTx();
+  h+=`<div class="lbl">${mt.lbl}</div><div class="chips molho" id="molhoC">`+
+   MOLHOS_SALADA.map((m,k)=>`<button class="chip tl" onclick="setMolho(${k},this)">${mt.m[k]}</button>`).join("")+
+   `</div><div class="semnota molho-av" id="molhoAv" hidden>${mt.esc}</div>`; }
  if(i.top) h+=acaiHTML(i);
  $("optBody").innerHTML=h;
  if(i.top){ acaiTopo(i); precoAcai(); }
@@ -3212,13 +3234,13 @@ const ACAI_K={p:"Açaí · com granola e/ou leite em pó",sp:"Açaí · sem gran
    Com só um dos dois esgotado não há nada a fazer: o cliente escolhe o outro e fica em i.p. */
 function acaiBaseToda(i){ return !!i.base && i.base.length>0 && i.base.every(s=>exOff("acai",s)); }
 /* ---- GRANOLA DUBAI (07-11-2026) ----
-   Topping especial do açaí, com preço próprio (+150, não os +50 dos outros toppings), mostrado a
+   Topping especial do açaí, com preço próprio (+100 desde 18-11-2026, antes +150; não os +50 dos outros toppings), mostrado a
    dourado e a brilhar. Vai na lista dos toppings extra (cur.xt / meta.xt), por isso esgotados
    (@x:acaix:Granola Dubai), carrinho, "repetir pedido" e descontos funcionam como nos outros.
    granola:true → conta como granola para o preço do copo: com ela o açaí fica no nível de baixo
    (i.p), porque leva granola e não mais polpa. O preço está aqui no código (não no /admin),
    igual nas /vendas (ACAI_PREMIUM). */
-const ACAI_PREMIUM=[{n:"Granola Dubai",p:150,granola:true,
+const ACAI_PREMIUM=[{n:"Granola Dubai",p:100,granola:true,
  d:{pt:"granola + pistácios + chocolate + matcha",en:"granola + pistachios + chocolate + matcha",
     fr:"granola + pistaches + chocolat + matcha",de:"Granola + Pistazien + Schokolade + Matcha",
     nl:"granola + pistaches + chocolade + matcha"}}];
@@ -3317,12 +3339,16 @@ function tglEx(n,v,el){
 }
 function confirmAdd(){
  const i=cur.item;
+ if(temMolho(i) && !cur.molho){   // 18-11-2026: o molho escolhe-se sempre (um dos dois ou «sem molho»)
+  const g=$("molhoC"), a=$("molhoAv"); if(g){ g.classList.add("falta"); g.scrollIntoView({behavior:"smooth",block:"center"}); } if(a) a.hidden=false; return; }
  let price=(cur.size==="G")?i.g:(i.top?precoAcaiDe(i,cur.top,cur.xt):i.p), opts=[];
  if(cur.size) opts.push(cur.size==="G"?"Grande":"Médio");   // sempre PT: vai para o WhatsApp
  if(cur.cat.milk&&!cur.item.nm&&cur.milk!=="Normal"){const m=LEITES.find(l=>l[0]===cur.milk);price+=m[1];opts.push("leite "+cur.milk.toLowerCase());}
  cur.extras.forEach(e=>{price+=e[1];opts.push(e[0].toLowerCase());});
  cur.sem.forEach(s=>opts.push("sem "+s.toLowerCase()));
+ if(temMolho(i) && cur.molho) opts.push(cur.molho==="Sem molho"?"sem molho":"molho "+cur.molho.toLowerCase());
  const meta={size:cur.size,milk:(cur.cat.milk&&!i.nm)?cur.milk:null,extras:cur.extras.map(e=>e[0])};
+ if(temMolho(i) && cur.molho) meta.molho=cur.molho;
  if(cur.sem.length) meta.sem=cur.sem.slice();
  if(i.top){ opts=optsAcai(i,cur.top,cur.xt); meta.top=cur.top.slice(); meta.xt=cur.xt.slice(); }
  addToCart(i.n,price,opts,i.nd,meta,cur.cat.cat,(i.pt!=null?i.pt:cur.cat.pt));

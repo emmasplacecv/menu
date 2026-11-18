@@ -214,6 +214,8 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .ped li .opt .dt.ltn{border-color:#B9AFA6;color:#6E625A;font-size:14px;font-weight:600;background:#fff;}
 .ped li:has(.com-leite){border-left:6px solid #4A2545;padding-left:10px;}
 .ped li .opt .soacai{padding:3px 10px;border-radius:8px;}
+/* 18-11-2026: molho das saladas em destaque (o «sem molho» fica a vermelho como os outros «sem…») */
+.ped li .opt .dt.mo{background:#E4F1DE;border-color:#2E6B32;color:#1F4D23;text-transform:uppercase;letter-spacing:.3px;}
 .ped li .opt .xtop{padding:2px 9px;border-radius:8px;}
 /* morada e andar: também são detalhes de quem prepara e entrega */
 .ped .mor{font-size:17px;font-weight:600;color:var(--ink);}
@@ -518,6 +520,7 @@ function detalhes(opts){
   return String(opts).split(/\s*,\s*/).filter(Boolean).map(o=>{
     if(/^grande$/i.test(o)) return '<span class="dt gr">GRANDE</span>';
     if(/^leite\s(?!em p|condensado)/i.test(o)) return `<span class="dt lt">🥛 ${esc(o.replace(/^leite\s+/i,"leite de "))}</span>`;
+    if(/^molho\s/i.test(o)) return `<span class="dt mo">🥗 ${esc(o)}</span>`;   // 18-11-2026: molho da salada
     return `<span class="dt${/^sem\s/i.test(o)?" sem":""}">${esc(o)}</span>`;
   }).join("");
 }
@@ -526,7 +529,7 @@ function detalhes(opts){
 function optAcai(opts){
   let h = String(opts).split(/\s*,\s*/).filter(Boolean).map(o=>{
     if(/^SÓ AÇAÍ$/.test(o)) return '<b class="soacai">SÓ AÇAÍ · copo cheio</b>';
-    if(/^Granola Dubai$/i.test(o)) return '<b class="xdubai">✨ GRANOLA DUBAI</b>';   // 07-11-2026: topping especial (+150)
+    if(/^Granola Dubai$/i.test(o)) return '<b class="xdubai">✨ GRANOLA DUBAI</b>';   // 07-11-2026: topping especial (+100)
     const m=o.match(/^topping de (caramelo|chocolate|morango)$/i);
     if(m) return `<b class="xtop">+ topping de ${esc(m[1])}</b>`;
     return `<span class="dt">${esc(o)}</span>`;
@@ -910,7 +913,7 @@ const EX_GRUPOS = [
   { t: "AÇAÍ — o que leva (incluído)", tipo: "acai",
     l: ["Granola", "Leite em pó", "Leite condensado", "Banana", "Morango", "Frutos vermelhos", "Kiwi"] },
   { t: "AÇAÍ — toppings extra (+50)", tipo: "acaix", l: ["Caramelo", "Chocolate", "Morango"] },
-  { t: "AÇAÍ — GRANOLA DUBAI (+150)", tipo: "acaix", l: ["Granola Dubai"] },
+  { t: "AÇAÍ — GRANOLA DUBAI (+100)", tipo: "acaix", l: ["Granola Dubai"] },
   { t: "LEITE À ESCOLHA (+100)", tipo: "leite", l: ["Aveia", "Coco", "Soja", "Amêndoa", "Sem lactose"] },
   { t: "EXTRAS DOS SUMOS (+50)", tipo: "extra", l: ["Gengibre", "Hortelã"] },
   { t: "XAROPES", tipo: "sem", l: ["Xarope de baunilha"] }
