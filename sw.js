@@ -6,7 +6,7 @@
    NÃO mexe nos painéis (/admin, /cozinha, /vendas): têm o seu próprio service worker.
    Os dados do servidor (menu, preços, esgotados) são guardados pela própria página (ver app.js),
    e os envios (pedidos, comprovativos) nunca passam por aqui. */
-const VERSAO = "ep-site-v1";            /* mudar o número sempre que a lista ESSENCIAL mudar */
+const VERSAO = "ep-site-v2";            /* mudar o número sempre que a lista ESSENCIAL mudar */
 const FOTOS = "ep-site-fotos";          /* fotos e letra: cache à parte, limitada */
 const ESSENCIAL = ["/", "/desenho.js", "/app.js", "/app.css", "/movel.js", "/movel.css", "/conta.js", "/conta.css",
   "/cartao.js", "/cartao.css", "/pedidos.js", "/menu-base.json", "/manifest.webmanifest", "/img/logo.webp",
@@ -44,7 +44,12 @@ function redePrimeiro(ev, chaveCache) {
     const daCopia = () => caches.match(chaveCache || req, { ignoreSearch: !chaveCache && req.mode === "navigate" })
       .then(c => c || (req.mode === "navigate" ? caches.match("/") : null));
     const t = setTimeout(() => daCopia().then(c => { if (c && !feito) { feito = true; resolve(c); } }), 6000);
-    fetch(req).then(r => {
+    /* 19-11-2026: pergunta sempre ao site se há versão nova (cache "no-cache": sem isto o telemóvel podia
+       usar durante 10 min a cópia do navegador e mostrar preços antigos depois de uma publicação) */
+    const pedido = req.mode === "navigate"
+      ? new Request(req.url, { cache: "no-cache", credentials: "same-origin" })
+      : new Request(req, { cache: "no-cache" });
+    fetch(pedido).then(r => {
       clearTimeout(t);
       if (r.ok) guardar(VERSAO, chaveCache || req, r);
       if (!feito) { feito = true; resolve(r); }
