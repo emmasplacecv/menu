@@ -1514,6 +1514,9 @@ textarea.fld{min-height:74px;resize:vertical;}
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-2.webp')"></div>
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-3.webp')"></div>
       <div class="hero-slide" style="--px:26%;background-image:url('img/capa-4.webp')"></div>
+      <!-- 19-11-2026: novidades (fotos 4 e 5 da lista CAPA) -->
+      <div class="hero-slide" style="--px:80%;background-image:url('img/capa-5.webp')"></div>
+      <div class="hero-slide" style="--px:80%;background-image:url('img/capa-6.webp')"></div>
     </div>
     <!-- MURAL DOS DESCONTOS: fundo de cor em movimento (só decoração; o texto está no painel, em #capaMural) -->
     <div class="capa-mural on" id="capaMuralFundo" aria-hidden="true">
@@ -1943,7 +1946,9 @@ const MENU=[
 
  {cat:"MATCHA &amp; COCO",tk:"c_matcha",img:"img/cat-matcha.webp",milk:true,pt:3,items:[
   {n:"Iced Matcha Latte",p:400,g:450},{n:"Matcha Crème Frappuccino",p:450,g:500},
-  {n:"Raw Coconut Latte",p:450,g:500},{n:"Iced Caramel Macchiato",d:"com leite de coco",p:450,g:500}]},
+  {n:"Raw Coconut Latte",p:450,g:500},{n:"Iced Caramel Macchiato",d:"com leite de coco",p:450,g:500},
+  /* 19-11-2026: novidade — tamanho único (médio), sem leite (nm) */
+  {n:"Matcha de Maracujá Gasoso",d:"matcha e polpa de maracujá com gás, com gelo · sem leite",p:425,nm:1}]},
 
  {cat:"AÇAÍ &amp; ÁGUA DE COCO",tk:"c_acai",pt:3,note:"Disponibilidade limitada — pode acabar durante o dia",items:[
   /* AÇAÍ — copo de 355 ml, vai sempre cheio. Os preços mudam-se no /admin (separador Menu);
@@ -1958,7 +1963,9 @@ const MENU=[
    top:["Granola","Leite em pó","Banana","Morango","Frutos vermelhos","Kiwi","Leite condensado"]}]},
   /* 07-11-2026: «Água de Coco Grande» saiu do menu (pedido do Miguel) */
 
- {cat:"BEBIDAS FRIAS",tk:"c_frias",img:"img/cat-frias.webp",milk:true,pt:3,items:[{n:"Iced Latte",p:225,g:250},{n:"Café Instantâneo Gelado",p:275,g:300},{n:"Frappé Clássico",p:275,g:300},{n:"Frappé de Chocolate",p:325,g:350},{n:"Frappé de Caramelo",p:350,g:375},{n:"Iced Latte de Caramelo",p:350,g:375},{n:"Iced Mocha",p:350,g:375}]},
+ {cat:"BEBIDAS FRIAS",tk:"c_frias",img:"img/cat-frias.webp",milk:true,pt:3,items:[{n:"Iced Latte",p:225,g:250},{n:"Café Instantâneo Gelado",p:275,g:300},{n:"Frappé Clássico",p:275,g:300},{n:"Frappé de Chocolate",p:325,g:350},{n:"Frappé de Caramelo",p:350,g:375},{n:"Iced Latte de Caramelo",p:350,g:375},{n:"Iced Mocha",p:350,g:375},
+  /* 19-11-2026: novidade — tamanho único; «com»: o que o cliente pode JUNTAR sem pagar (canela) */
+  {n:"Latte Espanhol",d:"espresso, leite e leite condensado, com gelo",p:350,com:["Canela"]}]},
 
  {cat:"SUMOS NATURAIS",tk:"c_sumos",img:"img/cat-sumos.webp",pt:3,extras:[["Gengibre",50],["Hortelã",50]],
   note:"Feitos na hora · tamanho único (473 ml)",items:[{n:"Sumo de Laranja",p:475},{n:"Sumo de Ananás",p:475},{n:"Sumo de Maracujá",p:475}]},
@@ -2533,6 +2540,25 @@ function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LAN
   nl:"* Afbeeldingen ter illustratie. De presentatie kan afwijken."};
  for(const l in N) if(I18N[l]) I18N[l].fotosNota=N[l];
 })();
+/* 19-11-2026: bebidas novas (Matcha de Maracujá Gasoso, Latte Espanhol) e a canela grátis — textos nos 5 idiomas */
+(function(){
+ const K={
+  juntar:{pt:"JUNTAR",en:"ADD",fr:"AJOUTER",de:"DAZU",nl:"TOEVOEGEN"},
+  gratis:{pt:"grátis",en:"free",fr:"offert",de:"gratis",nl:"gratis"},
+  comnota:{pt:"Sem custo. Toca para juntar.",en:"No extra cost. Tap to add.",fr:"Sans supplément. Touchez pour ajouter.",
+   de:"Ohne Aufpreis. Tippen zum Hinzufügen.",nl:"Zonder meerprijs. Tik om toe te voegen."}};
+ const D={
+  "Matcha de Maracujá Gasoso":{en:"Sparkling Passion Fruit Matcha",fr:"Matcha pétillant au fruit de la passion",de:"Prickelnder Maracuja-Matcha",nl:"Bruisende passievrucht-matcha"},
+  "matcha e polpa de maracujá com gás, com gelo · sem leite":{en:"matcha and passion fruit pulp, sparkling, over ice · no milk",
+   fr:"matcha et pulpe de fruit de la passion, pétillant, avec glaçons · sans lait",de:"Matcha und Maracujamark mit Kohlensäure, auf Eis · ohne Milch",
+   nl:"matcha en passievruchtpulp, bruisend, met ijs · zonder melk"},
+  "Latte Espanhol":{en:"Spanish Latte",fr:"Latte espagnol",de:"Spanischer Latte",nl:"Spaanse latte"},
+  "espresso, leite e leite condensado, com gelo":{en:"espresso, milk and condensed milk, over ice",fr:"espresso, lait et lait concentré sucré, avec glaçons",
+   de:"Espresso, Milch und gezuckerte Kondensmilch, auf Eis",nl:"espresso, melk en gecondenseerde melk, met ijs"},
+  "Canela":{en:"Cinnamon",fr:"Cannelle",de:"Zimt",nl:"Kaneel"}};
+ for(const k in K) for(const l in K[k]) if(I18N[l]) I18N[l][k]=K[k][l];
+ for(const n in D) for(const l in D[n]) if(I18N[l]){ I18N[l]._d=I18N[l]._d||{}; I18N[l]._d[n]=D[n][l]; }
+})();
 /* 22-10-2026: nota da baunilha nos milkshakes (incluída, sem custo; pode retirar-se) */
 (function(){
  const N={pt:"O xarope de baunilha está incluído, sem custo. Toca para retirar se não quiseres.",
@@ -2906,7 +2932,7 @@ function startOrder(){scrollHome("como-encomendar");}
    Produto sem foto nesta lista (ex.: novo no /admin) mostra o ícone da categoria em vez da foto. */
 const PFOTOS=new Set(["espresso","espresso-duplo","latte-classico","americano","cappuccino","mocha","latte-de-caramelo",
  "iced-matcha-latte","matcha-creme-frappuccino","raw-coconut-latte","iced-caramel-macchiato","acai","agua-de-coco-grande",
- "iced-latte","cafe-instantaneo-gelado","frappe-classico","frappe-de-chocolate","frappe-de-caramelo","iced-latte-de-caramelo","iced-mocha",
+ "iced-latte","cafe-instantaneo-gelado","latte-espanhol","matcha-de-maracuja-gasoso","frappe-classico","frappe-de-chocolate","frappe-de-caramelo","iced-latte-de-caramelo","iced-mocha",
  "sumo-de-laranja","sumo-de-ananas","sumo-de-maracuja",
  "milkshake-de-morango","milkshake-de-frutos-silvestres","milkshake-de-banana-e-morango","milkshake-tropical","milkshake-de-framboesa","milkshake-de-groselha",
  "muffin-de-laranja","muffin-de-chocolate","donut-de-chocolate","donut-de-doce-de-leite",
@@ -3142,6 +3168,7 @@ function exLimparCarrinho(){
     if(m.milk&&m.milk!=="Normal") o.push("leite "+m.milk.toLowerCase());
     (m.extras||[]).forEach(n=>o.push(n.toLowerCase()));
     (m.sem||[]).forEach(s=>o.push("sem "+s.toLowerCase()));
+    (m.com||[]).forEach(s=>o.push("com "+s.toLowerCase()));
     it.opts=o;
    }
   }
@@ -3174,7 +3201,7 @@ function pick(ci,ii){
  /* abre já sem o que acabou hoje: a granola/leite em pó esgotados não vêm marcados,
     e um xarope esgotado entra logo como "sem" (o cliente não o pode escolher) */
  cur={cat:c,item:i,size:i.g?"M":null,milk:"Normal",extras:[],
-      sem:(i.sem?i.sem.filter(s=>exOff("sem",s)):[]),
+      sem:(i.sem?i.sem.filter(s=>exOff("sem",s)):[]), com:[],
       top:(i.top?i.base.filter(s=>!exOff("acai",s)):[]),xt:[],molho:null};
  $("optAdd").textContent=t("adicionar");
  $("optSheet").classList.toggle("acai",!!i.top);
@@ -3207,6 +3234,10 @@ function pick(ci,ii){
   h+=`<div class="lbl">${mt.lbl}</div><div class="chips molho" id="molhoC">`+
    MOLHOS_SALADA.map((m,k)=>`<button class="chip tl" onclick="setMolho(${k},this)">${mt.m[k]}</button>`).join("")+
    `</div><div class="semnota molho-av" id="molhoAv" hidden>${mt.esc}</div>`; }
+ /* 19-11-2026: o que se pode JUNTAR sem pagar (Latte Espanhol: canela). Começa desligado. */
+ if(i.com) h+=`<div class="lbl">${t("juntar")}</div><div class="chips">`+
+   i.com.map(s=>`<button class="chip tl" onclick="tglCom('${s.replace(/'/g,"\\'")}',this)">${td(s)} · ${t("gratis")}</button>`).join("")+
+   `</div><div class="semnota">${t("comnota")}</div>`;
  if(i.top) h+=acaiHTML(i);
  $("optBody").innerHTML=h;
  if(i.top){ acaiTopo(i); precoAcai(); }
@@ -3337,6 +3368,10 @@ function tglEx(n,v,el){
  const k=cur.extras.findIndex(e=>e[0]===n);
  if(k>=0){cur.extras.splice(k,1);el.classList.remove("sel");}else{cur.extras.push([n,v]);el.classList.add("sel");}
 }
+function tglCom(n,el){
+ const k=cur.com.indexOf(n);
+ if(k>=0){ cur.com.splice(k,1); el.classList.remove("sel"); } else { cur.com.push(n); el.classList.add("sel"); }
+}
 function confirmAdd(){
  const i=cur.item;
  if(temMolho(i) && !cur.molho){   // 18-11-2026: o molho escolhe-se sempre (um dos dois ou «sem molho»)
@@ -3347,9 +3382,11 @@ function confirmAdd(){
  cur.extras.forEach(e=>{price+=e[1];opts.push(e[0].toLowerCase());});
  cur.sem.forEach(s=>opts.push("sem "+s.toLowerCase()));
  if(temMolho(i) && cur.molho) opts.push(cur.molho==="Sem molho"?"sem molho":"molho "+cur.molho.toLowerCase());
+ (cur.com||[]).forEach(s=>opts.push("com "+s.toLowerCase()));      // grátis: o preço não muda
  const meta={size:cur.size,milk:(cur.cat.milk&&!i.nm)?cur.milk:null,extras:cur.extras.map(e=>e[0])};
  if(temMolho(i) && cur.molho) meta.molho=cur.molho;
  if(cur.sem.length) meta.sem=cur.sem.slice();
+ if(cur.com&&cur.com.length) meta.com=cur.com.slice();
  if(i.top){ opts=optsAcai(i,cur.top,cur.xt); meta.top=cur.top.slice(); meta.xt=cur.xt.slice(); }
  addToCart(i.n,price,opts,i.nd,meta,cur.cat.cat,(i.pt!=null?i.pt:cur.cat.pt));
  closeAll(); openCart();
@@ -4553,6 +4590,7 @@ function repetirUltimo(){
    if(e){ price+=e[1]; opts.push(en.toLowerCase()); }
   });
   (m.sem||[]).forEach(z=>{ if((f.item.sem||[]).includes(z)) opts.push("sem "+z.toLowerCase()); });
+  (m.com||[]).forEach(z=>{ if((f.item.com||[]).includes(z)) opts.push("com "+z.toLowerCase()); });
   for(let k=0;k<s.q;k++) addToCart(f.item.n, price, opts, f.item.nd, m, f.cat.cat, (f.item.pt!=null?f.item.pt:f.cat.pt));
  });
  if(d.nome) $("fName").value=d.nome;
@@ -4780,7 +4818,11 @@ const CAPA=[
     Vem logo a seguir ao do açaí ("5% no resto do menu"); sem o banner do açaí é o primeiro e diz só "5% nos pedidos online".
     Para o tirar, pôr CAPA_MURAL=false (tira também o do açaí).
     Os números vêm do carrinho (DESC_ONLINE); as frases estão nas chaves mur… (5 idiomas). */
- {mural:true, mais:2500}
+ {mural:true, mais:2500},
+ /* 19-11-2026: NOVIDADES — entram logo a seguir ao banner do açaí (antes do mural dos 5%), cada uma com a sua foto.
+    Saem sozinhas se o produto for retirado ou esgotar. Nas outras línguas: "Novidade!" + o nome do produto. */
+ {prod:"Matcha de Maracujá Gasoso", foto:4, novo:true, a:"«Está calor. Quero algo fresco.»", b:"Novidade: Matcha de Maracujá Gasoso."},
+ {prod:"Latte Espanhol",            foto:5, novo:true, a:"«Gelado, mas diferente.»"  , b:"Novidade: Latte Espanhol. Com canela, se quiseres."}
 ];
 const CAPA_MURAL=true, CAPA_ACAI=true;
 const CAPA_SEG=6500;
@@ -4842,15 +4884,18 @@ function capaDur(i){
  return CAPA_SEG+((CAPA[i]&&CAPA[i].mais)||0);
 }
 function capaLista(){
- const l=[], murs=[];
+ const l=[], murs=[], novos=[];
  CAPA.forEach((c,i)=>{
   if(c.mural){ if(CAPA_MURAL && (c.mural!=="acai" || acaiNaCapa())) murs.push(i); return; }
   const f=findMenuItem(c.prod); if(!f || esgotados.includes(f.item.n)) return;
+  if(c.novo){ novos.push(i); return; }
   if(c.camp){ if(campMostra()) l.unshift(i); return; }
   if(campMostra() && c.prod===CAMP_PROD) return;
   l.push(i);
  });
- const r=murs.concat(l);                                       // os painéis de cor abrem a capa: açaí, depois os 5%
+ /* os painéis de cor abrem a capa: açaí, depois as novidades (19-11-2026), depois os 5% */
+ const ac=murs.filter(i=>CAPA[i].mural==="acai"), outros=murs.filter(i=>CAPA[i].mural!=="acai");
+ const r=ac.concat(novos,outros,l);
  return r.length?r:[0];
 }
 /* texto de uma foto: frase + resposta, ou o quadro da campanha (3 açaís -> 1 grátis · 2 açaís -> 2.º com −50%) */
@@ -4882,8 +4927,8 @@ function capaTexto(i){
    '<div class="cc-l"><b>2</b><span><small>'+ct("ccNoCarr")+'</small><strong>'+ct("ccPct")+'</strong></span></div>'+
    '<p>'+campNotaDia()+ct("ccNota")+'</p>'; }
  }else{
-  $("capaA").textContent = pt ? c.a : ht("heroKicker");
-  $("home-title").textContent = pt ? c.b : ht("heroTitle");
+  $("capaA").textContent = pt ? c.a : (c.novo ? t("novidade") : ht("heroKicker"));
+  $("home-title").textContent = pt ? c.b : (c.novo ? td(c.prod) : ht("heroTitle"));
   if(q){ q.hidden=true; q.innerHTML=""; }
  }
 }

@@ -709,14 +709,14 @@ function migrarNomes(ed){
  if(ed.ord){ e.ord={}; Object.keys(ed.ord).forEach(c=>{ e.ord[c]=[...new Set((ed.ord[c]||[]).map(nomeAtual))]; }); }
  return e;
 }
-const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "sp": 1050, "xp": 50, "ml": 355, "d": "copo 355 ml", "base": ["Granola", "Leite em pó"], "fr": ["Banana", "Morango", "Frutos vermelhos", "Kiwi"], "tp": ["Leite condensado"], "xt": ["Caramelo", "Chocolate", "Morango"], "top": ["Granola", "Leite em pó", "Banana", "Morango", "Frutos vermelhos", "Kiwi", "Leite condensado"]}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 475, "d": "473 ml"}, {"n": "Sumo de Ananás", "m": 475, "d": "473 ml"}, {"n": "Sumo de Maracujá", "m": 475, "d": "473 ml"}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
+const MENU=[["BEBIDAS QUENTES", [{"n": "Espresso", "m": 85}, {"n": "Espresso Duplo", "m": 150}, {"n": "Latte Clássico", "m": 150, "g": 175, "d": "meia de leite"}, {"n": "Americano", "m": 150, "g": 175}, {"n": "Cappuccino", "m": 175, "g": 200}, {"n": "Mocha", "m": 200, "g": 225}, {"n": "Latte de Caramelo", "m": 200, "g": 225}]], ["MATCHA & COCO", [{"n": "Iced Matcha Latte", "m": 400, "g": 450}, {"n": "Matcha Crème Frappuccino", "m": 450, "g": 500}, {"n": "Raw Coconut Latte", "m": 450, "g": 500}, {"n": "Iced Caramel Macchiato", "m": 450, "g": 500, "d": "com leite de coco"}, {"n": "Matcha de Maracujá Gasoso", "m": 425, "d": "matcha e polpa de maracujá com gás, com gelo · sem leite"}]], ["AÇAÍ & ÁGUA DE COCO", [{"n": "Açaí", "m": 950, "sp": 1050, "xp": 50, "ml": 355, "d": "copo 355 ml", "base": ["Granola", "Leite em pó"], "fr": ["Banana", "Morango", "Frutos vermelhos", "Kiwi"], "tp": ["Leite condensado"], "xt": ["Caramelo", "Chocolate", "Morango"], "top": ["Granola", "Leite em pó", "Banana", "Morango", "Frutos vermelhos", "Kiwi", "Leite condensado"]}]], ["BEBIDAS FRIAS", [{"n": "Iced Latte", "m": 225, "g": 250}, {"n": "Café Instantâneo Gelado", "m": 275, "g": 300}, {"n": "Frappé Clássico", "m": 275, "g": 300}, {"n": "Frappé de Chocolate", "m": 325, "g": 350}, {"n": "Frappé de Caramelo", "m": 350, "g": 375}, {"n": "Iced Latte de Caramelo", "m": 350, "g": 375}, {"n": "Iced Mocha", "m": 350, "g": 375}, {"n": "Latte Espanhol", "m": 350, "d": "espresso, leite e leite condensado, com gelo"}]], ["SUMOS NATURAIS", [{"n": "Sumo de Laranja", "m": 475, "d": "473 ml"}, {"n": "Sumo de Ananás", "m": 475, "d": "473 ml"}, {"n": "Sumo de Maracujá", "m": 475, "d": "473 ml"}]], ["DONUTS & MUFFINS", [{"n": "Muffin de Laranja", "m": 125}, {"n": "Muffin de Chocolate", "m": 150}, {"n": "Donut de Chocolate", "m": 150}, {"n": "Donut de Doce de Leite", "m": 150}]], ["MERENDA & PÃO RECHEADO", [{"n": "Merenda Mista", "m": 175, "d": "fiambre, queijo"}, {"n": "Merenda de Chouriço", "m": 175, "d": "chouriço, queijo"}, {"n": "Pão Recheado de Frango", "m": 225, "d": "rúcula, queijo, tomate"}, {"n": "Pão Recheado de Atum", "m": 250, "d": "queijo, tomate"}, {"n": "Pão Recheado Caprese", "m": 225, "d": "queijo, tomate, molho pesto"}]], ["TOSTAS & WRAPS", [{"n": "Tosta com Manteiga", "m": 120}, {"n": "Tosta de Fiambre", "m": 170}, {"n": "Tosta de Queijo", "m": 170}, {"n": "Tosta Mista", "m": 200}, {"n": "Wrap de Frango", "m": 425}, {"n": "Wrap de Atum", "m": 450}]], ["ALMOÇO", [{"n": "Sopa do Dia", "m": 300, "d": "pergunte a opção!"}, {"n": "Salada Fria de Frango", "m": 450, "d": "massa espiral, legumes, molho leve"}, {"n": "Salada Fria de Atum", "m": 475, "d": "massa espiral, legumes, molho leve"}, {"n": "Poke Bowl de Frango", "m": 650}, {"n": "Poke Bowl de Salmão", "m": 700}, {"n": "Poke Bowl de Atum", "m": 725}]]];
 
 /* ---- 16-10-2026: opções iguais às do site (index.html: LEITES, milk/nm, extras, COMBOS) ----
    Os preços dos leites e dos extras estão aqui e no site; os dos combos vêm do /admin. */
 const LEITES=[["Normal",0],["Aveia",100],["Coco",100],["Soja",100],["Amêndoa",100],["Sem lactose",100]];
 /* 22-10-2026: a lista vem da Gestão (ord["__cat:leite"]); sem ela, estas (os milkshakes passam a ter leite à escolha) */
 let CAT_LEITE=["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS","SMOOTHIES/ MILKSHAKE/ BATIDOS"];   // categorias com escolha de leite
-const SEM_LEITE=["Espresso","Espresso Duplo","Americano"];             // nestas não se escolhe leite
+const SEM_LEITE=["Espresso","Espresso Duplo","Americano","Matcha de Maracujá Gasoso"];   // 19-11: o matcha gasoso não leva leite             // nestas não se escolhe leite
 const CAT_EXTRAS={"SUMOS NATURAIS":[["Gengibre",50],["Hortelã",50]]};
 /* 18-11-2026: molho das saladas — grátis, escolha obrigatória (como no site: MOLHOS_SALADA no index.html) */
 const MOLHOS_SALADA=["Mostarda e mel","Iogurte natural com maionese e mostarda","Sem molho"];
@@ -1357,7 +1357,7 @@ function add(ci,ii){
  if(r!==null && r<=0){ alert("Já não há "+i.n+" para hoje."); return; }
  if(i.cb && !comboDisponivel(i.cb)){ alert("Já não há o que este combo leva."); return; }
  if(i.top){ abrirAcai(i); return; }            // açaí: escolher o que leva
- if(i.g || i.cb || temLeite(ci,i) || extrasDe(ci) || temBaun(i) || temMolho(i)){ abrirTamanho(ci,ii); return; }   // escolher tamanho/leite/extras/partes
+ if(i.g || i.cb || temLeite(ci,i) || extrasDe(ci) || temBaun(i) || temMolho(i) || comDe(i).length){ abrirTamanho(ci,ii); return; }   // escolher tamanho/leite/extras/partes
  meter(i.n,i.n,i.m);
 }
 /* ---------- FOLHA DE OPÇÕES (tamanho, leite, extras, partes do combo) ----------
@@ -1373,7 +1373,7 @@ function comboDisponivel(cb){ return !cb.partes || cb.partes.every(p=>opcoesPart
 let opc=null;
 function abrirTamanho(ci,ii){
  const i=MENU[ci][1][ii];
- opc={ci,ii,i,leite:"Normal",ex:[],esc:[],baun:!exOff("sem","Xarope de baunilha"),molho:null};
+ opc={ci,ii,i,leite:"Normal",ex:[],esc:[],com:[],baun:!exOff("sem","Xarope de baunilha"),molho:null};
  if(i.cb && i.cb.partes) opc.esc=i.cb.partes.map(p=>opcoesParte(p).find(disponivel)||null);
  $("tNome").textContent=i.n;
  desenharOpcoesProd();
@@ -1412,6 +1412,12 @@ function desenharOpcoesProd(){
   h+=`<div class="op-grp"><div class="vgrp"><span>Xarope de baunilha</span><em>${fo?"acabou hoje — vai sem":"incluído · toque para retirar"}</em></div><div class="vtops">`+
    bt(fo?"SEM baunilha":(o.baun?"Com baunilha":"SEM baunilha"), !fo&&o.baun, fo?"":"opBaun()", fo?"acabou":"", fo)+`</div></div>`;
  }
+ /* 19-11-2026: o que se junta sem pagar (Latte Espanhol: canela) — igual ao site */
+ const cg=comDe(i);
+ if(cg.length){
+  h+=`<div class="op-grp"><div class="vgrp"><span>Juntar</span><em>grátis · toque para juntar</em></div><div class="vtops">`+
+   cg.map((n,j)=>bt(o.com.includes(n)?"Com "+n.toLowerCase():"Sem "+n.toLowerCase(), o.com.includes(n), `opCom(${j})`, "grátis", false)).join("")+`</div></div>`;
+ }
  const ex=extrasDe(o.ci);
  if(ex){
   h+=`<div class="op-grp"><div class="vgrp"><span>Extras</span><em class="pago">+${ex[0][1]} ECV cada</em></div><div class="vtops">`+
@@ -1432,6 +1438,10 @@ function desenharOpcoesProd(){
 }
 function opLeite(j){ if(!opc) return; opc.leite=LEITES[j][0]; desenharOpcoesProd(); }
 const temBaun=i=>/^milkshake/i.test(i.n)&&!i.cb;
+/* 19-11-2026: grátis, a pedido do cliente (igual ao campo «com» do site) */
+const COM_GRATIS={"Latte Espanhol":["Canela"]};
+const comDe=i=>(i&&!i.cb&&COM_GRATIS[i.n])||[];
+function opCom(j){ if(!opc) return; const n=comDe(opc.i)[j]; if(!n) return; const k=opc.com.indexOf(n); if(k>=0) opc.com.splice(k,1); else opc.com.push(n); desenharOpcoesProd(); }
 function opBaun(){ if(!opc) return; opc.baun=!opc.baun; desenharOpcoesProd(); }
 function opExtra(j){
  if(!opc) return; const n=(extrasDe(opc.ci)||[])[j]; if(!n) return;
@@ -1460,6 +1470,7 @@ function escolherTamanho(sz){
  o.ex.forEach(n=>det.push(n.toLowerCase()));
  if(temBaun(i) && !o.baun) det.push("sem xarope de baunilha");
  if(temMolho(i)){ if(!o.molho) return; det.push(o.molho==="Sem molho"?"sem molho":"molho "+o.molho.toLowerCase()); }
+ (o.com||[]).forEach(n=>det.push("com "+n.toLowerCase()));
  const preco=precoOpc(sz);
  const xk=[].concat(
   (temLeite(o.ci,i)&&o.leite!=="Normal")?[exK("leite",o.leite)]:[],
