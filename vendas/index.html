@@ -718,6 +718,9 @@ const LEITES=[["Normal",0],["Aveia",100],["Coco",100],["Soja",100],["Amêndoa",1
 let CAT_LEITE=["BEBIDAS QUENTES","MATCHA & COCO","BEBIDAS FRIAS","SMOOTHIES/ MILKSHAKE/ BATIDOS"];   // categorias com escolha de leite
 const SEM_LEITE=["Espresso","Espresso Duplo","Americano","Matcha de Maracujá Gasoso"];   // 19-11: o matcha gasoso não leva leite             // nestas não se escolhe leite
 const CAT_EXTRAS={"SUMOS NATURAIS":[["Gengibre",50],["Hortelã",50]]};
+/* 18-11-2026: molho das saladas — grátis, escolha obrigatória (como no site: MOLHOS_SALADA no index.html) */
+const MOLHOS_SALADA=["Mostarda e mel","Iogurte natural com maionese e mostarda","Sem molho"];
+const temMolho=i=>!!i && !i.cb && /^salada/i.test(String(i.n||""));
 /* partes = o que o cliente escolhe em cada combo; serve para a cozinha saber e para descontar o stock */
 const COMBOS_BASE=[
  {n:"PEQUENO-ALMOÇO",d:"espresso + donut ou muffin de chocolate",p:220,partes:[["Espresso"],["Donut de Chocolate","Donut de Doce de Leite","Muffin de Chocolate"]]},
@@ -1354,7 +1357,7 @@ function add(ci,ii){
  if(r!==null && r<=0){ alert("Já não há "+i.n+" para hoje."); return; }
  if(i.cb && !comboDisponivel(i.cb)){ alert("Já não há o que este combo leva."); return; }
  if(i.top){ abrirAcai(i); return; }            // açaí: escolher o que leva
- if(i.g || i.cb || temLeite(ci,i) || extrasDe(ci) || temBaun(i) || comDe(i).length){ abrirTamanho(ci,ii); return; }   // escolher tamanho/leite/extras/partes
+ if(i.g || i.cb || temLeite(ci,i) || extrasDe(ci) || temBaun(i) || temMolho(i) || comDe(i).length){ abrirTamanho(ci,ii); return; }   // escolher tamanho/leite/extras/partes
  meter(i.n,i.n,i.m);
 }
 /* ---------- FOLHA DE OPÇÕES (tamanho, leite, extras, partes do combo) ----------
@@ -1370,7 +1373,7 @@ function comboDisponivel(cb){ return !cb.partes || cb.partes.every(p=>opcoesPart
 let opc=null;
 function abrirTamanho(ci,ii){
  const i=MENU[ci][1][ii];
- opc={ci,ii,i,leite:"Normal",ex:[],esc:[],com:[],baun:!exOff("sem","Xarope de baunilha")};
+ opc={ci,ii,i,leite:"Normal",ex:[],esc:[],com:[],baun:!exOff("sem","Xarope de baunilha"),molho:null};
  if(i.cb && i.cb.partes) opc.esc=i.cb.partes.map(p=>opcoesParte(p).find(disponivel)||null);
  $("tNome").textContent=i.n;
  desenharOpcoesProd();
@@ -1421,12 +1424,17 @@ function desenharOpcoesProd(){
    ex.map(([n,v],j)=>{ const fo=exOff("extra",n);
     return bt(n, !fo&&o.ex.includes(n), fo?"":`opExtra(${j})`, fo?"acabou":"+"+v, fo); }).join("")+`</div></div>`;
  }
+ if(temMolho(i)){
+  h+=`<div class="op-grp"><div class="vgrp"><span>Molho</span><em>grátis</em></div><div class="vtops">`+
+   MOLHOS_SALADA.map((n,j)=>bt(n, o.molho===n, `opMolho(${j})`)).join("")+`</div></div>`;
+ }
  if(i.g) h+=`<div class="vgrp" style="margin:0 0 8px"><span>Tamanho — toque para juntar ao pedido</span></div>`;
  $("tCorpo").innerHTML=h;
+ const semMolho=temMolho(i) && !o.molho;
  const falta=!!(i.cb && i.cb.partes && o.esc.some(x=>!x));
  $("tOps").innerHTML = i.g
   ? [["M","Médio"],["G","Grande"]].map(([sz,nm])=>`<button type="button" data-sz="${sz}" onclick="escolherTamanho('${sz}')"><b>${nm}</b><span>${precoOpc(sz)} ECV</span></button>`).join("")
-  : `<button type="button" class="um" data-sz="M"${falta?" disabled":""} onclick="escolherTamanho('M')"><b>${falta?"Esgotado":"Juntar ao pedido"}</b><span>${precoOpc("M")} ECV</span></button>`;
+  : `<button type="button" class="um" data-sz="M"${(falta||semMolho)?" disabled":""} onclick="escolherTamanho('M')"><b>${falta?"Esgotado":semMolho?"Escolha o molho":"Juntar ao pedido"}</b><span>${precoOpc("M")} ECV</span></button>`;
 }
 function opLeite(j){ if(!opc) return; opc.leite=LEITES[j][0]; desenharOpcoesProd(); }
 const temBaun=i=>/^milkshake/i.test(i.n)&&!i.cb;
@@ -1440,6 +1448,7 @@ function opExtra(j){
  const k=opc.ex.indexOf(n[0]); if(k>=0) opc.ex.splice(k,1); else opc.ex.push(n[0]);
  desenharOpcoesProd();
 }
+function opMolho(j){ if(!opc) return; opc.molho=MOLHOS_SALADA[j]; desenharOpcoesProd(); }
 function opEsc(k,j){ if(!opc||!opc.i.cb) return; opc.esc[k]=opcoesParte(opc.i.cb.partes[k])[j]; desenharOpcoesProd(); }
 function escolherTamanho(sz){
  const o=opc; if(!o) return;
@@ -1460,6 +1469,7 @@ function escolherTamanho(sz){
  if(temLeite(o.ci,i) && o.leite!=="Normal") det.push("leite "+o.leite.toLowerCase());
  o.ex.forEach(n=>det.push(n.toLowerCase()));
  if(temBaun(i) && !o.baun) det.push("sem xarope de baunilha");
+ if(temMolho(i)){ if(!o.molho) return; det.push(o.molho==="Sem molho"?"sem molho":"molho "+o.molho.toLowerCase()); }
  (o.com||[]).forEach(n=>det.push("com "+n.toLowerCase()));
  const preco=precoOpc(sz);
  const xk=[].concat(
@@ -1496,7 +1506,7 @@ let acai=null;
 const vSemBase=i=>!!i.base && i.base.length>0 && i.base.every(s=>exOff("acai",s));
 /* GRANOLA DUBAI (07-11-2026) — igual ao site (ACAI_PREMIUM no index.html): topping especial com preço
    próprio (+150), a dourado. Vai na lista xt; conta como granola para o nível do copo (fica em i.m). */
-const ACAI_PREMIUM=[{n:"Granola Dubai",p:150,granola:true,d:"granola + pistácios + chocolate + matcha"}];
+const ACAI_PREMIUM=[{n:"Granola Dubai",p:100,granola:true,d:"granola + pistácios + chocolate + matcha"}];
 const premDe=s=>ACAI_PREMIUM.find(x=>x.n===s);
 const xtTodos=i=>(i.xt||[]).concat(ACAI_PREMIUM.map(x=>x.n));
 const xpDe=(i,s)=>{ const pr=premDe(s); return pr ? pr.p : i.xp; };

@@ -585,7 +585,7 @@ const EX_GRUPOS=[
  {t:"AÇAÍ — o que leva (incluído)",tipo:"acai",
   l:["Granola","Leite em pó","Leite condensado","Banana","Morango","Frutos vermelhos","Kiwi"]},
  {t:"AÇAÍ — toppings extra (+50)",tipo:"acaix",l:["Caramelo","Chocolate","Morango"]},
- {t:"AÇAÍ — GRANOLA DUBAI (+150)",tipo:"acaix",l:["Granola Dubai"]},
+ {t:"AÇAÍ — GRANOLA DUBAI (+100)",tipo:"acaix",l:["Granola Dubai"]},
  {t:"LEITE À ESCOLHA (+100)",tipo:"leite",l:["Aveia","Coco","Soja","Amêndoa","Sem lactose"]},
  {t:"EXTRAS DOS SUMOS (+50)",tipo:"extra",l:["Gengibre","Hortelã"]},
  {t:"XAROPES",tipo:"sem",l:["Xarope de baunilha"]}
@@ -1660,10 +1660,9 @@ function hDiasPedidos(){
 }
 function hisAbrir(){
  hLimpar();
- /* uma vez por aparelho: pede ao servidor que regrave com os prazos novos o que foi guardado antes */
- try{ if(localStorage.getItem("ep_renovado")!=="2")
-  fetch(PROMO_API+"/renovar?key="+encodeURIComponent(KEY)).then(r=>r.json()).then(d=>{ if(d&&d.ok) localStorage.setItem("ep_renovado","2"); }).catch(()=>{});
- }catch(e){}
+ /* 18-11-2026: deixou de chamar /renovar. Era para uma só vez (14-10); se falhasse, repetia em cada abertura do
+    Histórico e regravava centenas de comprovativos — gastava as 1000 gravações por dia do plano gratuito da
+    Cloudflare, e a seguir as gravações da Gestão (menu, stock, esgotados) falhavam até às 23:00. */
  hisCopiaAviso();
  if(!hist.lido) hisCarregar();
 }
