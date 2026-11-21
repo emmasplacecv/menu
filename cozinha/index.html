@@ -132,6 +132,8 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
 .sbeb{margin:28px 0 0;padding:10px 12px;border-radius:12px;background:var(--dark);color:#F7F1E4;font-size:13px;font-weight:600;letter-spacing:.5px;}
 .scat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:18px 0 7px;}
 /* 03-11-2026: separador da lista dos extras */
+.exir{display:block;width:100%;margin:2px 0 10px;padding:11px 12px;border-radius:12px;border:1px dashed #4A2545;
+ background:transparent;color:#4A2545;font:inherit;font-size:13.5px;font-weight:600;text-align:left;cursor:pointer;}
 .exsep{margin:34px 0 0;padding:11px 12px;border-radius:12px;background:#4A2545;color:#F7F1E4;font-size:13px;font-weight:600;letter-spacing:.5px;}
 .buscabox{position:relative;margin-bottom:11px;}
 .buscabox input{width:100%;padding:12px 38px 12px 14px;border:1px solid var(--line);border-radius:11px;
@@ -280,10 +282,11 @@ h1{font-family:'Playfair Display',serif;font-size:24px;letter-spacing:-.2px;}
       <input class="fld" id="fBuscaStk" placeholder="Pesquisar produto…" oninput="pesquisarStk(this.value)">
       <button onclick="limparBuscaStk()" aria-label="Limpar pesquisa">×</button>
     </div>
+    <button type="button" class="exir" onclick="document.getElementById('exAncora').scrollIntoView({behavior:'smooth',block:'start'})">Extras (leites, toppings, molhos, canela…) ↓</button>
     <div id="stockLista"></div>
-    <div class="exsep">Extras — só TEM / ACABOU</div>
+    <div class="exsep" id="exAncora">Extras — só TEM / ACABOU</div>
     <div class="avisoStk">
-      Toppings, fruta, leites, xaropes e extras dos sumos. Em <b>ACABOU</b>, o extra fica
+      Toppings, fruta, leites, xaropes, extras dos sumos, molhos das saladas e canela. Em <b>ACABOU</b>, o extra fica
       <b>bloqueado no site e nas Vendas</b> e ninguém o pode escolher. Volta sozinho ao
       <b>TEM</b> à meia-noite, como os produtos.
     </div>
@@ -908,7 +911,8 @@ function desenharStock(){
    O site e as /vendas lêem as mesmas chaves e bloqueiam o extra.
    >>> QUANDO SE ACRESCENTA UM EXTRA NOVO AO MENU, acrescenta-se aqui também (e no site
        e nas /vendas, que geram a chave a partir dos seus próprios dados). <<<
-   tipos: acai (vai incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes) */
+   tipos: acai (vai incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes)
+   · com (o que se junta grátis: canela) · molho (saladas) */
 const EX_PRE = "@x:";
 const exK = (tipo, nome) => EX_PRE + tipo + ":" + nome;
 const EX_GRUPOS = [
@@ -918,7 +922,11 @@ const EX_GRUPOS = [
   { t: "AÇAÍ — GRANOLA DUBAI (+100)", tipo: "acaix", l: ["Granola Dubai"] },
   { t: "LEITE À ESCOLHA (+100)", tipo: "leite", l: ["Aveia", "Coco", "Soja", "Amêndoa", "Sem lactose"] },
   { t: "EXTRAS DOS SUMOS (+50)", tipo: "extra", l: ["Gengibre", "Hortelã"] },
-  { t: "XAROPES", tipo: "sem", l: ["Xarope de baunilha"] }
+  { t: "XAROPES", tipo: "sem", l: ["Xarope de baunilha"] },
+  /* 21-11-2026: canela do Latte Espanhol e molhos das saladas (grátis). Os dois molhos em ACABOU = salada «sem molho».
+     O molho de iogurte guarda-se com o nome curto (igual na Gestão, no site e nas /vendas). */
+  { t: "LATTE ESPANHOL — canela (grátis)", tipo: "com", l: ["Canela"] },
+  { t: "SALADAS — molho (grátis)", tipo: "molho", l: ["Mostarda e mel", "Iogurte com maionese"] }
 ];
 function desenharExtras(){
   const alvo = document.getElementById("extrasLista");

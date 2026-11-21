@@ -3111,6 +3111,7 @@ function build(){
    produtos (/soldout), com a chave "@x:<tipo>:<nome>" — por isso repõe-se sozinha à
    meia-noite exactamente como os produtos, e não foi preciso mexer no servidor.
    tipos: acai (vai incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes)
+   · com (o que se junta grátis: canela) · molho (saladas, nome curto em MOLHO_CHAVE)
    ============================================================ */
 const EX_PRE="@x:";
 const exK=(tipo,nome)=>EX_PRE+tipo+":"+nome;
@@ -3139,6 +3140,8 @@ function exDoItem(it){
  (m.extras||[]).forEach(n=>k.push(exK("extra",n)));
  (m.top||[]).forEach(n=>k.push(exK("acai",n)));
  (m.xt||[]).forEach(n=>k.push(exK("acaix",n)));
+ if(m.molho && m.molho!=="Sem molho") k.push(exK("molho",MOLHO_CHAVE[m.molho]||m.molho));
+ (m.com||[]).forEach(n=>k.push(exK("com",n)));
  return k;
 }
 function exForaNoCarrinho(){
@@ -3160,6 +3163,9 @@ function exLimparCarrinho(){
    m.top.filter(n=>exOff("acai",n)).forEach(n=>f.push(n)); m.top=fica; }
   if(m.xt){ const fica=m.xt.filter(n=>!exOff("acaix",n));
    m.xt.filter(n=>exOff("acaix",n)).forEach(n=>f.push(n)); m.xt=fica; }
+  if(m.molho && molhoOff(m.molho)){ f.push(m.molho); m.molho="Sem molho"; }      // 21-11-2026: molho acabado → sem molho
+  if(m.com&&m.com.length){ const fica=m.com.filter(n=>!exOff("com",n));
+   m.com.filter(n=>exOff("com",n)).forEach(n=>f.push(n)); m.com=fica; }
   if(!f.length) return;
   const fm=findMenuItem(it.name);
   if(fm){
@@ -3178,6 +3184,7 @@ function exLimparCarrinho(){
     if(m.milk&&m.milk!=="Normal") o.push("leite "+m.milk.toLowerCase());
     (m.extras||[]).forEach(n=>o.push(n.toLowerCase()));
     (m.sem||[]).forEach(s=>o.push("sem "+s.toLowerCase()));
+    if(m.molho) o.push(m.molho==="Sem molho"?"sem molho":"molho "+m.molho.toLowerCase());
     (m.com||[]).forEach(s=>o.push("com "+s.toLowerCase()));
     it.opts=o;
    }
@@ -3196,6 +3203,11 @@ let cur=null;
    Mudar também em /vendas (MOLHOS_SALADA). */
 const MOLHOS_SALADA=["Mostarda e mel","Iogurte natural com maionese e mostarda","Sem molho"];
 const temMolho=i=>!!i && /^salada/i.test(String(i.n||""));
+/* 21-11-2026: a Gestão e a Cozinha podem marcar cada molho como ACABOU (chave "@x:molho:<nome curto>").
+   Com os dois esgotados, a salada abre já com «sem molho». */
+const MOLHO_CHAVE={"Mostarda e mel":"Mostarda e mel","Iogurte natural com maionese e mostarda":"Iogurte com maionese"};
+const molhoOff=m=>m!=="Sem molho" && exOff("molho",MOLHO_CHAVE[m]||m);
+const molhosTodosOff=()=>MOLHOS_SALADA.filter(m=>m!=="Sem molho").every(molhoOff);
 const MOLHO_TX={
  pt:{lbl:"Molho · grátis",esc:"Escolha o molho (ou «sem molho»).",m:["Mostarda e mel","Iogurte natural com maionese e mostarda","Sem molho"]},
  en:{lbl:"Dressing · free",esc:"Choose the dressing (or “no dressing”).",m:["Honey mustard","Plain yogurt with mayonnaise and mustard","No dressing"]},
@@ -3212,7 +3224,7 @@ function pick(ci,ii){
     e um xarope esgotado entra logo como "sem" (o cliente não o pode escolher) */
  cur={cat:c,item:i,size:i.g?"M":null,milk:"Normal",extras:[],
       sem:(i.sem?i.sem.filter(s=>exOff("sem",s)):[]), com:[],
-      top:(i.top?i.base.filter(s=>!exOff("acai",s)):[]),xt:[],molho:null};
+      top:(i.top?i.base.filter(s=>!exOff("acai",s)):[]),xt:[],molho:(temMolho(i)&&molhosTodosOff())?"Sem molho":null};
  $("optAdd").textContent=t("adicionar");
  $("optSheet").classList.toggle("acai",!!i.top);
  const topo=$("optTop"), nomeEl=$("optName"), descEl=$("optDesc");   // desfaz o topo com foto do açaí
@@ -3242,11 +3254,15 @@ function pick(ci,ii){
    `</div><div class="semnota">${i._baun?t("baunNota"):t("semnota")}</div>`;
  if(temMolho(i)){ const mt=molhoTx();
   h+=`<div class="lbl">${mt.lbl}</div><div class="chips molho" id="molhoC">`+
-   MOLHOS_SALADA.map((m,k)=>`<button class="chip tl" onclick="setMolho(${k},this)">${mt.m[k]}</button>`).join("")+
+   MOLHOS_SALADA.map((m,k)=>{ const fo=molhoOff(m), on=cur.molho===m;
+    return `<button class="chip tl${on?" sel":""}${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="setMolho(${k},this)"`}>${mt.m[k]}${fo?esg:""}</button>`;
+   }).join("")+
    `</div><div class="semnota molho-av" id="molhoAv" hidden>${mt.esc}</div>`; }
  /* 19-11-2026: o que se pode JUNTAR sem pagar (Latte Espanhol: canela). Começa desligado. */
  if(i.com) h+=`<div class="lbl">${t("juntar")}</div><div class="chips">`+
-   i.com.map(s=>`<button class="chip tl" onclick="tglCom('${s.replace(/'/g,"\\'")}',this)">${td(s)} · ${t("gratis")}</button>`).join("")+
+   i.com.map(s=>{ const fo=exOff("com",s);
+    return `<button class="chip tl${fo?" esg":""}" ${fo?'disabled aria-disabled="true"':`onclick="tglCom('${s.replace(/'/g,"\\'")}',this)"`}>${td(s)} · ${t("gratis")}${fo?esg:""}</button>`;
+   }).join("")+
    `</div><div class="semnota">${t("comnota")}</div>`;
  if(i.top) h+=acaiHTML(i);
  $("optBody").innerHTML=h;
