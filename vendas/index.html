@@ -207,6 +207,10 @@ h1{font-size:19px;letter-spacing:.5px;}
 .prod b{font-size:13.5px;font-weight:700;line-height:1.25;color:var(--ink);}
 .prod>span.preco{font-size:13.5px;color:var(--verde2);font-weight:700;margin-top:1px;}
 .prod.fora{opacity:.4;pointer-events:none;}
+/* 23-11-2026: sigla do produto (pesquisa rápida), discreta no canto de baixo */
+.prod .sig{position:absolute;right:10px;bottom:8px;font-size:10.5px;font-weight:700;letter-spacing:1.2px;
+ color:var(--ink2);opacity:.55;line-height:1;pointer-events:none;}
+.prod .sig.hit{opacity:1;color:var(--verde2);}
 .prod .g{font-size:11px;color:var(--ink2);font-weight:400;}
 .prod .stk{font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:2px 7px;border-radius:20px;
  background:var(--cream);margin-top:1px;}
@@ -621,7 +625,7 @@ details.hv .hb ul{margin:4px 0 8px 18px;}
   <div class="box" id="boxProd">
     <input class="fld" id="fNome" placeholder="Nome do cliente (opcional)" onchange="guardarNome(this.value)">
     <div class="buscabox" id="buscabox" style="margin-top:12px">
-      <input class="fld" id="fBusca" placeholder="Pesquisar produto…" oninput="pesquisar(this.value)">
+      <input class="fld" id="fBusca" placeholder="Pesquisar produto ou sigla (ex.: PRF)…" oninput="pesquisar(this.value)" autocapitalize="off" autocorrect="off" spellcheck="false">
       <button onclick="limparBusca()" aria-label="Limpar pesquisa">×</button>
     </div>
     <div class="rapidos" id="rapidos" aria-label="Venda rápida"></div>
@@ -1132,6 +1136,59 @@ function guardarNome(v){ balcoes[activo].nome=v.trim(); guardar(); desenharTabs(
 /* pesquisa sem distinguir acentos ou maiúsculas: "acai" encontra "Açaí" */
 function normalizar(s){ return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
 
+/* 23-11-2026: PESQUISA POR SIGLA, em paralelo com a pesquisa pelo nome (que fica igual).
+   «PRF» encontra «Pão Recheado de Frango». Cada produto tem uma sigla única, que aparece no cartão:
+   - as iniciais das palavras, sem «de», «com», «e»… (Pão Recheado de Frango = PRF; Espresso, uma palavra = ES);
+   - se duas coincidem, junta-se a letra seguinte da última palavra (os três Frappés = FCL, FCH, FCA)
+     ou, se não chegar, da primeira e depois das do meio (Muffin de Chocolate / Merenda de Chouriço = MUC / MEC;
+     Combo Sopa e Pão / Combo Salada e Pão = CSOP / CSAP).
+   Também aceita siglas «à mão» que sigam o nome por ordem: FPC (FraPpé de Chocolate), PRDF, SFF…
+   Ordem dos resultados: sigla exacta, depois siglas que começam pelo que se escreveu, depois o resto. */
+const SIG_PEQ=new Set(["de","do","da","dos","das","com","e","a","o","ao","em","no","na"]);
+function sigPalavras(n){
+ const w=normalizar(n).split(/[^a-z0-9]+/).filter(Boolean), s=w.filter(x=>!SIG_PEQ.has(x));
+ return s.length?s:w;
+}
+function sigCom(p,ext){   // ext = {i: palavra que ganha letras, k: quantas a mais}
+ if(p.length===1) return p[0].slice(0,2+(ext?ext.k:0));
+ return p.map((x,j)=>x.slice(0,1+(ext&&ext.i===j?ext.k:0))).join("");
+}
+let _sig={chave:null,m:new Map()};
+function siglas(){
+ const nomes=[]; MENU.forEach(c=>c[1].forEach(i=>{ if(!nomes.includes(i.n)) nomes.push(i.n); }));
+ const chave=nomes.join("|"); if(chave===_sig.chave) return _sig.m;
+ const pal=new Map(nomes.map(n=>[n,sigPalavras(n)])), m=new Map(), grupos=new Map();
+ nomes.forEach(n=>{ const b=sigCom(pal.get(n)); m.set(n,b); if(!grupos.has(b)) grupos.set(b,[]); grupos.get(b).push(n); });
+ const ocup=new Set(); grupos.forEach((g,b)=>{ if(g.length===1) ocup.add(b); });
+ grupos.forEach((g,b)=>{
+  if(g.length<2) return;
+  let feito=false;
+  const nPal=Math.max(...g.map(n=>pal.get(n).length));
+  const ordem=[-1,0]; for(let j=1;j<nPal-1;j++) ordem.push(j);       // última palavra, primeira, depois as do meio
+  for(let k=1;k<=4 && !feito;k++) for(const qual of ordem){
+   const nv=g.map(n=>{ const p=pal.get(n); return sigCom(p,{i:qual<0?p.length-1:Math.min(qual,p.length-1),k}); });
+   if(new Set(nv).size===g.length && nv.every(x=>!ocup.has(x))){ g.forEach((n,j)=>{ m.set(n,nv[j]); ocup.add(nv[j]); }); feito=true; break; }
+  }
+  if(!feito) g.forEach((n,j)=>{ let x=b+(j+1); while(ocup.has(x)) x+="x"; m.set(n,x); ocup.add(x); });
+ });
+ _sig={chave,m}; return m;
+}
+/* a sigla escrita segue o nome por ordem? cada letra é o início de uma palavra ou continua a palavra anterior;
+   a primeira letra é sempre a da primeira palavra (FPC → FraPpé de Chocolate) */
+function sigCasa(q,n){
+ const w=normalizar(n).split(/[^a-z0-9]+/).filter(Boolean);
+ if(!w.length || w[0][0]!==q[0]) return false;
+ const ir=(qi,wi,pos)=>{
+  if(qi===q.length) return true;
+  const c=q[qi];
+  for(let p=pos;p<w[wi].length;p++) if(w[wi][p]===c && ir(qi+1,wi,p+1)) return true;
+  for(let j=wi+1;j<w.length;j++) if(w[j][0]===c && ir(qi+1,j,1)) return true;
+  return false;
+ };
+ return ir(1,0,1);
+}
+const ehSigla=q=>/^[a-z]{2,6}$/.test(q);
+
 let busca="";
 function pesquisar(v){
  busca=normalizar(v.trim());
@@ -1195,11 +1252,14 @@ function fimDeslizar(){
    de todo o menu, cada um com a categoria a que pertence */
 function produtosAMostrar(){
  if(!busca) return MENU[cat][1].map((i,k)=>({ci:cat, ii:k, item:i}));
- const out=[];
+ const out=[], sg=ehSigla(busca)?siglas():null;
  MENU.forEach((c,ci)=>{ c[1].forEach((i,ii)=>{
-  if(normalizar(i.n).includes(busca)) out.push({ci, ii, item:i, catNome:c[0]});
+  let r=-1;
+  if(sg){ const x=sg.get(i.n)||""; if(x===busca) r=0; else if(x.startsWith(busca)) r=1; else if(sigCasa(busca,i.n)) r=2; }
+  if(r<0 && normalizar(i.n).includes(busca)) r=2;                 // pesquisa pelo nome, como sempre
+  if(r>=0) out.push({ci, ii, item:i, catNome:c[0], r, o:out.length});
  }); });
- return out;
+ return out.sort((a,b)=>a.r-b.r||a.o-b.o);
 }
 
 function qtdNoPedido(nome){
@@ -1315,8 +1375,9 @@ function cartaoProduto(ci,ii,i,catNome){
  const q=balcoes[activo].itens.filter(v=>(v.base||v.nome)===i.n).reduce((t,v)=>t+v.q,0);
  const badge=q>0?`<span class="qtd-badge">${q}</span>`:"";
  const tira=q>0?`<button type="button" class="tira" onclick="tirarUm(${ci},${ii})" aria-label="Retirar ${esc(i.n)} do pedido">${IC_X}</button>`:"";
+ const sx=(siglas().get(i.n)||""), sgl=sx?`<span class="sig${busca&&ehSigla(busca)&&sx.startsWith(busca)?" hit":""}" aria-hidden="true">${esc(sx.toUpperCase())}</span>`:"";
  return `<div class="pw"><button class="prod${fora?" fora":""}${q>0?" sel":""}" onclick="add(${ci},${ii})">
-  ${badge}${cat}<b>${esc(i.n)}</b>${i.cb&&i.d?`<span class="cbd">${esc(i.d)}</span>`:""}<span class="preco">${preco} ECV</span>${stk}</button>${tira}</div>`;
+  ${badge}${cat}<b>${esc(i.n)}</b>${i.cb&&i.d?`<span class="cbd">${esc(i.d)}</span>`:""}<span class="preco">${preco} ECV</span>${stk}${sgl}</button>${tira}</div>`;
 }
 /* X do cartão: tira uma unidade (a última linha desse produto — tamanho ou açaí escolhido por último).
    Quando chega a zero, o cartão deixa de estar seleccionado. */
