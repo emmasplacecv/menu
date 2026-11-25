@@ -28,7 +28,8 @@ test("antes da pausa: aviso abre a capa, encomendas normais", async () => {
     assert.equal(c.lista[0], "pausa"); assert.ok(c.lista.length > 1, "continua a rodar");
     assert.equal(c.a, "Vamos fazer uma pausa curta."); assert.equal(c.b, "Último dia: quinta-feira, até às 17h.");
     assert.equal(c.fechada, false); assert.equal(c.banner, "");
-    assert.equal(c.cta, true, "sem botão de produto no aviso");
+    assert.equal(c.cta, false, "botão «Encomendar antes da pausa»");
+    assert.equal(await page.textContent("#capaCta"), "Encomendar antes da pausa");
     assert.deepEqual(erros, []);
   } finally { await amb.fechar(); }
 });
@@ -55,6 +56,8 @@ test("durante a pausa: loja fechada no site, só o aviso na capa, sem enviar", a
     assert.deepEqual(c.lista, ["pausa"]);
     assert.equal(c.a, "Estamos em pausa."); assert.equal(c.b, "Voltamos em Dezembro, com novidade.");
     assert.equal(c.fechada, true); assert.match(c.banner, /Estamos em pausa\.Voltamos em Dezembro/); assert.equal(c.barra, "none");
+    assert.equal(c.cta, true, "durante a pausa a capa não tem botão");
+    assert.equal(await page.evaluate(() => $("bannerFechado").classList.contains("pausa")), true, "caixa no roxo da marca");
     assert.ok(await page.locator("#bestGrid .best-card.blocked").count() > 0, "produtos bloqueados");
     assert.equal(await page.evaluate(() => { cart.push({ name: "Americano", price: 150, q: 1 }); sendWA(); return enviando; }), false);
     assert.equal(amb.falso.chamadas.filter(x => x.metodo === "POST" && /order/.test(x.caminho)).length, 0);

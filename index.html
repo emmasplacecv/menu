@@ -301,6 +301,7 @@ header .loc{font-size:14px;color:#6E4B2F;margin-top:8px;line-height:1.6;}
  background:var(--card);border:1px solid var(--line);border-radius:12px;
  padding:7px 12px;margin-bottom:12px;font-weight:300;}
 .langnote b{font-weight:600;color:var(--ink);}
+.fechado.pausa{background:#4A2545!important;color:#F4EAF0!important;}   /* 25-11-2026: pausa = roxo da marca, não alarme */
 .fechado{background:#8C2F2F;color:#fff;border-radius:16px;padding:15px 16px;margin-bottom:16px;
  font-size:15px;line-height:1.55;text-align:center;}
 .modebox{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:14px;margin-top:16px;text-align:center;}
@@ -2179,35 +2180,40 @@ function pausaFechada(){ const f=pausaFase(); return f==="pausa"||f==="regresso"
 function diaNaPausa(iso){ return !!PAUSA && iso>PAUSA.diaFecha && iso<PAUSA.diaAbre; }   // "AAAA-MM-DD"
 function pausaHoje(){ return new Date(Date.now()-36e5).toISOString().slice(0,10)===(PAUSA&&PAUSA.diaFecha); }
 const PAUSA_TX={
- pt:{curto:"Em pausa.", av:"Estamos em pausa e não é possível encomendar agora. Voltamos em Dezembro.",
+ pt:{cta:"Encomendar antes da pausa", estP:"Em pausa", estR:"Volta segunda às 8h",
+     curto:"Em pausa.", av:"Estamos em pausa e não é possível encomendar agora. Voltamos em Dezembro.",
      antesA:"Vamos fazer uma pausa curta.", antesB:"Último dia: quinta-feira, até às 17h.", hojeB:"Hoje é o último dia, até às 17h.",
      pausaA:"Estamos em pausa.", pausaB:"Voltamos em Dezembro, com novidade.",
      regA:"Já falta pouco.", regB:"Voltamos segunda-feira, 14 de Dezembro. E trazemos novidade.",
      fecPausa:"<b>Estamos em pausa.</b><br>Voltamos em Dezembro. Até lá, não aceitamos encomendas.",
      fecReg:"<b>Voltamos segunda-feira, 14 de Dezembro.</b><br>As encomendas reabrem nesse dia, a partir das 8h.",
      slots:"Já não há horas antes da pausa. Voltamos em Dezembro."},
- en:{curto:"On a break.", av:"We're on a short break and can't take orders right now. Back in December.",
+ en:{cta:"Order before the break", estP:"On a break", estR:"Back Monday 8am",
+     curto:"On a break.", av:"We're on a short break and can't take orders right now. Back in December.",
      antesA:"We're taking a short break.", antesB:"Last day: Thursday, until 5pm.", hojeB:"Today is the last day, until 5pm.",
      pausaA:"We're on a short break.", pausaB:"Back in December, with something new.",
      regA:"Almost there.", regB:"Back on Monday, 14 December. With something new.",
      fecPausa:"<b>We're on a short break.</b><br>Back in December. Until then, we're not taking orders.",
      fecReg:"<b>Back on Monday, 14 December.</b><br>Orders reopen that day, from 8am.",
      slots:"No times left before the break. We're back in December."},
- fr:{curto:"En pause.", av:"Nous sommes en pause et ne prenons pas de commandes pour l'instant. De retour en décembre.",
+ fr:{cta:"Commander avant la pause", estP:"En pause", estR:"Retour lundi à 8h",
+     curto:"En pause.", av:"Nous sommes en pause et ne prenons pas de commandes pour l'instant. De retour en décembre.",
      antesA:"Nous faisons une courte pause.", antesB:"Dernier jour\u00a0: jeudi, jusqu'à 17h.", hojeB:"Aujourd'hui, c'est le dernier jour, jusqu'à 17h.",
      pausaA:"Nous sommes en pause.", pausaB:"De retour en décembre, avec une nouveauté.",
      regA:"Plus que quelques jours.", regB:"De retour lundi 14 décembre. Avec une nouveauté.",
      fecPausa:"<b>Nous sommes en pause.</b><br>De retour en décembre. D'ici là, nous ne prenons pas de commandes.",
      fecReg:"<b>De retour lundi 14 décembre.</b><br>Les commandes rouvrent ce jour-là, dès 8h.",
      slots:"Plus d'horaires avant la pause. De retour en décembre."},
- de:{curto:"Pause.", av:"Wir machen gerade Pause und nehmen keine Bestellungen an. Zurück im Dezember.",
+ de:{cta:"Vor der Pause bestellen", estP:"Pause", estR:"Zurück Montag 8 Uhr",
+     curto:"Pause.", av:"Wir machen gerade Pause und nehmen keine Bestellungen an. Zurück im Dezember.",
      antesA:"Wir machen eine kurze Pause.", antesB:"Letzter Tag: Donnerstag, bis 17 Uhr.", hojeB:"Heute ist der letzte Tag, bis 17 Uhr.",
      pausaA:"Wir machen gerade Pause.", pausaB:"Zurück im Dezember – mit etwas Neuem.",
      regA:"Bald ist es so weit.", regB:"Zurück am Montag, 14. Dezember. Mit etwas Neuem.",
      fecPausa:"<b>Wir machen gerade Pause.</b><br>Zurück im Dezember. Bis dahin nehmen wir keine Bestellungen an.",
      fecReg:"<b>Zurück am Montag, 14. Dezember.</b><br>Bestellungen sind ab diesem Tag wieder möglich, ab 8 Uhr.",
      slots:"Vor der Pause sind keine Zeiten mehr frei. Zurück im Dezember."},
- nl:{curto:"Even pauze.", av:"We hebben even pauze en nemen nu geen bestellingen aan. Terug in december.",
+ nl:{cta:"Bestel vóór de pauze", estP:"Even pauze", estR:"Terug maandag 8.00",
+     curto:"Even pauze.", av:"We hebben even pauze en nemen nu geen bestellingen aan. Terug in december.",
      antesA:"We nemen een korte pauze.", antesB:"Laatste dag: donderdag, tot 17.00 uur.", hojeB:"Vandaag is de laatste dag, tot 17.00 uur.",
      pausaA:"We hebben even pauze.", pausaB:"Terug in december, met iets nieuws.",
      regA:"Bijna zover.", regB:"Terug op maandag 14 december. Met iets nieuws.",
@@ -2220,6 +2226,7 @@ function pausaT(k){
  const tx=PAUSA_TX[LANG]||PAUSA_TX.pt, f=pausaFase();
  if(k==="a") k = f==="antes" ? "antesA" : (f==="regresso" ? "regA" : "pausaA");
  else if(k==="b") k = f==="antes" ? (pausaHoje() ? "hojeB" : "antesB") : (f==="regresso" ? "regB" : "pausaB");
+ else if(k==="est") k = f==="regresso" ? "estR" : "estP";
  return tx[k]!=null ? tx[k] : PAUSA_TX.pt[k];
 }
 /* texto da caixa vermelha de loja fechada: o da pausa, ou o do interruptor do /admin */
@@ -4726,7 +4733,7 @@ async function carregarEstado(){
  const b=$("bannerFechado");
  if(lojaFechada){
   b.style.display="block";
-  b.innerHTML=fechadoHTML();
+  b.innerHTML=fechadoHTML(); b.classList.toggle("pausa",pausaFechada());
  }else b.style.display="none";
  document.querySelector(".bar").style.display=lojaFechada?"none":"";
  build();
@@ -4878,7 +4885,7 @@ function traduzir(){
  if(av){ av.style.display = entregasOff ? "block" : "none"; av.textContent = t("entsusp"); }
 
  const b=$("bannerFechado");
- if(b&&lojaFechada) b.innerHTML=fechadoHTML();
+ if(b&&lojaFechada){ b.innerHTML=fechadoHTML(); b.classList.toggle("pausa",pausaFechada()); }
  // caixa "sem pré-pagamento"
  const np=$("noPayBox"); if(np) np.innerHTML=t("balcao");
  rotularChips();
@@ -5055,6 +5062,10 @@ function desenharCapa(animar){
   cta.hidden=false;
   cta.innerHTML='<span>'+esc(t("trCta"))+'</span>';
   cta.onclick=()=>abrirProduto(CAMP_PROD);
+ } else if(c.pausa && pausaFase()==="antes" && !lojaFechada){   // aviso da pausa: empurra as encomendas destes dias
+  cta.hidden=false;
+  cta.innerHTML='<span>'+esc(pausaT("cta"))+'</span>';
+  cta.onclick=()=>scrollHome("menu");
  } else if(c.mural){                            // no mural o botão leva ao menu (só aparece em ecrã largo)
   cta.hidden=false;
   cta.innerHTML='<span>'+esc(t("murCta"))+'</span>';
