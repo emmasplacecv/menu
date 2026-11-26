@@ -724,6 +724,11 @@ const SEM_LEITE=["Espresso","Espresso Duplo","Americano","Matcha de Maracujá Ga
 const CAT_EXTRAS={"SUMOS NATURAIS":[["Gengibre",50],["Hortelã",50]]};
 /* 18-11-2026: molho das saladas — grátis, escolha obrigatória (como no site: MOLHOS_SALADA no index.html) */
 const MOLHOS_SALADA=["Mostarda e mel","Iogurte natural com maionese e mostarda","Sem molho"];
+/* 21-11-2026: cada molho pode estar em ACABOU (chave "@x:molho:<nome curto>", igual ao site, à Gestão e à Cozinha).
+   Com os dois esgotados, a salada fica logo «Sem molho». */
+const MOLHO_CHAVE={"Mostarda e mel":"Mostarda e mel","Iogurte natural com maionese e mostarda":"Iogurte com maionese"};
+const molhoK=m=>exK("molho",MOLHO_CHAVE[m]||m);
+const molhoOff=m=>m!=="Sem molho" && esgotados.includes(molhoK(m));
 const temMolho=i=>!!i && !i.cb && /^salada/i.test(String(i.n||""));
 /* partes = o que o cliente escolhe em cada combo; serve para a cozinha saber e para descontar o stock */
 const COMBOS_BASE=[
@@ -811,6 +816,7 @@ let esgotados=[], stock={};
    Guardam-se na MESMA lista do dia que os produtos (/soldout), com a chave
    "@x:<tipo>:<nome>" — repõem-se sozinhos à meia-noite, como os produtos.
    tipos: acai (incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes)
+   · com (o que se junta grátis: canela) · molho (saladas, nome curto em MOLHO_CHAVE)
    ============================================================ */
 /* 04-11-2026: MODO DO PEDIDO — 🛵 ENTREGA ou 🛍 LEVANTAR, em todos os pedidos (antes só a entrega tinha etiqueta
    e um pedido sem ela deixava a dúvida). Mesma função na Gestão, na Cozinha e nas Vendas. */
@@ -1477,7 +1483,8 @@ function desenharOpcoesProd(){
  const cg=comDe(i);
  if(cg.length){
   h+=`<div class="op-grp"><div class="vgrp"><span>Juntar</span><em>grátis · toque para juntar</em></div><div class="vtops">`+
-   cg.map((n,j)=>bt(o.com.includes(n)?"Com "+n.toLowerCase():"Sem "+n.toLowerCase(), o.com.includes(n), `opCom(${j})`, "grátis", false)).join("")+`</div></div>`;
+   cg.map((n,j)=>{ const fo=exOff("com",n); if(fo) o.com=o.com.filter(x=>x!==n);
+    return bt(fo?"Sem "+n.toLowerCase():(o.com.includes(n)?"Com "+n.toLowerCase():"Sem "+n.toLowerCase()), !fo&&o.com.includes(n), fo?"":`opCom(${j})`, fo?"acabou":"grátis", fo); }).join("")+`</div></div>`;
  }
  const ex=extrasDe(o.ci);
  if(ex){
@@ -1486,8 +1493,11 @@ function desenharOpcoesProd(){
     return bt(n, !fo&&o.ex.includes(n), fo?"":`opExtra(${j})`, fo?"acabou":"+"+v, fo); }).join("")+`</div></div>`;
  }
  if(temMolho(i)){
-  h+=`<div class="op-grp"><div class="vgrp"><span>Molho</span><em>grátis</em></div><div class="vtops">`+
-   MOLHOS_SALADA.map((n,j)=>bt(n, o.molho===n, `opMolho(${j})`)).join("")+`</div></div>`;
+  if(o.molho && molhoOff(o.molho)) o.molho=null;                                   // acabou depois de escolhido
+  const todos=MOLHOS_SALADA.filter(n=>n!=="Sem molho").every(molhoOff);
+  if(todos && !o.molho) o.molho="Sem molho";
+  h+=`<div class="op-grp"><div class="vgrp"><span>Molho</span><em>${todos?"os dois acabaram hoje — vai sem molho":"grátis"}</em></div><div class="vtops">`+
+   MOLHOS_SALADA.map((n,j)=>{ const fo=molhoOff(n); return bt(n, o.molho===n, fo?"":`opMolho(${j})`, fo?"acabou":"", fo); }).join("")+`</div></div>`;
  }
  if(i.g) h+=`<div class="vgrp" style="margin:0 0 8px"><span>Tamanho — toque para juntar ao pedido</span></div>`;
  $("tCorpo").innerHTML=h;
@@ -1535,7 +1545,9 @@ function escolherTamanho(sz){
  const preco=precoOpc(sz);
  const xk=[].concat(
   (temLeite(o.ci,i)&&o.leite!=="Normal")?[exK("leite",o.leite)]:[],
-  o.ex.map(n=>exK("extra",n)));
+  o.ex.map(n=>exK("extra",n)),
+  (temMolho(i)&&o.molho&&o.molho!=="Sem molho")?[molhoK(o.molho)]:[],
+  (o.com||[]).map(n=>exK("com",n)));
  fecharTamanho();
  meter(i.n+(det.length?" ("+det.join(", ")+")":""), i.n, preco, null, xk);
 }

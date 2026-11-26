@@ -117,6 +117,9 @@ li b.smx{display:inline-block;padding:1px 8px;border-radius:7px;background:#B326
 .cat{font-size:12.5px;letter-spacing:2px;font-weight:600;color:#8B5E3C;margin:20px 0 6px;}
 /* 03-11-2026: lista dos extras, no fim dos produtos */
 .exsep{margin:34px 0 0;padding:11px 13px;border-radius:12px;background:#4A2545;color:#F7F1E4;font-size:13px;font-weight:600;letter-spacing:.5px;}
+/* 21-11-2026: atalho no topo do separador para a lista dos extras (estava escondida no fim) */
+.exir{display:block;width:100%;margin:10px 0 4px;padding:11px 13px;border-radius:12px;border:1px dashed #4A2545;
+ background:transparent;color:#4A2545;font:inherit;font-size:13.5px;font-weight:600;text-align:left;cursor:pointer;}
 .exnota{margin:9px 0 2px;font-size:12.5px;line-height:1.5;color:var(--ink2);}
 .row .n small{display:block;margin-top:2px;font-size:11.5px;font-weight:500;color:var(--ink2);letter-spacing:0;text-transform:none;}
 .row.off .n small{color:var(--ink2);text-decoration:none;}
@@ -464,8 +467,9 @@ body{padding-bottom:76px;}
       Tudo o que marcar volta a estar <b>disponível automaticamente amanhã</b>.
       Não precisa de desmarcar ao fim do dia.
     </div>
+    <button type="button" class="exir" onclick="document.getElementById('exAncora').scrollIntoView({behavior:'smooth',block:'start'})">Extras (leites, toppings, molhos, canela…) ↓</button>
     <div id="lista"></div>
-    <div class="exsep">Extras — toppings, fruta, leites, xaropes</div>
+    <div class="exsep" id="exAncora">Extras — leites, toppings, fruta, xaropes, molhos, canela</div>
     <div class="exnota">Em <b>ACABOU</b>, o extra fica bloqueado no site e nas Vendas e ninguém o pode escolher.
       Volta sozinho ao <b>TEM</b> à meia-noite, como os produtos. A cozinha marca os mesmos extras no separador Stock.</div>
     <div id="listaEx"></div>
@@ -578,6 +582,7 @@ function desenhar(){
    O site e as /vendas lêem as mesmas chaves e bloqueiam o extra; a cozinha marca-os
    no separador Stock. >>> Extra novo no menu: acrescentar aqui, na cozinha e nas /vendas. <<<
    tipos: acai (incluído) · acaix (topping extra pago) · leite · extra (sumos) · sem (xaropes)
+   · com (o que se junta grátis: canela) · molho (saladas)
    ============================================================ */
 const EX_PRE="@x:";
 const exK=(tipo,nome)=>EX_PRE+tipo+":"+nome;
@@ -588,7 +593,11 @@ const EX_GRUPOS=[
  {t:"AÇAÍ — GRANOLA DUBAI (+100)",tipo:"acaix",l:["Granola Dubai"]},
  {t:"LEITE À ESCOLHA (+100)",tipo:"leite",l:["Aveia","Coco","Soja","Amêndoa","Sem lactose"]},
  {t:"EXTRAS DOS SUMOS (+50)",tipo:"extra",l:["Gengibre","Hortelã"]},
- {t:"XAROPES",tipo:"sem",l:["Xarope de baunilha"]}
+ {t:"XAROPES",tipo:"sem",l:["Xarope de baunilha"]},
+ /* 21-11-2026: canela do Latte Espanhol e molhos das saladas (grátis). Com os dois molhos em ACABOU,
+    a salada vai «sem molho». O molho de iogurte guarda-se com o nome curto (o nome completo é longo). */
+ {t:"LATTE ESPANHOL — canela (grátis)",tipo:"com",l:["Canela"]},
+ {t:"SALADAS — molho (grátis)",tipo:"molho",l:["Mostarda e mel","Iogurte com maionese"]}
 ];
 function desenharEx(){
  const alvo=$("listaEx"); if(!alvo) return;
