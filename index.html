@@ -301,6 +301,7 @@ header .loc{font-size:14px;color:#6E4B2F;margin-top:8px;line-height:1.6;}
  background:var(--card);border:1px solid var(--line);border-radius:12px;
  padding:7px 12px;margin-bottom:12px;font-weight:300;}
 .langnote b{font-weight:600;color:var(--ink);}
+.fechado.pausa{background:#4A2545!important;color:#F4EAF0!important;}   /* 25-11-2026: pausa = roxo da marca, não alarme */
 .fechado{background:#8C2F2F;color:#fff;border-radius:16px;padding:15px 16px;margin-bottom:16px;
  font-size:15px;line-height:1.55;text-align:center;}
 .modebox{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:14px;margin-top:16px;text-align:center;}
@@ -657,6 +658,9 @@ textarea.fld{min-height:74px;resize:vertical;}
  .home-facts{display:none;}
 }
 /* recolher / entrega numa linha */
+/* 26-11-2026: com a loja fechada (pausa ou «Fechar agora» na Gestão) não se encomenda, por isso
+   a caixa «Recolher no local / Entrega» e o «Entregas suspensas — o levantamento continua» não aparecem */
+.order-panel.fechada{display:none !important;}
 .order-panel{margin:12px 0 0;padding:0;border:0;background:none;box-shadow:none;}
 .order-panel .modebox{max-width:none;margin:0;padding:9px 12px 10px;border-width:1.5px;border-radius:16px;
  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;}
@@ -782,6 +786,7 @@ textarea.fld{min-height:74px;resize:vertical;}
 .capa .capa-cta{display:inline-flex;align-items:center;gap:7px;max-width:100%;border:0;border-radius:999px;padding:10px 13px;
  background:var(--tom);color:#FBF4E6;font:600 12px/1.15 'Jost',sans-serif;letter-spacing:.2px;text-align:left;cursor:pointer;
  box-shadow:0 5px 14px rgba(52,37,29,.2);transition:transform .12s ease,filter .12s ease,background-color .6s ease;}
+.capa .capa-cta[hidden]{display:none;}                /* 25-11-2026: sem botão, sem a pílula vazia */
 .capa .capa-cta i{flex:none;font-style:normal;font-size:16px;line-height:1;}
 .capa .capa-cta span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}      /* uma linha só: a altura da capa não muda */
 .capa .capa-cta b{flex:none;font-weight:700;white-space:nowrap;}
@@ -2158,6 +2163,85 @@ const HOME_I18N={
 };
 const LANGS=[["pt","PT"],["en","EN"],["fr","FR"],["de","DE"],["nl","NL"]];
 let LANG="pt";
+/* ---------- PAUSA (25-11-2026) ----------
+   Tudo automático, pelas horas de Cabo Verde (UTC−1). Não diz porquê nem para onde: só «pausa».
+     antes    até qui 26-11 às 17h00  -> a capa abre com «Último dia: quinta-feira, até às 17h» (encomendas normais;
+                                         um pedido que cairia num dia da pausa fica sem horas)
+     pausa    qui 26-11 17h00 -> sáb 12-12 00h00  -> loja fechada no site, capa só com «Estamos em pausa»
+     regresso sáb 12-12 00h00 -> seg 14-12 07h00  -> continua fechada; a capa diz «Voltamos segunda-feira, 14 de Dezembro»
+   A partir de seg 14-12 às 07h00 tudo volta ao normal sozinho. Para desligar já: PAUSA=null.
+   O interruptor «Fechar agora» do /admin continua a funcionar como sempre (e fecha também no servidor). */
+const PAUSA={fecha:Date.UTC(2026,10,26,18,0), regresso:Date.UTC(2026,11,12,1,0), abre:Date.UTC(2026,11,14,8,0),
+ diaFecha:"2026-11-26", diaAbre:"2026-12-14"};
+function pausaFase(){
+ if(!PAUSA) return "";
+ const n=Date.now();
+ if(n>=PAUSA.abre) return "";
+ return n<PAUSA.fecha ? "antes" : (n<PAUSA.regresso ? "pausa" : "regresso");
+}
+function pausaFechada(){ const f=pausaFase(); return f==="pausa"||f==="regresso"; }
+function diaNaPausa(iso){ return !!PAUSA && iso>PAUSA.diaFecha && iso<PAUSA.diaAbre; }   // "AAAA-MM-DD"
+function pausaHoje(){ return new Date(Date.now()-36e5).toISOString().slice(0,10)===(PAUSA&&PAUSA.diaFecha); }
+const PAUSA_TX={
+ pt:{cta:"Encomendar antes da pausa", estP:"Em pausa", estR:"Volta segunda às 8h",
+     curto:"Em pausa.", av:"Estamos em pausa e as encomendas estão suspensas. Voltamos em Dezembro.",
+     antesA:"Vamos fazer uma pausa curta.", antesB:"Último dia: quinta-feira, até às 17h.", hojeB:"Hoje é o último dia, até às 17h.",
+     pausaA:"Estamos em pausa.", pausaB:"Voltamos em Dezembro, com novidade.",
+     regA:"Já falta pouco.", regB:"Voltamos segunda-feira, 14 de Dezembro. E trazemos novidade.",
+     fecPausa:"<b>Estamos em pausa.</b><br>Voltamos em Dezembro. Até lá, as encomendas estão suspensas.",
+     fecReg:"<b>Voltamos segunda-feira, 14 de Dezembro.</b><br>As encomendas reabrem nesse dia, a partir das 8h.",
+     slots:"Já não há horas antes da pausa. Voltamos em Dezembro."},
+ en:{cta:"Order before the break", estP:"On a break", estR:"Back Monday 8am",
+     curto:"On a break.", av:"We're on a short break and orders are on hold. Back in December.",
+     antesA:"We're taking a short break.", antesB:"Last day: Thursday, until 5pm.", hojeB:"Today is the last day, until 5pm.",
+     pausaA:"We're on a short break.", pausaB:"Back in December, with something new.",
+     regA:"Almost there.", regB:"Back on Monday, 14 December. With something new.",
+     fecPausa:"<b>We're on a short break.</b><br>Back in December. Until then, orders are on hold.",
+     fecReg:"<b>Back on Monday, 14 December.</b><br>Orders reopen that day, from 8am.",
+     slots:"No times left before the break. We're back in December."},
+ fr:{cta:"Commander avant la pause", estP:"En pause", estR:"Retour lundi à 8h",
+     curto:"En pause.", av:"Nous sommes en pause et les commandes sont suspendues. De retour en décembre.",
+     antesA:"Nous faisons une courte pause.", antesB:"Dernier jour\u00a0: jeudi, jusqu'à 17h.", hojeB:"Aujourd'hui, c'est le dernier jour, jusqu'à 17h.",
+     pausaA:"Nous sommes en pause.", pausaB:"De retour en décembre, avec une nouveauté.",
+     regA:"Plus que quelques jours.", regB:"De retour lundi 14 décembre. Avec une nouveauté.",
+     fecPausa:"<b>Nous sommes en pause.</b><br>De retour en décembre. D'ici là, les commandes sont suspendues.",
+     fecReg:"<b>De retour lundi 14 décembre.</b><br>Les commandes rouvrent ce jour-là, dès 8h.",
+     slots:"Plus d'horaires avant la pause. De retour en décembre."},
+ de:{cta:"Vor der Pause bestellen", estP:"Pause", estR:"Zurück Montag 8 Uhr",
+     curto:"Pause.", av:"Wir machen gerade Pause, Bestellungen sind ausgesetzt. Zurück im Dezember.",
+     antesA:"Wir machen eine kurze Pause.", antesB:"Letzter Tag: Donnerstag, bis 17 Uhr.", hojeB:"Heute ist der letzte Tag, bis 17 Uhr.",
+     pausaA:"Wir machen gerade Pause.", pausaB:"Zurück im Dezember – mit etwas Neuem.",
+     regA:"Bald ist es so weit.", regB:"Zurück am Montag, 14. Dezember. Mit etwas Neuem.",
+     fecPausa:"<b>Wir machen gerade Pause.</b><br>Zurück im Dezember. Bis dahin sind Bestellungen ausgesetzt.",
+     fecReg:"<b>Zurück am Montag, 14. Dezember.</b><br>Bestellungen sind ab diesem Tag wieder möglich, ab 8 Uhr.",
+     slots:"Vor der Pause sind keine Zeiten mehr frei. Zurück im Dezember."},
+ nl:{cta:"Bestel vóór de pauze", estP:"Even pauze", estR:"Terug maandag 8.00",
+     curto:"Even pauze.", av:"We hebben even pauze en bestellingen zijn opgeschort. Terug in december.",
+     antesA:"We nemen een korte pauze.", antesB:"Laatste dag: donderdag, tot 17.00 uur.", hojeB:"Vandaag is de laatste dag, tot 17.00 uur.",
+     pausaA:"We hebben even pauze.", pausaB:"Terug in december, met iets nieuws.",
+     regA:"Bijna zover.", regB:"Terug op maandag 14 december. Met iets nieuws.",
+     fecPausa:"<b>We hebben even pauze.</b><br>Terug in december. Tot dan zijn bestellingen opgeschort.",
+     fecReg:"<b>Terug op maandag 14 december.</b><br>Bestellen kan weer vanaf die dag, vanaf 8.00 uur.",
+     slots:"Geen tijden meer vóór de pauze. Terug in december."}
+};
+var PAUSA_K={fechado:"curto", fechadoCurto:"curto", avfechado:"av"};   /* var: o t() pode ser chamado antes desta linha */
+function pausaT(k){
+ const tx=PAUSA_TX[LANG]||PAUSA_TX.pt, f=pausaFase();
+ if(k==="a") k = f==="antes" ? "antesA" : (f==="regresso" ? "regA" : "pausaA");
+ else if(k==="b") k = f==="antes" ? (pausaHoje() ? "hojeB" : "antesB") : (f==="regresso" ? "regB" : "pausaB");
+ else if(k==="est") k = f==="regresso" ? "estR" : "estP";
+ return tx[k]!=null ? tx[k] : PAUSA_TX.pt[k];
+}
+/* 26-11-2026: loja fechada -> esconde a caixa «Recolher no local / Entrega» (não se pode encomendar) */
+function acertarPainelModo(){ const op=document.getElementById("como-encomendar"); if(op) op.classList.toggle("fechada", !!(lojaFechada||pausaFechada())); }
+/* texto da caixa vermelha de loja fechada: o da pausa, ou o do interruptor do /admin */
+function fechadoHTML(){
+ const f=pausaFase();
+ if(f==="pausa") return pausaT("fecPausa");
+ if(f==="regresso") return pausaT("fecReg");
+ return t("fechado")+"<br>"+(msgFechada||t("fechadosub"));
+}
+
 function ht(k){ return (HOME_I18N[LANG]&&HOME_I18N[LANG][k]!=null)?HOME_I18N[LANG][k]:HOME_I18N.pt[k]; }
 /* ---- AÇAÍ: textos do pedido nos 5 idiomas ----
    k = textos da página · d = nomes que vão no pedido · w = palavras soltas (só se ainda não existirem) */
@@ -2582,7 +2666,10 @@ function td(s){
  const d=I18N[LANG]&&I18N[LANG]._d;
  return (d&&d[s]!=null)?d[s]:s;
 }
-function t(k){ return (I18N[LANG]&&I18N[LANG][k]!=null)?I18N[LANG][k]:I18N.pt[k]; }
+function t(k){
+ if(PAUSA_K && PAUSA_K[k] && pausaFechada()) return pausaT(PAUSA_K[k]);     // durante a pausa os avisos de fechado dizem «em pausa»
+ return (I18N[LANG]&&I18N[LANG][k]!=null)?I18N[LANG][k]:I18N.pt[k];
+}
 function detectarIdioma(){
  try{
   const g=localStorage.getItem("ep_lang");
@@ -4034,8 +4121,12 @@ async function fillSlots(){
  if(req!==slotsReq) return;                 // resposta antiga, ignora
  const out0=(d&&d.slots)||[];
  const dowS = (d&&d.dia) ? dowISO(d.dia) : agoraCV().dow;
- const out = out0.filter(sl=>naJanela(sl,dowS,mode));        // só as horas dentro da janela do dia
- if(!d){
+ const naPausa = !!(d && d.dia && diaNaPausa(d.dia));
+ const out = naPausa ? [] : out0.filter(sl=>naJanela(sl,dowS,mode));        // só as horas dentro da janela do dia
+ if(naPausa){
+  sel.innerHTML='<option value="">'+t("semhoras2")+'</option>'; slotVal=""; slotQuando=""; slotHoje=true;
+  $("slotMsg").textContent=pausaT("slots");
+ }else if(!d){
   sel.innerHTML='<option value="">Horários indisponíveis</option>'; slotVal="";
   $("slotMsg").textContent="Não foi possível carregar os horários. Verifique a ligação e tente novamente.";
  }else if(!out.length){
@@ -4074,7 +4165,8 @@ async function sendWA(){
  if(enviando) return;
  mtr("pedido_tentativa");
  if(navigator.onLine===false && window.EP_PEDIDOS){ window.EP_PEDIDOS.avisoSemRede(); return; }   // 17-11-2026: sem rede o pedido fica no carrinho
- if(lojaFechada){avisar("avfechado");return;}
+ if(pausaFechada() && !lojaFechada){ carregarEstado(); }
+ if(lojaFechada || pausaFechada()){avisar("avfechado");return;}
  if(entregasOff && mode==="entrega"){avisar("entsusp");return;}
  if(!cart.length){avisar("avvazio");return;}
  const nome=$("fName").value.trim();
@@ -4637,6 +4729,7 @@ function repetirUltimo(){
 }
 
 let esgotados=[], lojaFechada=false, msgFechada="", entregasOff=false;
+acertarPainelModo();   // 26-11-2026: na pausa a caixa recolher/entrega já não aparece ao abrir (antes de o servidor responder)
 /* 16-11-2026: pagamento por cartão (SISP/vinti4). Só aparece quando o servidor diz que está ligado. */
 let cartaoOn=false;
 const CARTAO_OPC={id:"cartao", cartao:true, pref:true, get b(){ return window.EP_CARTAO?window.EP_CARTAO.tx("chip"):"Cartão"; }};
@@ -4648,6 +4741,7 @@ async function carregarEstado(){
   const d=await r.json();
   if(!d.erro){ lojaFechada=!!d.fechado; msgFechada=d.msg||""; entregasOff=!!d.entregasOff; cartaoOn=!!d.cartao; if(!cartaoOn && banco && banco.cartao) banco=null; }
  }catch(e){}
+ if(pausaFechada()) lojaFechada=true;
  mtrTag("loja",lojaFechada?"fechada":"aberta"); if(entregasOff) mtrTag("entregas","suspensas");
  // entregas suspensas: forçar levantamento e assinalar
  document.querySelectorAll('[data-mode="entrega"], #topChips .chip:nth-child(2)').forEach(el=>{
@@ -4657,12 +4751,12 @@ async function carregarEstado(){
  if(entregasOff && mode==="entrega") setMode("recolha", true);
  const av=$("avisoEntregas");
  if(av){ av.style.display = entregasOff ? "block" : "none"; av.textContent = t("entsusp"); }
+ acertarPainelModo();
 
  const b=$("bannerFechado");
  if(lojaFechada){
   b.style.display="block";
-  b.innerHTML="<b>Estamos temporariamente fechados.</b><br>"+
-   (msgFechada||"Não estamos a aceitar encomendas neste momento. Volte mais tarde.");
+  b.innerHTML=fechadoHTML(); b.classList.toggle("pausa",pausaFechada());
  }else b.style.display="none";
  document.querySelector(".bar").style.display=lojaFechada?"none":"";
  build();
@@ -4812,9 +4906,10 @@ function traduzir(){
  if(entregasOff && mode==="entrega") setMode("recolha", true);
  const av=$("avisoEntregas");
  if(av){ av.style.display = entregasOff ? "block" : "none"; av.textContent = t("entsusp"); }
+ acertarPainelModo();
 
  const b=$("bannerFechado");
- if(b&&lojaFechada) b.innerHTML=t("fechado")+"<br>"+(msgFechada||t("fechadosub"));
+ if(b&&lojaFechada){ b.innerHTML=fechadoHTML(); b.classList.toggle("pausa",pausaFechada()); }
  // caixa "sem pré-pagamento"
  const np=$("noPayBox"); if(np) np.innerHTML=t("balcao");
  rotularChips();
@@ -4854,7 +4949,10 @@ const CAPA=[
  /* 19-11-2026: NOVIDADES — entram logo a seguir ao banner do açaí (antes do mural dos 5%), cada uma com a sua foto.
     Saem sozinhas se o produto for retirado ou esgotar. Nas outras línguas: "Novidade!" + o nome do produto. */
  {prod:"Matcha de Maracujá Gasoso", foto:4, novo:true, a:"«Está calor. Quero algo fresco.»", b:"Novidade: Matcha de Maracujá Gasoso."},
- {prod:"Latte Espanhol",            foto:5, novo:true, a:"«Gelado, mas diferente.»"  , b:"Novidade: Latte Espanhol. Com canela, se quiseres."}
+ {prod:"Latte Espanhol",            foto:5, novo:true, a:"«Gelado, mas diferente.»"  , b:"Novidade: Latte Espanhol. Com canela, se quiseres."},
+ /* 25-11-2026: PAUSA — o aviso da pausa abre a capa (foto do Frappé de Caramelo). Antes da pausa entra primeiro na
+    rotação; durante a pausa é o único. Os textos estão em PAUSA_TX (5 idiomas). Sai sozinho em PAUSA.abre. */
+ {pausa:true, foto:0, mais:2500}
 ];
 const CAPA_MURAL=true, CAPA_ACAI=true;
 const CAPA_SEG=6500;
@@ -4916,8 +5014,9 @@ function capaDur(i){
  return CAPA_SEG+((CAPA[i]&&CAPA[i].mais)||0);
 }
 function capaLista(){
- const l=[], murs=[], novos=[];
+ const l=[], murs=[], novos=[], fz=pausaFase(); let pz=-1;
  CAPA.forEach((c,i)=>{
+  if(c.pausa){ if(fz) pz=i; return; }
   if(c.mural){ if(CAPA_MURAL && (c.mural!=="acai" || acaiNaCapa())) murs.push(i); return; }
   const f=findMenuItem(c.prod); if(!f || esgotados.includes(f.item.n)) return;
   if(c.novo){ novos.push(i); return; }
@@ -4927,7 +5026,8 @@ function capaLista(){
  });
  /* os painéis de cor abrem a capa: açaí, depois as novidades (19-11-2026), depois os 5% */
  const ac=murs.filter(i=>CAPA[i].mural==="acai"), outros=murs.filter(i=>CAPA[i].mural!=="acai");
- const r=ac.concat(novos,outros,l);
+ if(pz>=0 && fz!=="antes") return [pz];                 // durante a pausa só o aviso
+ const r=(pz>=0?[pz]:[]).concat(ac,novos,outros,l);
  return r.length?r:[0];
 }
 /* texto de uma foto: frase + resposta, ou o quadro da campanha (3 açaís -> 1 grátis · 2 açaís -> 2.º com −50%) */
@@ -4958,6 +5058,10 @@ function capaTexto(i){
    '<div class="cc-l"><b>3</b><span><small>'+ct("ccNoCarr")+'</small><strong>'+ct("ccGratis")+'</strong></span></div>'+
    '<div class="cc-l"><b>2</b><span><small>'+ct("ccNoCarr")+'</small><strong>'+ct("ccPct")+'</strong></span></div>'+
    '<p>'+campNotaDia()+ct("ccNota")+'</p>'; }
+ }else if(c.pausa){
+  $("capaA").textContent=pausaT("a");
+  $("home-title").textContent=pausaT("b");
+  if(q){ q.hidden=true; q.innerHTML=""; }
  }else{
   $("capaA").textContent = pt ? c.a : (c.novo ? t("novidade") : ht("heroKicker"));
   $("home-title").textContent = pt ? c.b : (c.novo ? td(c.prod) : ht("heroTitle"));
@@ -4982,17 +5086,21 @@ function desenharCapa(animar){
   cta.hidden=false;
   cta.innerHTML='<span>'+esc(t("trCta"))+'</span>';
   cta.onclick=()=>abrirProduto(CAMP_PROD);
+ } else if(c.pausa && pausaFase()==="antes" && !lojaFechada){   // aviso da pausa: empurra as encomendas destes dias
+  cta.hidden=false;
+  cta.innerHTML='<span>'+esc(pausaT("cta"))+'</span>';
+  cta.onclick=()=>scrollHome("menu");
  } else if(c.mural){                            // no mural o botão leva ao menu (só aparece em ecrã largo)
   cta.hidden=false;
   cta.innerHTML='<span>'+esc(t("murCta"))+'</span>';
   cta.onclick=()=>scrollHome("menu");
- } else if(f && !fim && !lojaFechada){
+ } else if(f && !fim && !lojaFechada && !c.pausa){
   const p=f.item.top ? Math.min(f.item.p,f.item.sp||f.item.p) : f.item.p;
   cta.hidden=false;
   cta.innerHTML='<i aria-hidden="true">+</i><span>'+esc(td(f.item.n))+'</span><b>'+p+'$</b>';
   cta.onclick=()=>pick(f.ci,f.ii);
  } else { cta.hidden=true; cta.onclick=null; }
- const pts = lista.length>1 ? lista.map(i=>`<button type="button" class="${i===_capaK?"on":""}" onclick="capaIr(${i})" aria-label="${esc(CAPA[i].mural==="acai"?(td(CAMP_PROD)+" · "+DESC_ACAI_TXT+"% "+t("murOff")):CAPA[i].mural?(DESC_ONLINE+"% · "+t("murOff")):CAPA[i].camp?ct("capaCampB"):td(CAPA[i].prod))}"></button>`).join("") : "";
+ const pts = lista.length>1 ? lista.map(i=>`<button type="button" class="${i===_capaK?"on":""}" onclick="capaIr(${i})" aria-label="${esc(CAPA[i].mural==="acai"?(td(CAMP_PROD)+" · "+DESC_ACAI_TXT+"% "+t("murOff")):CAPA[i].mural?(DESC_ONLINE+"% · "+t("murOff")):CAPA[i].camp?ct("capaCampB"):CAPA[i].pausa?pausaT("b"):td(CAPA[i].prod))}"></button>`).join("") : "";
  if(pts!==_capaPts || animar){ $("capaPts").innerHTML=pts; _capaPts=pts; }
  if(animar){ const tx=sec.querySelector(".capa-txt"); tx.classList.remove("entra"); void tx.offsetWidth; tx.classList.add("entra"); }
 }

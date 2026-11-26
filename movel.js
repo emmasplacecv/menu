@@ -139,7 +139,8 @@
   /* aberto / fechado, pelo horário do site (HORARIO, hora de Cabo Verde) e pelo interruptor da Gestão */
   var desenharEstado = seguro(function () {
     var a = agoraCV(), h = HORARIO[a.dow], txt, off = true;
-    if (typeof lojaFechada !== "undefined" && lojaFechada) txt = tx("fechado");
+    if (typeof pausaFechada === "function" && pausaFechada()) txt = pausaT("est");   /* 25-11-2026: pausa */
+    else if (typeof lojaFechada !== "undefined" && lojaFechada) txt = tx("fechado");
     else if (h && a.min >= h[0] && a.min < h[1]) { txt = tx("aberto").replace("{h}", hora(h[1])); off = false; }
     else if (h && a.min < h[0]) txt = tx("abre").replace("{h}", hora(h[0]));
     else {
