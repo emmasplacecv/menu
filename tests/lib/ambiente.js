@@ -16,7 +16,11 @@ const TIPOS = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; ch
   ".webp": "image/webp", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml", ".pdf": "application/pdf",
   ".ttf": "font/ttf", ".mp3": "audio/mpeg", ".xml": "application/xml", ".txt": "text/plain; charset=utf-8", ".css": "text/css" };
 
-function servirFicheiros() {
+/* 26-11-2026: a pausa de Dezembro (bloco PAUSA no index.html) depende da hora real. Para os testes não mudarem
+   de resultado conforme o dia em que correm, o site é servido SEM a pausa (PAUSA=null), excepto com {pausa:true}
+   (tests/pausa.test.js, que fixa o relógio em cada fase). */
+function servirFicheiros(opc) {
+  opc = opc || {};
   return new Promise(ok => {
     const srv = http.createServer((req, res) => {
       let u = decodeURIComponent(new URL(req.url, "http://x").pathname);
@@ -27,6 +31,11 @@ function servirFicheiros() {
         f = path.join(f, "index.html");
       }
       if (!fs.existsSync(f)) { res.writeHead(404); return res.end("404"); }
+      if (!opc.pausa && f === path.join(RAIZ, "index.html")) {
+        const html = fs.readFileSync(f, "utf8").replace("const PAUSA={", "const PAUSA=null&&{");
+        res.writeHead(200, { "Content-Type": TIPOS[".html"], "Cache-Control": "no-cache" });
+        return res.end(html);
+      }
       res.writeHead(200, { "Content-Type": TIPOS[path.extname(f)] || "application/octet-stream", "Cache-Control": "no-cache" });
       fs.createReadStream(f).pipe(res);
     });
@@ -126,7 +135,7 @@ function novoServidorFalso(opc) {
 
 async function abrir(opc) {
   opc = opc || {};
-  const { srv, base } = await servirFicheiros();
+  const { srv, base } = await servirFicheiros({ pausa: !!opc.pausa });
   const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   const context = await browser.newContext(Object.assign({ locale: "pt-PT", timezoneId: "Atlantic/Cape_Verde",
     serviceWorkers: opc.serviceWorkers || "block" }, opc.contexto || {}));
